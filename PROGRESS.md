@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 3 (Part 3 examiner endpoint, speculative prefetch, fallback)
-- **State:** in progress
-- **Waiting on:** nothing to start. Before the step 3 checkpoint, Hassan needs to do HUMAN_GUIDE Stage 4a (`APP_PASSPHRASE`, `SESSION_SECRET` in Vercel, then `vercel env pull .env.local`) so the examiner endpoint's token check can run locally.
+- **State:** built, awaiting checkpoint
+- **Waiting on:** Hassan: first HUMAN_GUIDE Stage 4a (`APP_PASSPHRASE` and `SESSION_SECRET` in Vercel, then `vercel env pull .env.local`), then the step 3 test. See "Checkpoint for Hassan" below.
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
 
 ## Step status
@@ -16,7 +16,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 | 0 | Hassan's setup: repo, tools (HUMAN_GUIDE stage 0) | done | |
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
-| 3 | Part 3 examiner endpoint, speculative prefetch, fallback | pending | |
+| 3 | Part 3 examiner endpoint, speculative prefetch, fallback | built (awaiting checkpoint) | |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
 | 5 | Grading (streamed, structured) and results screen | pending | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
@@ -40,6 +40,38 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-23 (eighth part): step 3 built.** `npm run typecheck` (browser and `/api` projects), `npm test` (246 tests) and `npm run build` pass. The browser bundle contains neither the Anthropic SDK nor any secret name (checked).
+
+Built:
+- **Server:**
+  - `api/examiner.ts`: token check, input validation, `EXAMINER_MODEL` with `max_tokens` 80 and no thinking, streamed as plain text. The Anthropic client is created at module scope with retries off. A ping (`kind: "ping"`) makes no model call. The browser's abort cancels the model call.
+  - `api/session-start.ts`, minimal: passphrase in, HMAC token out (45 min). Step 4 adds the daily cap and question selection.
+  - `api/_lib/token.ts` (sign and verify tokens; constant-time passphrase compare), `api/_lib/examiner-prompt.ts` (validation plus a small prompt: Part 2 topic, Part 3 questions, Part 3 exchange only), and the prompt itself in `api/prompts/examiner.md`.
+  - Shared types: `src/shared/examiner-api.ts`.
+- **Browser:**
+  - `src/session/part3.ts`: pure rules for reply validation (one question of 25 words or fewer, no praise or feedback, `[END]` only under 45 s), the follow-up allowance per level, Part 3 order per level, the Part 3 clock (end after the first answer past 4:30 with 4+ questions) and speculative reuse (3 words or fewer added).
+  - `src/session/examiner-client.ts`: one request in flight, 40 per session, streamed read that decides `[NEXT]`/`[END]` early, and deadlines. Every failure resolves so the engine can fall back.
+  - `src/session/token-client.ts`: passphrase kept in localStorage; token refreshed after 30 min.
+- **Engine:**
+  - A Part 3 "discussion" phase: scripted link sentence plus listed questions.
+  - A speculative examiner request after 1.0 s of silence, cancelled if Julio keeps talking.
+  - On commit: reuse the speculative reply or re-request, 1.2 s deadline, then the scripted next question.
+  - A model follow-up is spoken with `source: "ai"`; the answer to a follow-up goes straight to the next listed question with no model call.
+  - Repeats use the bank's rephrase. Part 3 answers are 3.5 s endpointed.
+  - Resume continues at the next listed question.
+  - The examiner function is pinged at the start of Part 2 prep.
+  - New metrics: `examiner_reply` latency; counters `spec_fired`, `spec_reused`, `spec_aborted`, `spec_discarded`, `followups`, `examiner_fallback:<reason>`; events `ai-reply` and `ai-fallback`.
+- **Content:** a hand-written Part 3 set for the noisy-place card (2 concrete and 4 abstract questions, each with a rephrase and 2 follow-ups).
+- **Home:** a Spanish passphrase card (shown only when there's no working passphrase), plus token prewarm.
+- **Dev setup:**
+  - `npm run dev` now runs `vercel dev` on http://localhost:3000, through `scripts/dev.mjs` because Vercel refuses a `dev` script that calls `vercel dev` itself; `vercel.json`'s `devCommand` starts Vite.
+  - `npm run dev:vite` is the old UI-only server.
+  - `.vercelignore` keeps `/api` test files from deploying as functions.
+
+Checked locally with `vercel dev`: the pages load, and both functions compile and answer `{"error":"not-configured"}` because `SESSION_SECRET`/`APP_PASSPHRASE` aren't set yet. Test files aren't routed.
+
+Untested: a real model call. It needs Stage 4a, and it's Hassan's checkpoint.
 
 **2026-09-23 (seventh part): step 2 done.** Hassan's final retest (Edge 153, Yeti mic, headphones, Sonia Natural) passed everything:
 - pacing without Space;
@@ -189,7 +221,36 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Step 2 is done. The step 3 checkpoint will be written when step 3 is built (HUMAN_GUIDE.md Stage 3c).
+Matching guide sections: **HUMAN_GUIDE.md Stage 4a first (about 5 minutes), then Stage 3c.** Budget about 25 minutes. Estimated API cost: about 1 US cent per full test (Haiku 4.5, around 10 to 15 small requests).
+
+**Before testing (Stage 4a):**
+1. Pick the passphrase for Julio (no ñ or accents), for example `enfermero2027`.
+2. Generate a secret: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+3. In Vercel, Project > Settings > Environment Variables, add `APP_PASSPHRASE`, `SESSION_SECRET` and `DAILY_SESSION_CAP` = `12` for all environments.
+4. In the repo folder: `vercel env pull .env.local`.
+5. **Don't push.** GitHub is connected to Vercel.
+
+**Start:** stop any old dev server, then run `npm run dev` and open **http://localhost:3000** (the port changed from 5173) in **Edge with headphones**. Home asks for the "Clave de acceso": type the passphrase once. Press Shift+D and click "Reset numbers". Then click "Empezar examen". To get to Part 3 fast, answer briefly or press Space in Parts 1 and 2.
+
+**What to check in Part 3:**
+1. After the Part 2 round-off question: "We've been talking about a noisy place you have been to…" and the first Part 3 question.
+2. The questions stay on the theme (noise and cities) and get broader.
+3. Sometimes the examiner asks a follow-up about **what you said** ("You mentioned X. Why…?"). It never praises or corrects you.
+4. The gap after your answers feels about as quick as Part 1 (Part 3 waits 3.5 s of silence, a little longer than Part 1).
+5. Say "I think it's important because…" and pause about 4 seconds. It should **not** move on (Part 3 waits 5 s after "because").
+6. "Sorry?" gets a **reworded** version of the question.
+7. Turn Wi-Fi off in the middle of Part 3. The exam keeps going with the next prepared question, without freezing. Turn Wi-Fi back on.
+8. Part 3 ends after about 4½ to 5 minutes with "That is the end of the speaking test." The transcript screen shows the Part 3 answers, follow-ups included.
+
+**Good looks like:**
+- In Shift+D, "Commit → examiner audio (Part 3 AI)" is mostly under about 1 s (p50 ≤ 700 ms, p95 ≤ 1,200 ms).
+- `spec_reused` is well above `spec_discarded`.
+- `examiner_fallback:*` appears only during the Wi-Fi test.
+
+**Report back:**
+- pass/fail for items 1 to 8
+- whether the follow-ups felt natural (paste one or two)
+- "Copy report" from Shift+D; its event list shows every AI reply and fallback.
 
 ## Decisions
 
@@ -239,6 +300,14 @@ New decisions during the build go below with a date.
   - Stall detection only runs while Julio has the floor.
   - Barge-in needs 2 recognized words that aren't in the examiner's own line (the spec says "at least 2 recognized words"; the examiner's words leaking into the mic don't count).
 
+- 2026-09-23 (step 3, within the spec):
+  - The model is called only when a follow-up is still allowed: not after a follow-up answer (at most one per listed question) and not past the level's allowance. Otherwise the scripted next question is instant.
+  - When the model is slow, fails or returns something invalid, the fallback is always the next listed question. The bank's pre-written follow-ups are used for the fixed set only as data, for now.
+  - Speculative requests count toward the 40-per-session cap, so a very halting Part 3 could reach it. After that, Part 3 is scripted.
+  - When the model reply decides what comes next (follow-up, `[NEXT]` or `[END]`), the latency counts as "Part 3 AI", fallbacks included.
+  - A minimal passphrase card on Home (Spanish), shown only until a passphrase works. It does not block practice: without a token, Part 3 is scripted. The real gate comes in step 6.
+  - `npm run dev` goes through `scripts/dev.mjs` (Vercel refuses a `dev` script that calls `vercel dev`) and serves on port 3000.
+
 ## Open questions
 
 - "Commit → examiner audio (scripted)" p95 was 822 ms in the first step 2 run, then 449 ms in the final retest. It's driven by how fast Edge's online voice starts. Keep watching; if it goes over again, Hassan decides between accepting it and using a local voice when the online one is slow.
@@ -250,6 +319,8 @@ New decisions during the build go below with a date.
 - Stall restarts: the retest passed, but its counts weren't captured. Recheck the stall counter at the step 2 checkpoint.
 
 ## Known issues
+
+- SPA routes (`/lab`, `/examen`, `/transcripcion`) need a rewrite to `index.html` on the deployed site. `vercel dev` serves them through Vite, so this only matters at deploy (step 6).
 
 - Edge reports a recognition confidence of 1 for every result, so confidence isn't a useful signal on Edge (SPEC 11's "low-confidence words" input for grading will be empty there). Grading must lean on words that make no sense in context. Check Chrome's numbers at the retest.
 - Edge sometimes finalizes text late: the "voice end → final text" p95 was 8.5 s (only 5 samples). For step 2, endpointing must commit on silence using interim text and never wait for a final result. Late finals still land in the right turn.
