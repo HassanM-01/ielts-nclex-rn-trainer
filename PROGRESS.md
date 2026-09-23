@@ -5,15 +5,15 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 1 (speech layer and `/lab` page)
-- **State:** built, awaiting checkpoint
-- **Waiting on:** Hassan's lab test on Edge (headphones and speakers) and Chrome. See "Checkpoint for Hassan" below.
+- **State:** checkpoint run once (everything passed except mic selection); mic fix built, awaiting a short retest
+- **Waiting on:** Hassan's retest of the mic fix and stall count. See "Checkpoint for Hassan" below.
 
 ## Step status
 
 | Step | What | Status | Checkpoint result |
 |---|---|---|---|
 | 0 | Hassan's setup: repo, tools (HUMAN_GUIDE stage 0) | done | |
-| 1 | Speech layer and `/lab` page | built (awaiting checkpoint) | |
+| 1 | Speech layer and `/lab` page | built (awaiting retest) | 2026-09-23: all tests passed on Edge and Chrome. Problem: changing the mic needed Edge site permissions plus a page reload. Fix built, retest pending. |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | pending | |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | pending | |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
@@ -40,7 +40,37 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 
 ## Last session
 
-**2026-09-23: step 1 built.** `npm run typecheck`, `npm test` (74 tests) and `npm run build` all pass.
+**2026-09-23 (second part): checkpoint 1 result and mic fix.**
+
+Hassan's result: everything worked as expected on Edge and Chrome. One problem: he had to change the mic in Edge's site permissions and reload the page before it took effect. Numbers (Edge 153, Natural voice "Eric", headphones):
+
+| Metric (ms) | n | p50 | p95 | Budget |
+|---|---|---|---|---|
+| Click → examiner speaking | 2 | 144 | 699 | 500 / 1,000, ok |
+| Commit → examiner audio (scripted) | 7 | 190 | 342 | 400 / 800, ok |
+| speak() → voice start | 35 | 196 | 708 | |
+| Gap between examiner sentences | 20 | 196 | 305 | |
+| Recognizer restart gap | 21 | 423 | 586 | |
+| Voice onset → first interim | 36 | 828 | 1,654 | |
+| Voice end → final text | 5 | 997 | 8,545 | |
+
+Counters:
+- restarts: 5 ended, 2 monologue-pause, 1 preempt-examiner, **12 stall**
+- 5 `network` errors and **1 automatic switch to push-to-talk**
+- `on_device_model`: downloadable
+- `avg_confidence`: 1, with 0 zero-confidence results
+
+Hassan didn't notice when the stalls and the push-to-talk switch happened.
+
+Fix built:
+- The mic check shows "Micrófono en uso: …", with Spanish instructions for choosing another mic (the site icon, then Micrófono, then reload the page).
+- The lab status bar shows the mic too, and "Copy report" includes `mic`.
+- The page can't pick the recognizer's mic, and Edge only applies a new site mic after a reload, so those instructions are the fix for that case.
+- When a mic is plugged in or unplugged mid-session (for example headphones), the controller reopens the mic-level stream. If the physical device changed, it also restarts the recognizer (restart reason `mic-change`). No reload needed.
+- "Copy report" now ends with the notable events and their timestamps (stalls, recognizer errors and failures, mic changes, voice fallbacks), so we can see when stalls happen.
+- Typecheck, 77 tests and build pass. Commit 9717fd0.
+
+**2026-09-23 (first part): step 1 built.** `npm run typecheck`, `npm test` (74 tests) and `npm run build` all pass.
 
 Built:
 - Scaffold: Vite 8 + React 19 + Tailwind 4 + TypeScript 7 (strict) + Vitest 5. A small hand-written router (no router library). `npm run dev` is plain Vite for now.
@@ -63,37 +93,29 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Matching guide section: **HUMAN_GUIDE.md, Stage 1: Test the speech lab.** Budget about 30 minutes.
+**Retest of the mic fix** (about 10 minutes). The first checkpoint passed; this only covers what changed. Matching guide section: HUMAN_GUIDE.md Stage 1.
 
-**Start it:** in the repo folder run `npm run dev`, then open **http://localhost:5173/lab** in **Edge** (later repeat in Chrome). Click "Start mic" and allow the microphone. Press **Shift+D** at any time for the numbers overlay.
+Run `npm run dev` and open **http://localhost:5173/lab** in **Edge**.
 
-**Edge, headphones on:**
-1. **Mic check** (top left, in Spanish): read the notice, then "Grabar 3 segundos", say a sentence, and listen to the playback. The transcript should match what you said. Answer "Sí, uso audífonos", and the examiner speaks one line.
-2. **Examiner voice:** the voice list should show `[Natural]` voices. Pick a British, an American and an Australian one and press "Test voice" for each. Note how natural each sounds and its "voice start delay" (shown next to the button).
-3. **Conversation test:** "Start conversation" and answer the 6 questions normally. Each answer should commit about 2.5 s after you stop (or press Space), and the next question should start quickly. Then press "Examiner reads a long line" and talk over it: the examiner should stop within a second, and your words should show as your turn.
-4. **2-minute monologue:** "Start monologue", then read a news article aloud for the full 2:00. Afterwards, "Copy transcript" and compare it with the article. Orange ⟲ marks show where the recognizer restarted; check for missing words around them (usually 45 to 60 s in).
-5. **Forced restart:** while talking (the conversation test works for this), press "Force recognizer restart" in Settings mid-sentence and keep talking. Note any lost words.
+1. **Reset the numbers** first (the "Reset numbers" button in the Numbers card).
+2. **Mic name:** click "Start mic". The status bar shows `mic: <name>`, and the mic check (after "Grabar 3 segundos") shows "Micrófono en uso: <name>". Is it the right mic?
+3. **Plug-in switch:** start with headphones unplugged and "Start mic". Plug the headset in, wait about 2 seconds, and say a sentence.
+   - The mic name should change to the headset's.
+   - The Event log should show `mic-change`, and your sentence should be transcribed from the headset mic.
+   - Then unplug it and say another sentence: it should switch back without a reload.
+   - Bluetooth headsets work too.
+4. **Stalls:** with the right mic selected, run the conversation test once and the 2-minute monologue once, then "Copy report".
+   - With the right mic, `restart:stall` should be 0 or close to it.
+   - There should be no `rec_failure:network`.
 
-**Edge, laptop speakers (headphones unplugged):**
-6. Untick "Headphones" in Settings. Run the conversation test again. In "Live transcript", the examiner's own words may appear in grey as "heard during examiner audio (ignored)". That is correct. They must **not** appear in your "You:" lines.
-7. Talk over "Examiner reads a long line". It should **not** stop.
-8. **Volume test:** "Run volume test" and listen. At 4 s the mic stream opens, and at 10 s recognition starts. Does the voice get quieter at either point? If it does, untick "VAD stream echoCancellation" and run it again. If it still drops, set Windows Sound > Communications to "Do nothing" and run it once more. Report which step fixed it.
+**Good looks like:** the right mic name shows, plugging and unplugging switches mics without a reload, and there are few or no stalls on the right mic.
 
-**Chrome, headphones on:** repeat steps 1 to 5. The voices will be Google or Microsoft ones, not Natural; that's expected.
+**Report back:**
+- whether the mic name was right
+- whether the plug and unplug switch worked
+- the full "Copy report" text; it now ends with "Notable events" and their times.
 
-**Good looks like:**
-- Transcripts match your speech.
-- No lost words at the ⟲ marks.
-- On speakers, the examiner never leaks into your "You:" lines.
-- Barge-in works with headphones and is off without them.
-- In the "Numbers" table, "Commit → examiner audio (scripted)" is p50 ≤ 400 ms and p95 ≤ 800 ms (green), and "Click → examiner speaking" is ≤ 1,000 ms.
-
-**Report back:** use the KICKOFF.md template 3:
-- pass/fail per test and browser
-- any lost words and roughly when
-- how the voices felt (natural or robotic, speed)
-- the volume test result
-- and paste **"Copy report"** from the Numbers card once per browser. It includes the recognition engine, whether an on-device model is present, average confidence, restart counts and every latency figure.
+If the stalls are near 0, step 1 is done. If there are still many stalls on the right mic, the stall detector is misfiring, and I'll tune it before step 2.
 
 ## Decisions
 
@@ -124,9 +146,14 @@ New decisions during the build go below with a date.
 
 ## Open questions
 
-- Do Edge's Natural (online) voices start fast enough for the 800 ms p95 "commit → examiner audio" budget? The lab measures it (the "speak() → voice start" row). If they don't, we'll need to choose between voice quality and speed.
+- Resolved 2026-09-23: Edge's Natural voices do fit the budget on Hassan's connection. Commit → examiner audio was 190 / 342 ms (p50 / p95); speak() → start was 196 / 708 ms.
+- Were the 12 stall restarts and the one network failover caused by the mic mix-up, or is the stall detector misfiring on Edge? The retest will tell.
 
 ## Known issues
+
+- Edge reports a recognition confidence of 1 for every result, so confidence isn't a useful signal on Edge (SPEC 11's "low-confidence words" input for grading will be empty there). Grading must lean on words that make no sense in context. Check Chrome's numbers at the retest.
+- Edge sometimes finalizes text late: the "voice end → final text" p95 was 8.5 s (only 5 samples). For step 2, endpointing must commit on silence using interim text and never wait for a final result. Late finals still land in the right turn.
+- The page can't choose the mic the recognizer uses; the browser's own setting decides. The app shows the mic in use and explains how to change it.
 
 - The lab page (and the overlay) only repaints while the tab is visible: rendering is tied to animation frames (SPEC 13). The speech layer itself keeps running in the background.
 - Intermediate commit 437da71 doesn't build on its own (it imports files from the next commit). The branch head builds fine.
