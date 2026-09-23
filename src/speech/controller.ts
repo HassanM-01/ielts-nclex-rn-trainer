@@ -61,6 +61,8 @@ export class SpeechController {
   vadOptions: VadOptions = { echoCancellation: true, noiseSuppression: true };
   prefs: SpeechPrefs;
   examinerSpeaking = false;
+  /** The examiner's audio has actually started (examinerSpeaking covers the wait before it). */
+  examinerAudible = false;
   examinerInterruptible = true;
   monologue = false;
   failure: RecognizerFailure | null = null;
@@ -125,6 +127,7 @@ export class SpeechController {
           this.metrics.record(meta.source === "ai" ? "commit_to_audio_ai" : "commit_to_audio_scripted", at - meta.commitAt);
         }
         if (meta?.clickAt !== undefined) this.metrics.record("click_to_speaking", at - meta.clickAt);
+        this.examinerAudible = true;
         this.metrics.log("tts-line-start", `line ${lineId} +${Math.round(at - requestedAt)} ms`);
       },
       onSentenceStart: (_lineId, _index, speakToStart, gap) => {
@@ -133,6 +136,7 @@ export class SpeechController {
       },
       onLineEnd: (lineId, r) => {
         this.lineMeta.delete(lineId);
+        this.examinerAudible = false;
         this.metrics.log("tts-line-end", `line ${lineId}${r.cancelled ? " (cancelled)" : ""}`);
       },
       onFallback: (from, to) => {
@@ -225,6 +229,13 @@ export class SpeechController {
     this.changed();
   }
 
+  /** Use a voice for this session only (resuming an exam), without pinning it. */
+  useSessionVoice(voiceURI: string | null): void {
+    const voice = voiceURI ? this.synth.voices.find((v) => v.voiceURI === voiceURI) : undefined;
+    if (voice) this.applyVoice(voice);
+    this.changed();
+  }
+
   setRate(rate: number): void {
     this.synth.rate = rate;
     this.changed();
@@ -240,6 +251,12 @@ export class SpeechController {
   markMicNoticeSeen(): void {
     this.prefs.micNoticeSeen = true;
     savePrefs(this.prefs);
+  }
+
+  markMicCheckDone(): void {
+    this.prefs.micCheckDone = true;
+    savePrefs(this.prefs);
+    this.changed();
   }
 
   setMonologue(on: boolean): void {
@@ -400,6 +417,13 @@ export class SpeechController {
       if (turn?.kind === "candidate") interim = trimEcho(turn.line, interim);
     }
     return [final, interim].filter(Boolean).join(" ");
+  }
+
+  /** VAD heard voice within the last `ms` (text may not have arrived yet). */
+  voicedRecently(now: number, ms = 1_000): boolean {
+    const d = this.vad?.detector;
+    if (!d) return false;
+    return d.voiced || now - d.lastVoicedAt < ms;
   }
 
   /**
@@ -590,6 +614,9 @@ export class SpeechController {
       unsubMetrics();
     };
   }
+
+  /** subscribe() bound to this instance, stable for React effect deps. */
+  readonly subscribeBound = (fn: () => void) => this.subscribe(fn);
 
   getVersion(): number {
     return this.version;

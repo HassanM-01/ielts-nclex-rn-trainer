@@ -13,6 +13,8 @@ export interface SpeechPrefs {
   headphones: boolean;
   /** The one-time notice about where audio goes has been shown. */
   micNoticeSeen: boolean;
+  /** The mic check has been completed once (Home then shows it on demand). */
+  micCheckDone: boolean;
 }
 
 const KEY = "speech.prefs.v1";
@@ -23,6 +25,7 @@ export const DEFAULT_PREFS: SpeechPrefs = {
   pinnedVoiceURI: null,
   headphones: false,
   micNoticeSeen: false,
+  micCheckDone: false,
 };
 
 function asAccent(x: unknown): Accent | null {
@@ -40,6 +43,7 @@ export function loadPrefs(): SpeechPrefs {
       pinnedVoiceURI: typeof p.pinnedVoiceURI === "string" ? p.pinnedVoiceURI : null,
       headphones: p.headphones === true,
       micNoticeSeen: p.micNoticeSeen === true,
+      micCheckDone: p.micCheckDone === true,
     };
   } catch {
     return { ...DEFAULT_PREFS };
