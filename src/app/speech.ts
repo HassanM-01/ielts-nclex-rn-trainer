@@ -1,5 +1,5 @@
-// One SpeechController per page load, shared by the lab, the mic check and
-// the debug overlay.
+// One SpeechController per page load, shared by the lab, the mic check, the
+// exam screen and the debug overlay.
 
 import { useEffect, useReducer } from "react";
 import { SpeechController } from "../speech/controller";
@@ -15,13 +15,16 @@ export function getSpeech(): SpeechController {
   return instance;
 }
 
-/** Re-render on controller changes, at most once per animation frame. */
-export function useSpeech(): SpeechController {
-  const speech = getSpeech();
+/**
+ * Re-render on changes, at most once per animation frame (SPEC 13: render
+ * the interim transcript at most once per frame).
+ */
+export function useFrameSubscription(subscribe: ((fn: () => void) => () => void) | null): void {
   const [, force] = useReducer((x: number) => x + 1, 0);
   useEffect(() => {
+    if (!subscribe) return;
     let raf = 0;
-    const unsub = speech.subscribe(() => {
+    const unsub = subscribe(() => {
       if (!raf)
         raf = requestAnimationFrame(() => {
           raf = 0;
@@ -32,6 +35,11 @@ export function useSpeech(): SpeechController {
       unsub();
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [speech]);
+  }, [subscribe]);
+}
+
+export function useSpeech(): SpeechController {
+  const speech = getSpeech();
+  useFrameSubscription(speech.subscribeBound);
   return speech;
 }

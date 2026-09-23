@@ -80,6 +80,7 @@ export function MicCheck({ speech }: { speech: SpeechController }) {
     speech.setHeadphones(on);
     setStep("examiner");
     await speech.say(EXAMINER_LINE, { then: "discard" });
+    speech.markMicCheckDone();
     setStep("done");
   };
 
