@@ -11,7 +11,7 @@
 import { Metrics } from "../metrics/latency";
 import { browserVersion, currentBrowser } from "./browser";
 import { nonEchoWordCount, shouldBargeIn, trimEcho } from "./echo-guard";
-import { isStall, shouldPreemptOnExaminerStart, shouldRestartInMonologue } from "./policy";
+import { effectiveSilenceMs, isStall, shouldPreemptOnExaminerStart, shouldRestartInMonologue } from "./policy";
 import { loadPrefs, savePrefs, type SpeechPrefs } from "./prefs";
 import { Recognizer, type RecognizerFailure, type RestartReason } from "./recognizer";
 import { Synthesizer, type LineResult } from "./synthesizer";
@@ -80,6 +80,7 @@ export class SpeechController {
   private tickListeners = new Set<(now: number) => void>();
   private ticker: ReturnType<typeof setInterval> | null = null;
   private lastStallAt = -Infinity;
+  private stallStreak = 0;
   private awaitingFirstText: number | null = null;
   private awaitingFinal: number | null = null;
   private lineMeta = new Map<number, SayOptions>();
@@ -432,9 +433,7 @@ export class SpeechController {
    */
   silenceMs(now: number): number {
     const sinceResult = Number.isFinite(this.recognizer.lastResultAt) ? now - this.recognizer.lastResultAt : Infinity;
-    const vadSilence = this.vad ? this.vad.detector.silenceMs(now) : Infinity;
-    const s = Math.min(sinceResult, vadSilence);
-    return Number.isFinite(s) ? s : 0;
+    return effectiveSilenceMs(this.vad ? this.vad.detector.silenceMs(now) : null, sinceResult);
   }
 
   // ---- examiner ------------------------------------------------------------
@@ -606,8 +605,10 @@ export class SpeechController {
     if (rec.isCapturing && vad && listening) {
       const d = vad.detector;
       const lastResult = Math.max(rec.lastResultAt, rec.sessionStartedAt, this.currentTurn.startedAt);
-      if (isStall({ now, voiced: d.voiced, voiceStartedAt: d.voiceStartedAt, lastResultAt: lastResult, lastStallAt: this.lastStallAt })) {
+      if (rec.lastResultAt > this.lastStallAt) this.stallStreak = 0; // text came back
+      if (isStall({ now, voiced: d.voiced, voiceStartedAt: d.voiceStartedAt, lastResultAt: lastResult, lastStallAt: this.lastStallAt, streak: this.stallStreak })) {
         this.lastStallAt = now;
+        this.stallStreak++;
         this.metrics.count("stalls");
         this.metrics.log("stall", `voice for 3 s with no text in turn #${this.currentTurn.id}; restarting`);
         rec.restart("stall");

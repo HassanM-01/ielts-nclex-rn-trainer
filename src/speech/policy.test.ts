@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  effectiveSilenceMs,
   isStall,
+  stallCooldownMs,
   NetworkErrorWindow,
   restartDelayMs,
   shouldPreemptOnExaminerStart,
@@ -42,6 +44,33 @@ describe("stall detection", () => {
   it("cools down after a stall restart", () => {
     expect(isStall({ ...base, lastStallAt: 6_000 })).toBe(false);
     expect(isStall({ ...base, lastStallAt: 4_000 })).toBe(true);
+  });
+});
+
+describe("stall back-off", () => {
+  it("doubles the cooldown for stalls in a row, up to 30 s", () => {
+    expect([1, 2, 3, 4, 5].map(stallCooldownMs)).toEqual([5_000, 10_000, 20_000, 30_000, 30_000]);
+  });
+  it("applies the streak's cooldown", () => {
+    const base = { now: 20_000, voiced: true, voiceStartedAt: 0, lastResultAt: 0, lastStallAt: 12_000 };
+    expect(isStall({ ...base, streak: 1 })).toBe(true); // 8 s since the last stall > 5 s
+    expect(isStall({ ...base, streak: 2 })).toBe(false); // needs 10 s
+  });
+});
+
+describe("effectiveSilenceMs", () => {
+  it("uses the shorter of VAD silence and time since the last words", () => {
+    expect(effectiveSilenceMs(3_000, 1_000)).toBe(1_000);
+    expect(effectiveSilenceMs(500, 3_000)).toBe(500);
+  });
+  it("trusts the recognizer after 5 s without words, even if the VAD hears 'voice'", () => {
+    expect(effectiveSilenceMs(0, 4_999)).toBe(0);
+    expect(effectiveSilenceMs(0, 5_000)).toBe(5_000);
+  });
+  it("handles no VAD and no words yet", () => {
+    expect(effectiveSilenceMs(null, 2_000)).toBe(2_000);
+    expect(effectiveSilenceMs(1_500, Infinity)).toBe(1_500);
+    expect(effectiveSilenceMs(null, Infinity)).toBe(0);
   });
 });
 

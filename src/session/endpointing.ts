@@ -95,7 +95,9 @@ export function decideAnswer(turn: AnswerTurn, t: AnswerTick): AnswerAction {
     return { type: "wait" };
   }
 
-  if (t.voicedRecently) return { type: "wait" };
+  // The VAD can postpone the no-speech repeat (words may be on their way),
+  // but only by one more no-speech period: room noise must not stall the exam.
+  if (t.voicedRecently && t.now - turn.listenStartedAt < 2 * t.defaults.noSpeechMs) return { type: "wait" };
   if (t.now - turn.listenStartedAt >= t.defaults.noSpeechMs) {
     return turn.repeated ? { type: "move-on" } : { type: "no-speech-repeat" };
   }
@@ -140,7 +142,7 @@ export function decideMonologue(m: MonologueTurn, t: MonologueTick): MonologueAc
   const silence = Math.min(t.silenceMs, t.now - m.listenStartedAt);
 
   if (!hasSpeech) {
-    if (t.voicedRecently) return { type: "wait" };
+    if (t.voicedRecently && t.now - m.listenStartedAt < 2 * t.noSpeechMs) return { type: "wait" };
     if (t.now - m.listenStartedAt >= t.noSpeechMs) return m.startRepeated ? { type: "move-on" } : { type: "repeat-start" };
     return { type: "wait" };
   }

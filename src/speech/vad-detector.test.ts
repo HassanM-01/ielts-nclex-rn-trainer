@@ -60,17 +60,55 @@ describe("VoiceDetector", () => {
     expect(d.silenceMs(t)).toBeCloseTo(t - lastVoiced, -1);
   });
 
-  it("slowly absorbs a steady loud noise instead of calling it voice forever", () => {
+  it("absorbs a steady noise that starts later within a few seconds", () => {
     const d = new VoiceDetector();
     const { t } = feed(d, -65, 0, 1_000);
-    const fan = feed(d, -40, t, 120_000);
-    expect(fan.events[0]?.type).toBe("voice-start");
+    const fan = feed(d, -40, t, 10_000);
+    expect(fan.events.map((e) => e.type)).toEqual(["voice-start", "voice-end"]);
+    const end = fan.events[1]!;
+    expect(end.at - t).toBeLessThan(5_000);
     expect(d.voiced).toBe(false);
+  });
+
+  it("does not call room noise voice when the mic opens into it", () => {
+    const d = new VoiceDetector();
+    const { events } = feed(d, -45, 0, 10_000);
+    expect(events).toEqual([]);
+    expect(d.floorDb).toBeCloseTo(-45, 0);
+  });
+
+  it("only calibrates for the first third of a second", () => {
+    const d = new VoiceDetector();
+    expect(feed(d, -20, 0, 250).events).toEqual([]);
+    expect(d.calibrating).toBe(true);
+  });
+
+  it("keeps hearing continuous speech over a noisy room", () => {
+    const d = new VoiceDetector();
+    let { t } = feed(d, -48, 0, 2_000);
+    // 6 s of speech: syllables at -22 dB with short dips to -40 dB.
+    const events: VadEvent[] = [];
+    let voicedFrames = 0;
+    let frames = 0;
+    for (const end = t + 6_000; t < end; t += 33) {
+      const inDip = Math.floor(t / 33) % 6 === 0;
+      const r = d.feed(inDip ? -40 : -22, t);
+      events.push(...r.events);
+      frames++;
+      if (r.frame.voiced) voicedFrames++;
+    }
+    expect(events[0]?.type).toBe("voice-start");
+    expect(voicedFrames / frames).toBeGreaterThan(0.9);
+    const after = feed(d, -48, t, 1_000);
+    expect(after.events.map((e) => e.type)).toContain("voice-end");
   });
 
   it("keeps the voice threshold within bounds", () => {
     const d = new VoiceDetector();
     feed(d, -100, 0, 2_000);
     expect(d.onThresholdDb).toBeGreaterThanOrEqual(-62);
+    const loud = new VoiceDetector();
+    feed(loud, -25, 0, 5_000);
+    expect(loud.onThresholdDb).toBeLessThanOrEqual(-20);
   });
 });

@@ -10,8 +10,14 @@ export const MONOLOGUE_RESTART_AGE_MS = 45_000;
 export const MONOLOGUE_RESTART_PAUSE_MS = 700;
 /** VAD hears voice this long with no recognition result: stall. */
 export const STALL_MS = 3_000;
-/** After a stall restart, don't flag another stall for this long. */
+/** After a stall restart, don't flag another stall for this long (doubles per stall in a row). */
 export const STALL_COOLDOWN_MS = 5_000;
+export const STALL_COOLDOWN_MAX_MS = 30_000;
+/**
+ * No new recognized words for this long means Julio has stopped, even if the
+ * VAD still hears "voice" (room noise it hasn't learned yet).
+ */
+export const RESULT_SILENCE_OVERRIDE_MS = 5_000;
 /** Three network errors inside this window: give up on continuous recognition. */
 export const NETWORK_ERROR_WINDOW_MS = 60_000;
 export const NETWORK_ERROR_LIMIT = 3;
@@ -40,11 +46,21 @@ export interface StallInput {
   lastResultAt: number;
   /** Last stall restart, to avoid restart loops. */
   lastStallAt: number;
+  /** Stall restarts in a row with no text in between. */
+  streak?: number;
+}
+
+/**
+ * Cooldown after a stall restart: 5 s, doubling for each stall in a row with
+ * no text in between (so a restart that didn't help can't spin), capped at 30 s.
+ */
+export function stallCooldownMs(streak: number): number {
+  return Math.min(STALL_COOLDOWN_MAX_MS, STALL_COOLDOWN_MS * 2 ** Math.max(0, streak - 1));
 }
 
 export function isStall(i: StallInput): boolean {
   if (!i.voiced) return false;
-  if (i.now - i.lastStallAt < STALL_COOLDOWN_MS) return false;
+  if (i.now - i.lastStallAt < stallCooldownMs(i.streak ?? 1)) return false;
   const since = Math.max(i.voiceStartedAt, i.lastResultAt);
   return i.now - since >= STALL_MS;
 }
@@ -77,6 +93,18 @@ export class NetworkErrorWindow {
 export function restartDelayMs(consecutiveShortSessions: number): number {
   if (consecutiveShortSessions <= 1) return 0;
   return Math.min(2_000, 250 * (consecutiveShortSessions - 1));
+}
+
+/**
+ * Silence used for endpointing. Normally the shorter of the VAD silence and
+ * the time since the last recognized words, so a quiet voice the VAD misses
+ * can't end a turn early. But once no words have arrived for 5 s, trust the
+ * recognizer: the VAD can't hold a turn open forever on room noise.
+ */
+export function effectiveSilenceMs(vadSilenceMs: number | null, sinceResultMs: number): number {
+  if (!Number.isFinite(sinceResultMs)) return vadSilenceMs ?? 0;
+  if (sinceResultMs >= RESULT_SILENCE_OVERRIDE_MS) return sinceResultMs;
+  return Math.min(vadSilenceMs ?? Infinity, sinceResultMs);
 }
 
 /** Watchdog: treat an utterance as finished after (words x 0.5 s + 2 s). */

@@ -113,8 +113,11 @@ describe("decideAnswer", () => {
     expect(decideAnswer({ ...turn, speechStartedAt: null, repeated: true }, { ...silent, now: 18_000 }).type).toBe("move-on");
   });
 
-  it("waits while the VAD hears voice that has no text yet", () => {
-    expect(decideAnswer({ ...turn, speechStartedAt: null }, tick({ text: "", now: 30_000, voicedRecently: true })).type).toBe("wait");
+  it("waits while the VAD hears voice that has no text yet, but not forever", () => {
+    const quiet = { ...turn, speechStartedAt: null };
+    expect(decideAnswer(quiet, tick({ text: "", now: 20_000, voicedRecently: true })).type).toBe("wait");
+    // Room noise the VAD calls voice can't hold the exam past 16 s.
+    expect(decideAnswer(quiet, tick({ text: "", now: 26_000, voicedRecently: true })).type).toBe("no-speech-repeat");
   });
 });
 

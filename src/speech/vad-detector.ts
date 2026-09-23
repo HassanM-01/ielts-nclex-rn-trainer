@@ -1,5 +1,12 @@
 // Voice activity decision from RMS levels (SPEC 6, "Voice activity"). Pure:
 // vad.ts feeds it dBFS samples at ~30 Hz; tests feed it synthetic ones.
+//
+// Noise floor: the 10th percentile of the last 4 s of levels. Speech dips
+// between words and syllables, so the low percentile stays near the room's
+// noise even while someone talks; steady noise (a fan, a hum, a sensitive
+// mic's hiss) becomes the floor within a few seconds instead of reading as
+// endless "voice". The first third of a second after the mic opens only
+// calibrates.
 
 export interface VadFrame {
   t: number;
@@ -20,29 +27,34 @@ export interface VadEvent {
 export const VAD_ON_ABOVE_FLOOR_DB = 12;
 export const VAD_OFF_ABOVE_FLOOR_DB = 7;
 export const VAD_MIN_THRESHOLD_DB = -62;
-export const VAD_MAX_THRESHOLD_DB = -30;
+export const VAD_MAX_THRESHOLD_DB = -20;
 /** Voice must stay above threshold this long to count (drops clicks). */
 export const VAD_ATTACK_MS = 90;
 /** Voice ends after this long below the off threshold. */
 export const VAD_HANGOVER_MS = 250;
-
-const FLOOR_START_DB = -70;
-const FLOOR_RISE_DB_PER_S_SILENT = 3;
-const FLOOR_RISE_DB_PER_S_VOICED = 1;
-const FLOOR_FALL_ALPHA = 0.2;
+/** Levels kept for the floor estimate (~4 s at 30 Hz). */
+export const VAD_FLOOR_WINDOW = 120;
+/** Samples used only to calibrate after the mic opens (~330 ms). */
+export const VAD_CALIBRATION_SAMPLES = 10;
+const FLOOR_PERCENTILE = 0.1;
+const FLOOR_MIN_DB = -100;
 
 export function rmsToDb(rms: number): number {
   return rms > 0 ? 20 * Math.log10(rms) : -120;
 }
 
 export class VoiceDetector {
-  floorDb = FLOOR_START_DB;
+  floorDb = -70;
   voiced = false;
   /** Start of the current voiced stretch (valid while voiced). */
   voiceStartedAt = 0;
   lastVoicedAt = -Infinity;
   private aboveSince: number | null = null;
-  private lastT: number | null = null;
+  private history: number[] = [];
+
+  get calibrating(): boolean {
+    return this.history.length < VAD_CALIBRATION_SAMPLES;
+  }
 
   get onThresholdDb(): number {
     return clamp(this.floorDb + VAD_ON_ABOVE_FLOOR_DB, VAD_MIN_THRESHOLD_DB, VAD_MAX_THRESHOLD_DB);
@@ -59,17 +71,13 @@ export class VoiceDetector {
   }
 
   feed(db: number, t: number): { frame: VadFrame; events: VadEvent[] } {
-    const dt = this.lastT === null ? 0 : Math.max(0, (t - this.lastT) / 1000);
-    this.lastT = t;
     const events: VadEvent[] = [];
+    this.history.push(db);
+    if (this.history.length > VAD_FLOOR_WINDOW) this.history.shift();
+    this.floorDb = Math.max(FLOOR_MIN_DB, lowPercentile(this.history, FLOOR_PERCENTILE));
 
-    // Noise floor: falls fast, rises slowly (very slowly during voice, so a
-    // steady fan is eventually absorbed but speech is not).
-    if (db < this.floorDb) {
-      this.floorDb += (db - this.floorDb) * FLOOR_FALL_ALPHA;
-    } else {
-      const rate = this.voiced ? FLOOR_RISE_DB_PER_S_VOICED : FLOOR_RISE_DB_PER_S_SILENT;
-      this.floorDb = Math.min(db, this.floorDb + rate * dt);
+    if (this.calibrating) {
+      return { frame: this.frame(t, db), events };
     }
 
     if (!this.voiced) {
@@ -93,11 +101,17 @@ export class VoiceDetector {
       events.push({ type: "voice-end", at: this.lastVoicedAt, pauseMs: 0 });
     }
 
-    return {
-      frame: { t, db, floorDb: this.floorDb, thresholdDb: this.onThresholdDb, voiced: this.voiced },
-      events,
-    };
+    return { frame: this.frame(t, db), events };
   }
+
+  private frame(t: number, db: number): VadFrame {
+    return { t, db, floorDb: this.floorDb, thresholdDb: this.onThresholdDb, voiced: this.voiced };
+  }
+}
+
+function lowPercentile(values: readonly number[], p: number): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))] ?? -70;
 }
 
 function clamp(x: number, lo: number, hi: number): number {
