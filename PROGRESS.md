@@ -5,8 +5,9 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 3 (Part 3 examiner endpoint, speculative prefetch, fallback)
-- **State:** planned, not started
-- **Waiting on:** Hassan's go-ahead on the step 3 plan, his answers to its questions, and HUMAN_GUIDE Stage 3a/3b (Anthropic key, Vercel link, `vercel env pull`) before the endpoint can run locally.
+- **State:** in progress
+- **Waiting on:** nothing to start. Before the step 3 checkpoint, Hassan needs to do HUMAN_GUIDE Stage 4a (`APP_PASSPHRASE`, `SESSION_SECRET` in Vercel, then `vercel env pull .env.local`) so the examiner endpoint's token check can run locally.
+- **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
 
 ## Step status
 
@@ -30,8 +31,8 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 |---|---|---|
 | GitHub repo created and cloned; SPEC.md, CLAUDE.md, PROGRESS.md, HUMAN_GUIDE.md, .env.example in root | step 1 | yes |
 | Node.js LTS, Git, Claude Code installed; Edge and Chrome installed; headphones | step 1 | yes (Node 24.21) |
-| Vercel account, CLI installed and logged in, project linked | step 3 | |
-| Anthropic API key created, monthly spend limit set, key added to Vercel env vars | step 3 | |
+| Vercel account, CLI installed and logged in, project linked | step 3 | yes (2026-09-23; GitHub connected, so pushes deploy) |
+| Anthropic API key created, monthly spend limit set, key added to Vercel env vars | step 3 | yes (2026-09-23; EXAMINER_MODEL and GRADE_MODEL set too; `.env.local` pulled) |
 | APP_PASSPHRASE and SESSION_SECRET chosen and added to Vercel env vars | step 4 | |
 | Supabase project created (East US), secret key and URL added to Vercel env vars | step 6 | |
 | Migrations run in Supabase | step 6 | |
@@ -206,6 +207,9 @@ Decisions made before the build, from the planning chats:
 - Three difficulty levels change support and feedback, never topics; full tests always at real-exam conditions.
 
 New decisions during the build go below with a date.
+
+- 2026-09-23: **No pushes to GitHub until step 4's passphrase gate and session tokens work** (Hassan). GitHub is connected to Vercel and every push deploys publicly.
+- 2026-09-23 (step 3 plan): the examiner endpoint verifies a session token from the start. A minimal `/api/session-start` (passphrase in, 45-minute token out) is built in step 3; step 4 adds the daily cap and question selection. The Part 3 set for the noisy-place card is hand-written until the step 4 bank.
 
 - 2026-09-23: The `/lab` page's controls and readouts are in English (it's Hassan's tool). The parts Julio will see (mic check, headphones question, error banners) are in Spanish from `src/i18n`. (Hassan agreed.)
 - 2026-09-23: `env.example` and `gitignore` renamed to `.env.example` and `.gitignore`. (Hassan agreed.)
