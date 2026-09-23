@@ -4,14 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "dev": "node scripts/dev.mjs",
+    "dev:vite": "vite",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.api.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },

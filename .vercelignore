@@ -1,0 +1,2 @@
+# Test files in /api would otherwise deploy as functions.
+api/**/*.test.ts

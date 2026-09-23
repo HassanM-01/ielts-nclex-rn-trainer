@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "devCommand": "vite --port $PORT",
+  "functions": {
+    "api/examiner.ts": {
+      "includeFiles": "api/prompts/**"
+    }
+  }
+}
