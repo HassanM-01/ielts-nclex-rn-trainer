@@ -4,9 +4,9 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 
 ## Current status
 
-- **Current step:** 2 (engine: scripted opening, Part 1, Part 2; endpointing; voice commands)
-- **State:** checkpoint run once (most passed); fix built for "Sorry?" and the 40 s cut-off, awaiting a short retest
-- **Waiting on:** Hassan's retest. See "Checkpoint for Hassan" below.
+- **Current step:** 3 (Part 3 examiner endpoint, speculative prefetch, fallback)
+- **State:** planned, not started
+- **Waiting on:** Hassan's go-ahead on the step 3 plan, his answers to its questions, and HUMAN_GUIDE Stage 3a/3b (Anthropic key, Vercel link, `vercel env pull`) before the endpoint can run locally.
 
 ## Step status
 
@@ -14,7 +14,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 |---|---|---|---|
 | 0 | Hassan's setup: repo, tools (HUMAN_GUIDE stage 0) | done | |
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
-| 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | built (awaiting retest) | 2026-09-23: opening, pacing, "because" pause, saying nothing and all of Part 2 passed. "Sorry?" didn't repeat the first time, and a 40 s+ answer wasn't cut off. Fix built. |
+| 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | pending | |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
 | 5 | Grading (streamed, structured) and results screen | pending | |
@@ -39,6 +39,14 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-23 (seventh part): step 2 done.** Hassan's final retest (Edge 153, Yeti mic, headphones, Sonia Natural) passed everything:
+- pacing without Space;
+- "Sorry?" repeated twice (`repeat_requests: 2`);
+- the 40 s cut-off (`time_limits: 1`, 112-word answer);
+- quick answers kept.
+
+Numbers: commit → examiner audio 125 / 449 ms; click → speaking 878 ms (n = 1, over the 500 ms target but under the 1 s limit); voice onset → first interim 919 / 1,942 ms; 0 stalls; 0 barge-ins; 1 isolated `network` error. Step 3 is planned and waiting for the go-ahead.
 
 **2026-09-23 (sixth part): retest regression and fix.**
 
@@ -180,25 +188,7 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Retest of the step 2 fixes** (about 10 minutes, Edge, **same Yeti mic and headphones as before**). Matching guide section: HUMAN_GUIDE.md Stage 2. **Reload the page first** so the new code loads.
-
-0. **Pacing is back:** a normal answer moves on by itself about 2.5 s after you stop (4 s after a short answer), with no Space needed. If it ever seems stuck, it should still move on within about 5 s of your last word.
-
-1. Run `npm run dev`, open http://localhost:5173, press Shift+D, and click **"Reset numbers"**. Then click "Empezar examen".
-2. **"Sorry?":** on two different Part 1 questions, say just "Sorry?" **as soon as** the examiner finishes. It should repeat the question word for word about 2.5 s later (not 8 s).
-3. **Long answer:** on a Part 1 question, talk without stopping for more than 40 s. You should hear "Thank you." and the next question at about 40 s. Your leftover words must not appear in the next answer.
-4. **Quick answers:** answer a few questions immediately after the examiner stops. On the transcript screen at the end, check that your first words are there and the examiner's words aren't.
-5. Finish the exam (or click "Terminar"), then copy **"Copy report"** from the Shift+D overlay. It works from any page now.
-
-**Good looks like:**
-- "Sorry?" repeats within about 3 s.
-- The 40 s cut-off happens.
-- `repeat_requests` and `time_limits` appear in the counters.
-- `stalls` is low.
-- `barge_ins` is 0 unless you talked over the examiner on purpose.
-- `space_commits` is 0 unless you pressed Space on purpose.
-
-**Report back:** pass/fail for items 2 to 4, and the full "Copy report" text (it ends with the exam's event list).
+Step 2 is done. The step 3 checkpoint will be written when step 3 is built (HUMAN_GUIDE.md Stage 3c).
 
 ## Decisions
 
@@ -247,7 +237,7 @@ New decisions during the build go below with a date.
 
 ## Open questions
 
-- "Commit → examiner audio (scripted)" p95 was 822 ms against the 800 ms limit (p50 287 ms), driven by Edge's online Natural voice (speak() → start p95 784 ms). Watch it on the retest. If it stays over, the options are: accept it, or use a local voice when the online one is slow. That would be a decision for Hassan.
+- "Commit → examiner audio (scripted)" p95 was 822 ms in the first step 2 run, then 449 ms in the final retest. It's driven by how fast Edge's online voice starts. Keep watching; if it goes over again, Hassan decides between accepting it and using a local voice when the online one is slow.
 - Echo trim (SPEC 6) strips a leading run of the answer that matches the end of the question. A real answer that repeats the question's last words ("Do you like buying shoes?" / "Buying shoes is fun") loses them ("is fun"). It's rare and the spec is followed as written; restricting the trim to text that began during the examiner's audio would avoid it. To propose to Hassan after the retest.
 
 - Part 1's wait after a continuation word ("because") is 4.0 s by the spec's numbers (2.5 + 1.5). HUMAN_GUIDE Stage 2 asks for a 4-second pause not to move on, which is borderline in Part 1. Section 16's 4-second test is for Part 3 (5 s there). Keep the spec numbers unless Hassan wants Part 1 more patient.
