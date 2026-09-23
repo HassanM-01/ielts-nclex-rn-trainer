@@ -10,7 +10,7 @@ import { SessionResults, type FinalSegment, type ResultSnapshot } from "./transc
 import { getRecognitionCtor, type SRResultEvent, type SpeechRecognitionLike } from "./web-speech";
 
 export type RecognizerFailure = "network" | "not-allowed" | "audio-capture" | "unsupported" | "language" | "start";
-export type RestartReason = "ended" | "forced" | "preempt-examiner" | "monologue-pause" | "stall";
+export type RestartReason = "ended" | "forced" | "preempt-examiner" | "monologue-pause" | "stall" | "mic-change";
 export type RecognizerMode = "continuous" | "push-to-talk";
 export type RecognizerState = "idle" | "starting" | "running" | "restarting" | "stopped" | "failed";
 

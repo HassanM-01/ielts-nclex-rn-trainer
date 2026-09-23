@@ -26,6 +26,10 @@ export const es = {
     noPlayback: "No pudimos reproducir la grabación, pero el reconocimiento de voz funciona.",
     retry: "Repetir la prueba",
     level: "Nivel del micrófono",
+    micInUse: "Micrófono en uso:",
+    micUnknown: "desconocido",
+    wrongMic:
+      "¿No es el micrófono correcto? Haz clic en el ícono que está a la izquierda de la dirección de la página, elige tu micrófono en «Micrófono» y vuelve a cargar la página. Si conectas tus audífonos después, la aplicación cambia a su micrófono sola.",
     headphonesQuestion: "¿Usas audífonos?",
     headphonesYes: "Sí, uso audífonos",
     headphonesNo: "No, uso las bocinas de la computadora",

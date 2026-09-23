@@ -24,9 +24,14 @@ export class Vad {
     private readonly analyser: AnalyserNode,
     private readonly onFrame: (f: VadFrame) => void,
     private readonly onEvent: (e: VadEvent) => void,
+    onEnded: () => void,
   ) {
     this.buf = new Float32Array(analyser.fftSize);
     this.timer = setInterval(() => this.sample(), SAMPLE_INTERVAL_MS);
+    // The mic was unplugged or taken away.
+    stream.getAudioTracks()[0]?.addEventListener("ended", () => {
+      if (!this.closed) onEnded();
+    });
   }
 
   /** Opens the mic stream; returns null (never throws) if it can't. */
@@ -34,6 +39,7 @@ export class Vad {
     options: VadOptions,
     onFrame: (f: VadFrame) => void,
     onEvent: (e: VadEvent) => void,
+    onEnded: () => void = () => undefined,
   ): Promise<{ vad: Vad | null; error: string | null }> {
     let stream: MediaStream | null = null;
     try {
@@ -46,7 +52,7 @@ export class Vad {
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 1024;
       source.connect(analyser);
-      return { vad: new Vad(stream, options, ctx, analyser, onFrame, onEvent), error: null };
+      return { vad: new Vad(stream, options, ctx, analyser, onFrame, onEvent, onEnded), error: null };
     } catch (err) {
       stream?.getTracks().forEach((t) => t.stop());
       return { vad: null, error: err instanceof Error ? err.name || err.message : String(err) };
@@ -57,6 +63,16 @@ export class Vad {
   get appliedEchoCancellation(): boolean | null {
     const s = this.stream.getAudioTracks()[0]?.getSettings();
     return typeof s?.echoCancellation === "boolean" ? s.echoCancellation : null;
+  }
+
+  /** The microphone's name, e.g. "Headset Microphone (Jabra Evolve2)". */
+  get micLabel(): string {
+    return this.stream.getAudioTracks()[0]?.label ?? "";
+  }
+
+  /** Identifies the physical device (stable across "default" aliases). */
+  get groupId(): string {
+    return this.stream.getAudioTracks()[0]?.getSettings().groupId ?? "";
   }
 
   get alive(): boolean {

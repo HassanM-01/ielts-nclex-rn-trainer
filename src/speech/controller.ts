@@ -86,6 +86,8 @@ export class SpeechController {
   private manualVoice = false;
   private version = 0;
   private initPromise: Promise<void> | null = null;
+  private devicesWatched = false;
+  private micChangeTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(metricsKey: string | null = null) {
     this.metrics = new Metrics(metricsKey);
@@ -258,6 +260,7 @@ export class SpeechController {
 
   startRecognizer(): void {
     this.started = true;
+    this.watchDevices();
     this.startTicker();
     this.recognizer.start();
     this.metrics.setInfo("recognizer_mode", this.recognizer.mode);
@@ -270,14 +273,50 @@ export class SpeechController {
       options,
       (f) => this.onVadFrame(f),
       (e) => this.onVadEvent(e),
+      () => this.onMicChange("ended"),
     );
     this.vad = vad;
     this.vadError = error;
+    this.metrics.setInfo("mic", vad ? vad.micLabel || "unknown" : null);
     this.metrics.setInfo("vad", vad ? "on" : `off (${error ?? "unknown"})`);
     this.metrics.setInfo("vad_echo_cancellation", vad ? vad.appliedEchoCancellation : null);
     this.metrics.log("vad", vad ? `opened, echoCancellation=${String(vad.appliedEchoCancellation)}` : `failed: ${error}`);
     this.startTicker();
     this.changed();
+  }
+
+  /** The microphone in use (from the VAD stream), or "" if unknown. */
+  get micLabel(): string {
+    return this.vad?.micLabel ?? "";
+  }
+
+  /**
+   * A mic was plugged in or unplugged (e.g. headphones). Reopen the VAD
+   * stream on the new default and, if the device actually changed, restart
+   * the recognizer so it captures from it too. No reload needed.
+   */
+  private watchDevices(): void {
+    if (this.devicesWatched || !navigator.mediaDevices) return;
+    this.devicesWatched = true;
+    navigator.mediaDevices.addEventListener("devicechange", () => this.onMicChange("devicechange"));
+  }
+
+  private onMicChange(reason: "devicechange" | "ended"): void {
+    if (this.micChangeTimer) clearTimeout(this.micChangeTimer);
+    // Devices often arrive in bursts (a headset adds a mic and a speaker).
+    this.micChangeTimer = setTimeout(() => void this.switchMic(reason), 500);
+  }
+
+  private async switchMic(reason: "devicechange" | "ended"): Promise<void> {
+    if (!this.started) return;
+    const before = { group: this.vad?.groupId ?? "", label: this.micLabel };
+    await this.openVad();
+    const after = { group: this.vad?.groupId ?? "", label: this.micLabel };
+    if (reason === "ended" || before.group !== after.group) {
+      this.metrics.count("mic_changes");
+      this.metrics.log("mic-change", `${before.label || "?"} → ${after.label || "?"} (${reason})`);
+      this.recognizer.restart("mic-change");
+    }
   }
 
   closeVad(): void {

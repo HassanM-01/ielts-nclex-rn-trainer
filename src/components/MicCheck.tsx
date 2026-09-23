@@ -112,6 +112,14 @@ export function MicCheck({ speech }: { speech: SpeechController }) {
           <div className="mb-1 text-sm text-slate-500">{t.micCheck.level}</div>
           <MicMeter frame={speech.vad?.lastFrame ?? null} label={t.micCheck.level} showMarkers={false} />
           {vadMissing && <p className="mt-1 text-sm text-amber-700">{t.vad.unavailable}</p>}
+          {speech.started && (
+            <>
+              <p className="mt-2 text-sm">
+                <span className="text-slate-500">{t.micCheck.micInUse}</span> {speech.micLabel || t.micCheck.micUnknown}
+              </p>
+              <p className="text-xs text-slate-500">{t.micCheck.wrongMic}</p>
+            </>
+          )}
         </div>
       )}
 

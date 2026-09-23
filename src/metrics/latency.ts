@@ -56,6 +56,8 @@ export interface LatencyRow extends Summary {
 }
 
 const MAX_EVENTS = 200;
+/** Events worth pasting into a checkpoint report. */
+const NOTABLE_EVENTS = new Set(["stall", "rec-error", "rec-failure", "mic-change", "tts-fallback", "tts-watchdog", "tts-stuck", "vad"]);
 const MAX_SAMPLES = 500;
 
 export class Metrics {
@@ -143,6 +145,11 @@ export class Metrics {
     for (const [k, v] of this.counters) lines.push(`- ${k}: ${v}`);
     lines.push("Info:");
     for (const [k, v] of this.info) lines.push(`- ${k}: ${String(v)}`);
+    const notable = this.events.filter((e) => NOTABLE_EVENTS.has(e.type)).slice(-30);
+    if (notable.length) {
+      lines.push("Notable events (seconds since page load):");
+      for (const e of notable) lines.push(`- ${(e.t / 1000).toFixed(1)} ${e.type}${e.detail ? `: ${e.detail}` : ""}`);
+    }
     return lines.join("\n");
   }
 

@@ -66,6 +66,7 @@ export function StatusBar({ speech }: { speech: SpeechController }) {
       <span>
         VAD: <b>{speech.vad ? `${speech.vad.lastFrame?.db.toFixed(0) ?? "…"} dB` : speech.vadError ? `off (${speech.vadError})` : "off"}</b>
       </span>
+      {speech.micLabel && <span>mic: <b>{speech.micLabel}</b></span>}
       {speech.monologue && <span className="text-amber-700">monologue restart rule on</span>}
     </div>
   );
