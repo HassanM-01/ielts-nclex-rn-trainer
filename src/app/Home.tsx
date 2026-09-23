@@ -11,6 +11,7 @@ import { RecognitionBanner } from "../components/RecognitionBanner";
 import { t } from "../i18n";
 import { canResume, clearCheckpoint, loadCheckpoint } from "../session/checkpoint";
 import { resumeExam, startNewExam } from "../session/exam-session";
+import { getToken, login, loginStatus, storedPassphrase, type LoginResult } from "../session/token-client";
 import { navigate } from "./router";
 import { useSpeech } from "./speech";
 
@@ -29,11 +30,21 @@ export function Home() {
   const [cp, setCp] = useState(loadCheckpoint);
   const [micBlocked, setMicBlocked] = useState(false);
   const [showMicCheck, setShowMicCheck] = useState(!speech.prefs.micCheckDone);
+  const [pass, setPass] = useState("");
+  const [passState, setPassState] = useState<LoginResult | "none" | "checking">(storedPassphrase() ? (loginStatus() ?? "ok") : "none");
 
   useEffect(() => {
     void speech.init();
     if (!speech.started) void requestMicPermission().then((ok) => setMicBlocked(!ok));
+    // Prewarm the session token (SPEC 3.5).
+    if (storedPassphrase()) void getToken().then(() => setPassState(loginStatus() ?? "ok"));
   }, [speech]);
+
+  const submitPass = async () => {
+    if (!pass.trim()) return;
+    setPassState("checking");
+    setPassState(await login(pass.trim()));
+  };
 
   const start = () => {
     startNewExam(speech, performance.now());
@@ -59,6 +70,34 @@ export function Home() {
       <BrowserBanner />
       <RecognitionBanner speech={speech} />
       {micBlocked && <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-amber-900">{t.home.micBlocked}</div>}
+
+      {passState !== "ok" && (
+        <section className="rounded-lg border border-slate-200 bg-white p-4">
+          <h2 className="font-semibold">{t.home.passTitle}</h2>
+          {passState !== "unavailable" && <p className="mb-3 text-slate-700">{t.home.passBody}</p>}
+          {passState === "wrong" && <p className="mb-2 text-rose-700">{t.home.passWrong}</p>}
+          {passState === "unavailable" && <p className="mb-2 text-amber-800">{t.home.passUnavailable}</p>}
+          <form
+            className="flex flex-wrap gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void submitPass();
+            }}
+          >
+            <input
+              type="password"
+              autoComplete="current-password"
+              className="rounded-lg border border-slate-300 px-3 py-2"
+              placeholder={t.home.passPlaceholder}
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+            />
+            <button type="submit" className="rounded-lg bg-slate-800 px-4 py-2 text-white" disabled={passState === "checking"}>
+              {passState === "checking" ? t.home.passChecking : t.home.passSave}
+            </button>
+          </form>
+        </section>
+      )}
 
       {resumable && (
         <section className="rounded-lg border border-sky-200 bg-sky-50 p-4">

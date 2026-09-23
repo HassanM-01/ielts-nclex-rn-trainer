@@ -39,6 +39,8 @@ export interface ExamCheckpoint {
   voiceURI: string | null;
   /** First step not yet completed. */
   nextStep: number;
+  /** Inside Part 3: the next listed question to ask on resume. */
+  part3Next?: number;
   answers: AnswerRecord[];
   notes: string;
   finished: boolean;

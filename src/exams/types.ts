@@ -44,6 +44,41 @@ export interface CueCard {
   roundoff: string[];
 }
 
+export interface HelpPhrase {
+  en: string;
+  es: string;
+}
+
+export interface Part3Question {
+  q: string;
+  /** concrete: people's own experience or their country; abstract: causes, comparisons, the future, society. */
+  kind: "concrete" | "abstract";
+  /** Said instead of a verbatim repeat when Julio asks. */
+  rephrase: string;
+  /** Pre-written follow-ups, for when the model call fails. */
+  followups: string[];
+  help?: HelpPhrase[];
+}
+
+export interface Part3Set {
+  id: string;
+  theme: string;
+  questions: Part3Question[];
+}
+
+/** Part 3 timing (SPEC 8: the engine owns timing, not the model). */
+export interface DiscussionRules {
+  answer: AnswerRules;
+  /** Part 3 ends after the first answer that finishes past this... */
+  endAfterMs: number;
+  /** ...once at least this many listed questions were asked. */
+  minQuestions: number;
+  /** Nominal length, for "seconds left" in the examiner request. */
+  lengthMs: number;
+  /** The model may only end Part 3 with less than this left. */
+  endAllowedUnderMs: number;
+}
+
 export type Step =
   /** Examiner line with no answer expected. */
   | { kind: "say"; state: ExamState; text: string; interruptible?: boolean }
@@ -52,7 +87,9 @@ export type Step =
   /** Part 2 preparation: cue card and notes, then a countdown. */
   | { kind: "prep"; state: ExamState; card: CueCard; ms: number }
   /** Part 2 long turn. */
-  | { kind: "monologue"; state: ExamState; id: string; card: CueCard; text: string; repeatText: string; rules: MonologueRules };
+  | { kind: "monologue"; state: ExamState; id: string; card: CueCard; text: string; repeatText: string; rules: MonologueRules }
+  /** Part 3: listed questions, with model-chosen follow-ups. `link` is spoken before the first question. */
+  | { kind: "discussion"; state: ExamState; id: string; set: Part3Set; part2Prompt: string; link: string; rules: DiscussionRules };
 
 /** Endpointing values an exam supplies to the engine (SPEC 8). */
 export interface EndpointingDefaults {

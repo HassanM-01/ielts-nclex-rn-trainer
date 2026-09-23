@@ -2,7 +2,8 @@
 // engine runs. Lines follow the neutral, formulaic style of the real test.
 
 import { LEVELS, type LevelId } from "../levels/levels";
-import type { AnswerRules, CueCard, EndpointingDefaults, MonologueRules, Step } from "./types";
+import { orderPart3 } from "../session/part3";
+import type { AnswerRules, CueCard, DiscussionRules, EndpointingDefaults, MonologueRules, Part3Set, Step } from "./types";
 
 export interface Part1Topic {
   id: string;
@@ -17,6 +18,8 @@ export interface Part1Topic {
 export interface IeltsItems {
   part1: Part1Topic[];
   part2: CueCard;
+  /** The Part 3 set linked to the Part 2 card. */
+  part3?: Part3Set;
 }
 
 export const IELTS_ENDPOINTING: EndpointingDefaults = {
@@ -30,6 +33,14 @@ export const OPENING_RULES: AnswerRules = { baseSilenceMs: 2_500, maxAnswerMs: n
 export const ROUNDOFF_RULES: AnswerRules = { baseSilenceMs: 2_500, maxAnswerMs: 40_000 };
 /** Part 3 and Clinical (used from step 3). */
 export const PART3_RULES: AnswerRules = { baseSilenceMs: 3_500, maxAnswerMs: null };
+
+export const PART3_DISCUSSION: DiscussionRules = {
+  answer: PART3_RULES,
+  endAfterMs: 270_000,
+  minQuestions: 4,
+  lengthMs: 300_000,
+  endAllowedUnderMs: 45_000,
+};
 
 export const PART2_HARD_STOP_MS = 120_000;
 export const PART2_BACKUP_SILENCE_MS = 4_000;
@@ -66,7 +77,17 @@ export const LINES = {
   resume: "Let's continue.",
   /** Printed on the cue card. */
   cueCardLead: "You should say:",
+  part3Link: (topic: string) =>
+    `We've been talking about ${topic}, and I'd like to discuss with you one or two more general questions related to this.`,
 };
+
+/** "Describe a noisy place you have been to." -> "a noisy place you have been to" */
+export function cardTopic(prompt: string): string {
+  return prompt
+    .replace(/^describe\s+/i, "")
+    .replace(/[.?!]\s*$/, "")
+    .trim();
+}
 
 export function topicIntro(t: Part1Topic): string {
   return t.intro ?? `Now let's talk about ${t.topic.toLowerCase()}.`;
@@ -127,7 +148,18 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
     steps.push({ kind: "ask", state: "part2_roundoff", id: `${card.id}-roundoff`, part: 2, text: roundoff, repeatText: roundoff, rules: ROUNDOFF_RULES });
   }
 
-  // Part 3 (AI-assisted) is added in step 3.
+  if (items.part3 && items.part3.questions.length > 0) {
+    steps.push({
+      kind: "discussion",
+      state: "part3",
+      id: items.part3.id,
+      set: { ...items.part3, questions: orderPart3(items.part3.questions, level.part3Order) },
+      part2Prompt: card.prompt,
+      link: LINES.part3Link(cardTopic(card.prompt)),
+      rules: PART3_DISCUSSION,
+    });
+  }
+
   steps.push({ kind: "say", state: "closing", text: LINES.closing, interruptible: false });
   return steps;
 }

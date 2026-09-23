@@ -58,7 +58,7 @@ export const es = {
 
   home: {
     start: "Empezar examen",
-    startHint: "Examen completo: presentación, Parte 1 y Parte 2 (unos 10 minutos). Usa audífonos si puedes.",
+    startHint: "Examen completo: presentación y Partes 1, 2 y 3 (unos 12 a 14 minutos). Usa audífonos si puedes.",
     micCheckAgain: "Probar el micrófono",
     hideMicCheck: "Ocultar la prueba del micrófono",
     resumeTitle: "Tienes un examen sin terminar",
@@ -67,6 +67,14 @@ export const es = {
     viewSoFar: "Ver mis respuestas",
     discard: "Descartar",
     lastExam: "Ver la transcripción de tu último examen",
+    passTitle: "Clave de acceso",
+    passBody: "Escribe la clave que te dio Hassan. Solo tienes que hacerlo una vez en esta computadora.",
+    passPlaceholder: "Clave",
+    passSave: "Guardar",
+    passChecking: "Revisando…",
+    passWrong: "La clave no es correcta. Revísala e inténtalo otra vez.",
+    passUnavailable:
+      "No pudimos conectar con el servidor. Puedes practicar igual: en la Parte 3 el examinador usará solo preguntas fijas.",
     micBlocked:
       "El navegador no nos deja usar el micrófono. Haz clic en el ícono a la izquierda de la dirección, permite el micrófono y vuelve a cargar la página.",
   },

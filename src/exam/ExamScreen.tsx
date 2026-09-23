@@ -57,7 +57,7 @@ export function ExamScreen() {
   const now = performance.now();
   const p = engine.phase;
   const status: Status =
-    p.kind === "listening" || p.kind === "monologue"
+    p.kind === "listening" || p.kind === "monologue" || p.kind === "discussion"
       ? "listening"
       : p.kind === "prep"
         ? "preparing"
@@ -71,10 +71,10 @@ export function ExamScreen() {
     preparing: "bg-amber-600",
   };
 
-  const rec = "stepIndex" in p ? engine.answers.find((a) => a.stepId === stepId(engine, p.stepIndex)) : undefined;
-  const live = rec ? engine.answerText(rec) : "";
+  const rec = engine.currentRecord;
+  const live = rec && rec.outcome === null ? engine.answerText(rec) : "";
   const showCard = engine.card && (engine.state === "part2_prep" || engine.state === "part2_speak");
-  const canRepeat = p.kind === "listening" || p.kind === "monologue";
+  const canRepeat = p.kind === "listening" || p.kind === "monologue" || p.kind === "discussion";
 
   return (
     <main className="mx-auto max-w-2xl space-y-4 p-6" lang="es">
@@ -147,11 +147,6 @@ export function ExamScreen() {
       <p className="text-xs text-slate-500">{t.exam.spaceHint}</p>
     </main>
   );
-}
-
-function stepId(engine: ExamEngine, i: number): string | undefined {
-  const s = engine.steps[i];
-  return s && (s.kind === "ask" || s.kind === "monologue") ? s.id : undefined;
 }
 
 function stepRules(engine: ExamEngine, i: number): number {

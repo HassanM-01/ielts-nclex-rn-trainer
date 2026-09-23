@@ -12,7 +12,8 @@ export type LatencyName =
   | "tts_sentence_gap"
   | "rec_restart_gap"
   | "rec_first_interim"
-  | "rec_final_lag";
+  | "rec_final_lag"
+  | "examiner_reply";
 
 /** SPEC 3 performance budget (ms). */
 export const BUDGET: Partial<Record<LatencyName, { target: number; limit: number }>> = {
@@ -30,6 +31,7 @@ export const LATENCY_LABELS: Record<LatencyName, string> = {
   rec_restart_gap: "Recognizer restart gap (end → start)",
   rec_first_interim: "Voice onset → first interim text",
   rec_final_lag: "Voice end → final text",
+  examiner_reply: "Examiner request → reply (model)",
 };
 
 export interface LogEvent {
@@ -63,7 +65,7 @@ const MAX_EVENTS = 200;
 const NOTABLE_EVENTS = new Set([
   "stall", "rec-error", "rec-failure", "mic-change", "tts-fallback", "tts-watchdog", "tts-stuck", "vad",
   "barge-in", "carry", "echo-trim", "commit", "repeat-request", "no-speech-repeat", "no-answer", "time-limit",
-  "backup-prompt", "hard-stop",
+  "backup-prompt", "hard-stop", "ai-reply", "ai-fallback", "part3-end",
 ]);
 const REPORT_EVENTS = 80;
 const MAX_SAMPLES = 500;

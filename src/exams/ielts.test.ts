@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildIeltsScript, greeting, LINES, PART1_RULES } from "./ielts";
+import { buildIeltsScript, cardTopic, greeting, LINES, PART1_RULES, PART3_DISCUSSION } from "./ielts";
 import { FIXED_SET } from "./ielts-fixed-set";
 
 const script = buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 3, hour: 15 });
@@ -25,13 +25,33 @@ describe("buildIeltsScript", () => {
     expect(shoes?.kind === "ask" && shoes.text).toBe("Now let's talk about shoes. Do you like buying shoes?");
   });
 
-  it("runs Part 2 as instructions, prep, long turn, round-off", () => {
+  it("runs Part 2 as instructions, prep, long turn, round-off, then Part 3", () => {
     const kinds = script.slice(14).map((s) => `${s.kind}:${s.state}`);
-    expect(kinds).toEqual(["say:part2_prep", "prep:part2_prep", "monologue:part2_speak", "ask:part2_roundoff", "say:closing"]);
+    expect(kinds).toEqual(["say:part2_prep", "prep:part2_prep", "monologue:part2_speak", "ask:part2_roundoff", "discussion:part3", "say:closing"]);
     const prep = script[15];
     expect(prep?.kind === "prep" && prep.ms).toBe(60_000);
     const mono = script[16];
     expect(mono?.kind === "monologue" && mono.rules).toEqual({ hardStopMs: 120_000, goalMs: 120_000, backupSilenceMs: 4_000, endSilenceMs: 6_000 });
+  });
+
+  it("links Part 3 to the card with the scripted sentence", () => {
+    const d = script.find((s) => s.kind === "discussion");
+    expect(d?.kind === "discussion" && d.link).toBe(
+      "We've been talking about a noisy place you have been to, and I'd like to discuss with you one or two more general questions related to this.",
+    );
+    expect(d?.kind === "discussion" && d.rules).toEqual(PART3_DISCUSSION);
+    expect(d?.kind === "discussion" && d.set.questions.map((q) => q.kind)).toEqual(["concrete", "concrete", "abstract", "abstract", "abstract", "abstract"]);
+  });
+
+  it("orders Part 3 by level", () => {
+    const l1 = buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 1, hour: 9 });
+    const d = l1.find((s) => s.kind === "discussion");
+    expect(d?.kind === "discussion" && d.set.questions.map((q) => q.kind)).toEqual(["concrete", "concrete", "abstract"]);
+  });
+
+  it("skips Part 3 when the items have no set", () => {
+    const noP3 = buildIeltsScript({ ...FIXED_SET, part3: undefined }, { examinerName: "Sonia", level: 3, hour: 9 });
+    expect(noP3.some((s) => s.kind === "discussion")).toBe(false);
   });
 
   it("uses the level's prep time and speaking goal", () => {
@@ -50,6 +70,13 @@ describe("buildIeltsScript", () => {
   it("has unique step ids", () => {
     const ids = script.flatMap((s) => (s.kind === "ask" || s.kind === "monologue" ? [s.id] : []));
     expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe("cardTopic", () => {
+  it("turns the cue card prompt into a topic phrase", () => {
+    expect(cardTopic("Describe a noisy place you have been to.")).toBe("a noisy place you have been to");
+    expect(cardTopic("Describe someone older than you whom you admire.")).toBe("someone older than you whom you admire");
   });
 });
 

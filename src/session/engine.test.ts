@@ -5,6 +5,8 @@ import { Metrics } from "../metrics/latency";
 import type { SayOptions, SayResult, Turn, TurnKind } from "../speech/controller";
 import type { ExamCheckpoint } from "./checkpoint";
 import { ExamEngine, type SpeechPort } from "./engine";
+import type { ExaminerOutcome, ExaminerPort } from "./examiner-client";
+import type { ExaminerTurnRequest } from "../shared/examiner-api";
 
 // Scriptable stand-in for the speech controller: say() resolves on the next
 // microtask; the test sets what Julio "said", the silence, and the clock.
@@ -85,6 +87,28 @@ class FakeSpeech implements SpeechPort {
   }
 }
 
+/** Scripted examiner model: replies are queued; "hang" never answers until aborted. */
+class FakeExaminer implements ExaminerPort {
+  calls = 0;
+  pings = 0;
+  requests: { body: ExaminerTurnRequest; signal?: AbortSignal }[] = [];
+  replies: (ExaminerOutcome | "hang")[] = [];
+  request(body: ExaminerTurnRequest, signal?: AbortSignal): Promise<ExaminerOutcome> {
+    this.calls++;
+    this.requests.push({ body, signal });
+    const r = this.replies.shift() ?? { ok: true, reply: { type: "next" }, ms: 300, raw: "[NEXT]" };
+    if (r === "hang") {
+      return new Promise((resolve) => signal?.addEventListener("abort", () => resolve({ ok: false, reason: "aborted", ms: 0 })));
+    }
+    return Promise.resolve(r);
+  }
+  ping(): void {
+    this.pings++;
+  }
+}
+
+const followup = (text: string): ExaminerOutcome => ({ ok: true, reply: { type: "followup", text }, ms: 400, raw: text });
+
 let clock = 0;
 const flush = async () => {
   for (let i = 0; i < 5; i++) await Promise.resolve();
@@ -111,7 +135,7 @@ function checkpoint(over: Partial<ExamCheckpoint> = {}): ExamCheckpoint {
   };
 }
 
-function setup(cpOver: Partial<ExamCheckpoint> = {}) {
+function setup(cpOver: Partial<ExamCheckpoint> = {}, examiner: ExaminerPort | null = null) {
   const speech = new FakeSpeech();
   const cp = checkpoint(cpOver);
   const steps = buildIeltsScript(cp.items, { examinerName: "Sonia", level: 3, hour: 15 });
@@ -121,6 +145,7 @@ function setup(cpOver: Partial<ExamCheckpoint> = {}) {
     defaults: IELTS_ENDPOINTING,
     save: (c) => saves.push(c.nextStep),
     wallClock: () => 1_000_000 + clock,
+    examiner,
   });
   return { speech, engine, cp, saves };
 }
@@ -180,6 +205,10 @@ describe("ExamEngine", () => {
     expect(speech.lastSaid).toBe(`Thank you. ${FIXED_SET.part2.roundoff[0]}`);
 
     await answer(speech, "I prefer quiet places because I work nights");
+    // Part 3 (no examiner model here: fully scripted), then the closing line.
+    expect(engine.state).toBe("part3");
+    expect(speech.lastSaid).toBe(`${LINES.part3Link("a noisy place you have been to")} ${FIXED_SET.part3!.questions[0]!.q}`);
+    for (let i = 0; i < 6; i++) await answer(speech, "People in big cities hear traffic and construction all day long");
     expect(engine.phase.kind).toBe("done");
     expect(speech.lastSaid).toBe(LINES.closing);
     expect(cp.finished).toBe(true);
@@ -188,7 +217,8 @@ describe("ExamEngine", () => {
     const part2 = cp.answers.find((a) => a.stepId === "p2-noisy-place");
     expect(part2?.text).toBe("It was a market in Guadalajara and I went there last summer There was loud music and many people shouting");
     expect(part2?.backupPrompt).toBe(true);
-    expect(cp.answers.filter((a) => a.outcome === "answered")).toHaveLength(16);
+    expect(cp.answers.filter((a) => a.outcome === "answered")).toHaveLength(22);
+    expect(cp.answers.filter((a) => a.part === 3)).toHaveLength(6);
     expect(saves.length).toBeGreaterThanOrEqual(16);
   });
 
@@ -346,5 +376,162 @@ describe("ExamEngine", () => {
     engine.start();
     await flush();
     expect(speech.lastSaid).toBe("Let's continue. How often do you buy new shoes?");
+  });
+});
+
+describe("ExamEngine Part 3", () => {
+  const P3 = FIXED_SET.part3!.questions;
+  const PART3_STEP = 18;
+
+  it("warms the examiner function at the start of Part 2 prep", async () => {
+    const ex = new FakeExaminer();
+    const { engine } = setup({ nextStep: 14 }, ex);
+    engine.start();
+    await flush();
+    expect(engine.phase.kind).toBe("prep");
+    expect(ex.pings).toBe(1);
+    expect(ex.calls).toBe(0);
+  });
+
+  it("opens with the link sentence and asks a model follow-up, then the next listed question", async () => {
+    const ex = new FakeExaminer();
+    ex.replies.push(followup("You mentioned the market. Why is it so noisy?"));
+    const { speech, engine, cp } = setup({ nextStep: PART3_STEP }, ex);
+    engine.start();
+    await flush();
+    expect(engine.state).toBe("part3");
+    expect(speech.lastSaid).toContain(LINES.part3Link("a noisy place you have been to"));
+    expect(speech.lastSaid).toContain(P3[0]!.q);
+
+    await answer(speech, LONG);
+    const last = speech.said[speech.said.length - 1]!;
+    expect(last.text).toBe("You mentioned the market. Why is it so noisy?");
+    expect(last.opts.source).toBe("ai");
+    expect(last.opts.commitAt).toBe(clock);
+    expect(ex.calls).toBe(1); // the speculative request was reused
+    expect(ex.requests[0]?.body.exchange.at(-1)).toEqual({ role: "candidate", text: LONG });
+    expect(ex.requests[0]?.body.questions).toEqual(P3.map((q) => q.q));
+
+    // After a follow-up answer: no model call, the scripted next question.
+    await answer(speech, LONG);
+    expect(speech.lastSaid).toBe(P3[1]!.q);
+    expect(ex.calls).toBe(1);
+    expect(cp.answers.filter((a) => a.part === 3).map((a) => a.stepId)).toEqual(["p3-noise-q1", "p3-noise-q1-f", "p3-noise-q2"]);
+    expect(cp.answers.find((a) => a.stepId === "p3-noise-q1-f")?.question).toBe("You mentioned the market. Why is it so noisy?");
+  });
+
+  it("asks the next listed question on [NEXT]", async () => {
+    const ex = new FakeExaminer();
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, ex);
+    engine.start();
+    await flush();
+    await answer(speech, LONG);
+    const last = speech.said[speech.said.length - 1]!;
+    expect(last.text).toBe(P3[1]!.q);
+    expect(last.opts.source).toBe("ai");
+  });
+
+  it("falls back to the scripted next question after the 1.2 s deadline", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    const ex = new FakeExaminer();
+    ex.replies.push("hang");
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, ex);
+    engine.start();
+    await flush();
+    await answer(speech, LONG);
+    expect(speech.lastSaid).not.toBe(P3[1]!.q);
+    await vi.advanceTimersByTimeAsync(1_200);
+    await flush();
+    expect(speech.lastSaid).toBe(P3[1]!.q);
+    expect(ex.requests[0]?.signal?.aborted).toBe(true);
+    expect(speech.metrics.getCounters()["examiner_fallback:timeout"]).toBe(1);
+    vi.useRealTimers();
+  });
+
+  it("cancels the speculative request when he keeps talking", async () => {
+    const ex = new FakeExaminer();
+    ex.replies.push("hang");
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, ex);
+    engine.start();
+    await flush();
+    speech.reply("I think the market is");
+    clock += 1_500;
+    speech.silence = 1_200;
+    speech.tick(clock); // 1.2 s pause: the speculative request goes out
+    expect(ex.calls).toBe(1);
+    speech.silence = 0;
+    clock += 100;
+    speech.tick(clock); // talking again
+    expect(ex.requests[0]?.signal?.aborted).toBe(true);
+    expect(speech.metrics.getCounters().spec_aborted).toBe(1);
+  });
+
+  it("asks again when the answer grew more than 3 words after the speculative request", async () => {
+    const ex = new FakeExaminer();
+    ex.replies.push("hang", followup("Why do you think that is?"));
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, ex);
+    engine.start();
+    await flush();
+    speech.reply("the market and");
+    clock += 1_500;
+    speech.silence = 1_200;
+    speech.tick(clock);
+    expect(ex.calls).toBe(1);
+    await answer(speech, "the market and the bus station and the big hospital downtown");
+    expect(ex.calls).toBe(2);
+    expect(ex.requests[0]?.signal?.aborted).toBe(true);
+    expect(speech.lastSaid).toBe("Why do you think that is?");
+  });
+
+  it("repeats a listed question with the bank's rephrase", async () => {
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, new FakeExaminer());
+    engine.start();
+    await flush();
+    await answer(speech, "Sorry?", 3_500); // Part 3 waits 3.5 s
+    expect(speech.lastSaid).toBe(P3[0]!.rephrase);
+  });
+
+  it("does not end a Part 3 turn 4 s after 'because'", async () => {
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, null);
+    engine.start();
+    await flush();
+    const asked = speech.said.length;
+    await answer(speech, `${LONG} because`, 4_000);
+    expect(speech.said.length).toBe(asked);
+    await answer(speech, `${LONG} because`, 5_000);
+    expect(speech.said.length).toBe(asked + 1);
+  });
+
+  it("ends after the first answer past 4:30 once 4 listed questions were asked", async () => {
+    const { speech, engine, cp } = setup({ nextStep: PART3_STEP }, null);
+    engine.start();
+    await flush();
+    for (let i = 0; i < 3; i++) {
+      clock += 70_000;
+      await answer(speech, LONG);
+    }
+    expect(engine.state).toBe("part3");
+    clock += 70_000; // now past 4:30, with 4 asked
+    await answer(speech, LONG);
+    expect(speech.lastSaid).toBe(LINES.closing);
+    expect(cp.answers.filter((a) => a.part === 3)).toHaveLength(4);
+    expect(engine.phase.kind).toBe("done");
+  });
+
+  it("is fully scripted without an examiner", async () => {
+    const { speech, engine } = setup({ nextStep: PART3_STEP }, null);
+    engine.start();
+    await flush();
+    await answer(speech, LONG);
+    const last = speech.said[speech.said.length - 1]!;
+    expect(last.text).toBe(P3[1]!.q);
+    expect(last.opts.source).toBe("scripted");
+  });
+
+  it("resumes Part 3 at the next listed question", async () => {
+    const { speech, engine } = setup({ nextStep: PART3_STEP, part3Next: 2 }, null);
+    engine.start();
+    await flush();
+    expect(speech.lastSaid).toBe(`Let's continue. ${P3[2]!.q}`);
   });
 });

@@ -9,6 +9,8 @@ import { conditionsLevel, DEFAULT_LEVEL } from "../levels/levels";
 import type { SpeechController } from "../speech/controller";
 import { newSessionId, saveCheckpoint, type ExamCheckpoint } from "./checkpoint";
 import { ExamEngine } from "./engine";
+import { ExaminerClient } from "./examiner-client";
+import { getToken } from "./token-client";
 
 const FALLBACK_EXAMINER_NAME = "Alex";
 
@@ -59,6 +61,8 @@ function launch(speech: SpeechController, cp: ExamCheckpoint, clickAt: number): 
     level: cp.level,
     defaults: IELTS_ENDPOINTING,
     save: (c) => void saveCheckpoint(c),
+    // One client per exam: its guard counts the 40-request session cap.
+    examiner: new ExaminerClient(() => getToken()),
   });
   active = engine;
   saveCheckpoint(cp);
