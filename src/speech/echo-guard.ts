@@ -33,6 +33,16 @@ export function trimEcho(examinerLine: string, result: string, minWords = ECHO_M
   return result.trim();
 }
 
+/**
+ * Words heard during examiner audio that aren't in the examiner's own line.
+ * A sensitive mic can pick up the examiner through headphones; those words
+ * must not count as Julio talking over the examiner.
+ */
+export function nonEchoWordCount(examinerLine: string, heard: string): number {
+  const line = new Set(normalizeWords(examinerLine));
+  return normalizeWords(heard).filter((w) => !line.has(w)).length;
+}
+
 export interface BargeInInput {
   headphones: boolean;
   examinerSpeaking: boolean;
@@ -40,7 +50,7 @@ export interface BargeInInput {
   interruptible: boolean;
   /** VAD heard voice recently; null when the VAD stream is unavailable. */
   vadVoiced: boolean | null;
-  /** Words recognized since the examiner line started. */
+  /** Words recognized since the examiner line started, not counting the examiner's own words. */
   recognizedWords: number;
 }
 

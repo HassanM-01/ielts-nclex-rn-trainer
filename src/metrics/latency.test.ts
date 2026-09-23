@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Metrics } from "./latency";
 
 describe("Metrics", () => {
@@ -14,6 +14,28 @@ describe("Metrics", () => {
     m.record("tts_start", -5);
     m.record("tts_start", Number.NaN);
     expect(m.rows().find((r) => r.name === "tts_start")?.n).toBe(0);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("keeps counters and events across a reload, with wall-clock times", () => {
+    vi.useFakeTimers();
+    const store = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+      removeItem: (k: string) => void store.delete(k),
+    });
+    const a = new Metrics("m");
+    a.count("stalls");
+    a.log("stall", "voice for 3 s with no text in turn #4; restarting");
+    vi.advanceTimersByTime(1_100); // persist is debounced
+    const b = new Metrics("m");
+    expect(b.getCounters()).toEqual({ stalls: 1 });
+    expect(b.report()).toMatch(/\d\d:\d\d:\d\d stall: voice for 3 s/);
   });
 
   it("puts notable events in the copyable report, not routine ones", () => {

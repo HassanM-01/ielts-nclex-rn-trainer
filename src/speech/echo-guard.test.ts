@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shouldBargeIn, trimEcho } from "./echo-guard";
+import { nonEchoWordCount, shouldBargeIn, trimEcho } from "./echo-guard";
 
 describe("trimEcho", () => {
   const line = "Do you work or are you a student?";
@@ -22,6 +22,18 @@ describe("trimEcho", () => {
   });
   it("handles an empty examiner line", () => {
     expect(trimEcho("", "hello there")).toBe("hello there");
+  });
+});
+
+describe("nonEchoWordCount", () => {
+  const line = "Do you work or are you a student?";
+  it("ignores the examiner's own words picked up by the mic", () => {
+    expect(nonEchoWordCount(line, "are you a student")).toBe(0);
+    expect(nonEchoWordCount(line, "you a student")).toBe(0);
+  });
+  it("counts Julio's words", () => {
+    expect(nonEchoWordCount(line, "sorry sorry")).toBe(2);
+    expect(nonEchoWordCount(line, "yes I work")).toBe(2);
   });
 });
 

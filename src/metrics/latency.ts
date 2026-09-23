@@ -33,7 +33,10 @@ export const LATENCY_LABELS: Record<LatencyName, string> = {
 };
 
 export interface LogEvent {
+  /** performance.now() on the page that logged it. */
   t: number;
+  /** Wall clock (epoch ms), so events from earlier page loads still read right. */
+  at: number;
   type: string;
   detail?: string;
 }
@@ -57,7 +60,12 @@ export interface LatencyRow extends Summary {
 
 const MAX_EVENTS = 200;
 /** Events worth pasting into a checkpoint report. */
-const NOTABLE_EVENTS = new Set(["stall", "rec-error", "rec-failure", "mic-change", "tts-fallback", "tts-watchdog", "tts-stuck", "vad"]);
+const NOTABLE_EVENTS = new Set([
+  "stall", "rec-error", "rec-failure", "mic-change", "tts-fallback", "tts-watchdog", "tts-stuck", "vad",
+  "barge-in", "carry", "echo-trim", "commit", "repeat-request", "no-speech-repeat", "no-answer", "time-limit",
+  "backup-prompt", "hard-stop",
+]);
+const REPORT_EVENTS = 80;
 const MAX_SAMPLES = 500;
 
 export class Metrics {
@@ -92,7 +100,7 @@ export class Metrics {
   }
 
   log(type: string, detail?: string): void {
-    this.events.push({ t: Math.round(performance.now()), type, detail });
+    this.events.push({ t: Math.round(performance.now()), at: Date.now(), type, detail });
     if (this.events.length > MAX_EVENTS) this.events.shift();
     this.changed();
   }
@@ -145,10 +153,13 @@ export class Metrics {
     for (const [k, v] of this.counters) lines.push(`- ${k}: ${v}`);
     lines.push("Info:");
     for (const [k, v] of this.info) lines.push(`- ${k}: ${String(v)}`);
-    const notable = this.events.filter((e) => NOTABLE_EVENTS.has(e.type)).slice(-30);
+    const notable = this.events.filter((e) => NOTABLE_EVENTS.has(e.type)).slice(-REPORT_EVENTS);
     if (notable.length) {
-      lines.push("Notable events (seconds since page load):");
-      for (const e of notable) lines.push(`- ${(e.t / 1000).toFixed(1)} ${e.type}${e.detail ? `: ${e.detail}` : ""}`);
+      lines.push("Notable events (local time):");
+      for (const e of notable) {
+        const time = new Date(e.at).toLocaleTimeString("en-GB", { hour12: false });
+        lines.push(`- ${time} ${e.type}${e.detail ? `: ${e.detail}` : ""}`);
+      }
     }
     return lines.join("\n");
   }
@@ -178,8 +189,8 @@ export class Metrics {
   private persist(): void {
     if (!this.storageKey) return;
     try {
-      const { latency, counters } = this.snapshot();
-      localStorage.setItem(this.storageKey, JSON.stringify({ latency, counters }));
+      const { latency, counters, events } = this.snapshot();
+      localStorage.setItem(this.storageKey, JSON.stringify({ latency, counters, events }));
     } catch {
       // Storage full or blocked: metrics stay in memory.
     }
@@ -190,12 +201,17 @@ export class Metrics {
     try {
       const raw = localStorage.getItem(this.storageKey);
       if (!raw) return;
-      const data = JSON.parse(raw) as Pick<MetricsSnapshot, "latency" | "counters">;
+      const data = JSON.parse(raw) as Partial<Pick<MetricsSnapshot, "latency" | "counters" | "events">>;
       for (const [k, v] of Object.entries(data.latency ?? {})) {
         if (k in LATENCY_LABELS && Array.isArray(v)) this.latency.set(k as LatencyName, v.filter((x) => typeof x === "number"));
       }
       for (const [k, v] of Object.entries(data.counters ?? {})) {
         if (typeof v === "number") this.counters.set(k, v);
+      }
+      if (Array.isArray(data.events)) {
+        this.events = data.events
+          .filter((e): e is LogEvent => !!e && typeof e.type === "string" && typeof e.at === "number")
+          .slice(-MAX_EVENTS);
       }
     } catch {
       // Corrupt entry: start fresh.

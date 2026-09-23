@@ -10,12 +10,11 @@
 
 import { Metrics } from "../metrics/latency";
 import { browserVersion, currentBrowser } from "./browser";
-import { shouldBargeIn, trimEcho } from "./echo-guard";
+import { nonEchoWordCount, shouldBargeIn, trimEcho } from "./echo-guard";
 import { isStall, shouldPreemptOnExaminerStart, shouldRestartInMonologue } from "./policy";
 import { loadPrefs, savePrefs, type SpeechPrefs } from "./prefs";
 import { Recognizer, type RecognizerFailure, type RestartReason } from "./recognizer";
 import { Synthesizer, type LineResult } from "./synthesizer";
-import { countWords } from "./text";
 import { TranscriptBuffer, type FinalSegment } from "./transcript";
 import { Vad, type VadOptions } from "./vad";
 import type { VadEvent, VadFrame } from "./vad-detector";
@@ -459,7 +458,8 @@ export class SpeechController {
     // A later say() may already have taken over; only close our own line.
     if (this.synth.currentLineId === null) this.examinerSpeaking = false;
     if (!bargedIn && this.currentTurn === myTurn) {
-      this.newTurn(opts.then ?? "candidate", text);
+      const next = this.newTurn(opts.then ?? "candidate", text);
+      if (next.kind === "candidate" && this.prefs.headphones) this.carryPending(myTurn.id, next.id);
     }
     this.changed();
     return { ...result, bargedIn };
@@ -468,6 +468,22 @@ export class SpeechController {
   /** Stop the examiner mid-line (engine use; not barge-in). */
   cancelSpeech(): void {
     this.synth.cancel();
+  }
+
+  /**
+   * Headphones: an answer that starts right as the examiner stops can be
+   * merged by the recognizer into a result that began during the examiner's
+   * line (e.g. faint headphone sound in a sensitive mic). Move results that
+   * aren't final yet into Julio's turn; echo trim strips any examiner words.
+   */
+  private carryPending(from: number, to: number): void {
+    this.recognizer.retag(from, to);
+    const interim = this.interims.get(from);
+    if (interim) {
+      this.interims.delete(from);
+      this.interims.set(to, interim);
+      this.metrics.log("carry", `"${interim}"`);
+    }
   }
 
   private bargeIn(): void {
@@ -499,11 +515,12 @@ export class SpeechController {
       const isFirst = this.buffer.segments(seg.turnId).length === 0;
       this.buffer.add(seg);
       if (turn?.kind === "candidate" && isFirst) {
-        const trimmed = trimEcho(turn.line, seg.text);
-        if (trimmed !== seg.text) {
+        const heard = seg.text;
+        const trimmed = trimEcho(turn.line, heard);
+        if (trimmed !== heard) {
           this.buffer.replaceText(seg.turnId, 0, trimmed);
           this.metrics.count("echo_trims");
-          this.metrics.log("echo-trim", `"${seg.text}" → "${trimmed}"`);
+          this.metrics.log("echo-trim", `"${heard}" → "${trimmed}"`);
         }
       }
       if (seg.promoted) {
@@ -529,7 +546,7 @@ export class SpeechController {
 
     if (this.examinerSpeaking) {
       const turn = this.currentTurn;
-      const words = countWords(this.turnText(turn.id));
+      const words = nonEchoWordCount(turn.line, this.turnText(turn.id));
       if (
         shouldBargeIn({
           headphones: this.prefs.headphones,
@@ -582,13 +599,17 @@ export class SpeechController {
     const now = performance.now();
     const rec = this.recognizer;
     const vad = this.vad;
-    if (rec.isCapturing && vad && (!this.examinerSpeaking || this.prefs.headphones)) {
+    // Stalls only count while Julio has the floor: during examiner audio the
+    // VAD can hear the examiner (speakers, or a sensitive mic near
+    // headphones), and a restart there can swallow the start of his answer.
+    const listening = !this.examinerSpeaking && this.currentTurn.kind === "candidate";
+    if (rec.isCapturing && vad && listening) {
       const d = vad.detector;
-      const lastResult = Math.max(rec.lastResultAt, rec.sessionStartedAt);
+      const lastResult = Math.max(rec.lastResultAt, rec.sessionStartedAt, this.currentTurn.startedAt);
       if (isStall({ now, voiced: d.voiced, voiceStartedAt: d.voiceStartedAt, lastResultAt: lastResult, lastStallAt: this.lastStallAt })) {
         this.lastStallAt = now;
         this.metrics.count("stalls");
-        this.metrics.log("stall", "voice for 3 s with no text; restarting");
+        this.metrics.log("stall", `voice for 3 s with no text in turn #${this.currentTurn.id}; restarting`);
         rec.restart("stall");
       } else if (this.monologue && !d.voiced && shouldRestartInMonologue(rec.sessionAge(now), d.silenceMs(now))) {
         rec.restart("monologue-pause");

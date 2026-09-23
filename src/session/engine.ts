@@ -429,7 +429,9 @@ export class ExamEngine {
       rec.outcome = outcome;
       rec.committedAt = this.wall();
     }
-    this.speech.metrics.log("commit", `${this.steps[stepIndex]?.kind === "monologue" ? "part 2" : "answer"}: ${outcome}`);
+    const words = (rec?.text ?? "").split(/\s+/).filter(Boolean);
+    const snippet = words.length > 8 ? `${words.slice(0, 8).join(" ")}… (${words.length} words)` : words.join(" ");
+    this.speech.metrics.log("commit", `${rec?.stepId ?? "?"} ${outcome}: "${snippet}"`);
     this.prefix = prefix;
     this.cp.nextStep = stepIndex + 1;
     this.opts.save(this.cp);
