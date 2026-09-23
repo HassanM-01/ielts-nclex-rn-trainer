@@ -40,6 +40,27 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 
 ## Last session
 
+**2026-09-23 (sixth part): retest regression and fix.**
+
+Hassan's retest: answers no longer moved on by themselves; he had to press Space every time. His report covered one minute:
+- 5 stall restarts, all in turn #3 (his first answer).
+- The VAD stream reopened once at 16:30:48 (a Windows device change).
+- Only 2 "first interim" samples (p95 9.5 s).
+- No commits.
+
+Diagnosis:
+- The VAD called the room's steady noise "voice". Its noise floor only rose 1 dB/s while it thought it heard voice, so noise ~25 dB above the starting floor read as voice for about 20 s. The reopen at 16:30:48 started that over.
+- Endpointing silence is min(VAD silence, time since last words), so a VAD stuck on "voice" meant silence never started and nothing committed.
+- The same stuck VAD fired stall restarts every 5 s during his answer, each cutting recognition for 0.5 to 2 s.
+- The step 2 fix didn't cause this; the Yeti's hiss or room noise that day exposed it.
+
+Fix:
+1. **VAD noise floor** = the 10th percentile of the last 4 s of levels, plus ~330 ms of calibration when the mic opens. Speech dips between words, so it still reads as voice (tested), while steady noise becomes the floor within a few seconds, and opening the mic into a noisy room no longer reads as voice. Also, the voice threshold can now go up to floor + 12 dB with a ceiling of -20 dBFS, instead of -30.
+2. **Endpointing trusts the recognizer after 5 s without new words**, even if the VAD still hears "voice" (`effectiveSilenceMs`).
+3. **The VAD can postpone the no-speech repeat by at most one extra 8 s period**, so noise can't hold a turn forever.
+4. **Stall back-off:** the cooldown doubles for each stall in a row with no text in between (5 s, 10 s, 20 s, capped at 30 s), so a restart that didn't help can't keep cutting recognition.
+- 183 tests; typecheck and build pass.
+
 **2026-09-23 (fifth part): step 2 checkpoint result and fix.**
 
 Hassan's result (Edge 153, Yeti USB mic, headphones, voice Sonia (Natural, en-GB)):
@@ -159,7 +180,9 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Retest of the step 2 fix** (about 10 minutes, Edge, **same Yeti mic and headphones as before**). Matching guide section: HUMAN_GUIDE.md Stage 2.
+**Retest of the step 2 fixes** (about 10 minutes, Edge, **same Yeti mic and headphones as before**). Matching guide section: HUMAN_GUIDE.md Stage 2. **Reload the page first** so the new code loads.
+
+0. **Pacing is back:** a normal answer moves on by itself about 2.5 s after you stop (4 s after a short answer), with no Space needed. If it ever seems stuck, it should still move on within about 5 s of your last word.
 
 1. Run `npm run dev`, open http://localhost:5173, press Shift+D, and click **"Reset numbers"**. Then click "Empezar examen".
 2. **"Sorry?":** on two different Part 1 questions, say just "Sorry?" **as soon as** the examiner finishes. It should repeat the question word for word about 2.5 s later (not 8 s).
@@ -173,6 +196,7 @@ Half-done: nothing.
 - `repeat_requests` and `time_limits` appear in the counters.
 - `stalls` is low.
 - `barge_ins` is 0 unless you talked over the examiner on purpose.
+- `space_commits` is 0 unless you pressed Space on purpose.
 
 **Report back:** pass/fail for items 2 to 4, and the full "Copy report" text (it ends with the exam's event list).
 
