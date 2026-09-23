@@ -4,16 +4,16 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 
 ## Current status
 
-- **Current step:** 1 (speech layer and `/lab` page)
-- **State:** checkpoint run once (everything passed except mic selection); mic fix built, awaiting a short retest
-- **Waiting on:** Hassan's retest of the mic fix and stall count. See "Checkpoint for Hassan" below.
+- **Current step:** 2 (engine: scripted opening, Part 1, Part 2; endpointing; voice commands)
+- **State:** planned, not started
+- **Waiting on:** Hassan's go-ahead on the step 2 plan (and the answers to its open questions).
 
 ## Step status
 
 | Step | What | Status | Checkpoint result |
 |---|---|---|---|
 | 0 | Hassan's setup: repo, tools (HUMAN_GUIDE stage 0) | done | |
-| 1 | Speech layer and `/lab` page | built (awaiting retest) | 2026-09-23: all tests passed on Edge and Chrome. Problem: changing the mic needed Edge site permissions plus a page reload. Fix built, retest pending. |
+| 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | pending | |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | pending | |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
@@ -39,6 +39,8 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-23 (third part):** Hassan's mic-fix retest passed, so step 1 is done. He didn't paste the retest's "Copy report", so the stall count on the right mic wasn't recorded; watch the stall counter during the step 2 checkpoint. Step 2 is planned and waiting for his go-ahead.
 
 **2026-09-23 (second part): checkpoint 1 result and mic fix.**
 
@@ -93,29 +95,7 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Retest of the mic fix** (about 10 minutes). The first checkpoint passed; this only covers what changed. Matching guide section: HUMAN_GUIDE.md Stage 1.
-
-Run `npm run dev` and open **http://localhost:5173/lab** in **Edge**.
-
-1. **Reset the numbers** first (the "Reset numbers" button in the Numbers card).
-2. **Mic name:** click "Start mic". The status bar shows `mic: <name>`, and the mic check (after "Grabar 3 segundos") shows "Micrófono en uso: <name>". Is it the right mic?
-3. **Plug-in switch:** start with headphones unplugged and "Start mic". Plug the headset in, wait about 2 seconds, and say a sentence.
-   - The mic name should change to the headset's.
-   - The Event log should show `mic-change`, and your sentence should be transcribed from the headset mic.
-   - Then unplug it and say another sentence: it should switch back without a reload.
-   - Bluetooth headsets work too.
-4. **Stalls:** with the right mic selected, run the conversation test once and the 2-minute monologue once, then "Copy report".
-   - With the right mic, `restart:stall` should be 0 or close to it.
-   - There should be no `rec_failure:network`.
-
-**Good looks like:** the right mic name shows, plugging and unplugging switches mics without a reload, and there are few or no stalls on the right mic.
-
-**Report back:**
-- whether the mic name was right
-- whether the plug and unplug switch worked
-- the full "Copy report" text; it now ends with "Notable events" and their times.
-
-If the stalls are near 0, step 1 is done. If there are still many stalls on the right mic, the stall detector is misfiring, and I'll tune it before step 2.
+Step 1 is done. The step 2 checkpoint will be written when step 2 is built (HUMAN_GUIDE.md Stage 2).
 
 ## Decisions
 
@@ -147,7 +127,7 @@ New decisions during the build go below with a date.
 ## Open questions
 
 - Resolved 2026-09-23: Edge's Natural voices do fit the budget on Hassan's connection. Commit → examiner audio was 190 / 342 ms (p50 / p95); speak() → start was 196 / 708 ms.
-- Were the 12 stall restarts and the one network failover caused by the mic mix-up, or is the stall detector misfiring on Edge? The retest will tell.
+- Stall restarts: the retest passed, but its counts weren't captured. Recheck the stall counter at the step 2 checkpoint.
 
 ## Known issues
 
