@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 3 (Part 3 examiner endpoint, speculative prefetch, fallback)
-- **State:** built, awaiting checkpoint
-- **Waiting on:** Hassan: first HUMAN_GUIDE Stage 4a (`APP_PASSPHRASE` and `SESSION_SECRET` in Vercel, then `vercel env pull .env.local`), then the step 3 test. See "Checkpoint for Hassan" below.
+- **State:** checkpoint run once; fixes built for two problems; awaiting a short retest
+- **Waiting on:** Hassan's retest (see "Checkpoint for Hassan"), and his decision on the Part 3 latency question under "Open questions".
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
 
 ## Step status
@@ -16,7 +16,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 | 0 | Hassan's setup: repo, tools (HUMAN_GUIDE stage 0) | done | |
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
-| 3 | Part 3 examiner endpoint, speculative prefetch, fallback | built (awaiting checkpoint) | |
+| 3 | Part 3 examiner endpoint, speculative prefetch, fallback | built (awaiting retest) | 2026-09-24: Part 3 felt good, follow-ups worked, the Wi-Fi-off fallback worked. Problems: Part 2 didn't move on after finishing early; after the Wi-Fi test the app stayed in push-to-talk. Fixes built. |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
 | 5 | Grading (streamed, structured) and results screen | pending | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
@@ -33,13 +33,38 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Node.js LTS, Git, Claude Code installed; Edge and Chrome installed; headphones | step 1 | yes (Node 24.21) |
 | Vercel account, CLI installed and logged in, project linked | step 3 | yes (2026-09-23; GitHub connected, so pushes deploy) |
 | Anthropic API key created, monthly spend limit set, key added to Vercel env vars | step 3 | yes (2026-09-23; EXAMINER_MODEL and GRADE_MODEL set too; `.env.local` pulled) |
-| APP_PASSPHRASE and SESSION_SECRET chosen and added to Vercel env vars | step 4 | |
+| APP_PASSPHRASE and SESSION_SECRET chosen and added to Vercel env vars | step 4 | yes (2026-09-24, pulled to .env.local) |
 | Supabase project created (East US), secret key and URL added to Vercel env vars | step 6 | |
 | Migrations run in Supabase | step 6 | |
 | CRON_SECRET added; cron job visible in Vercel | step 6 | |
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-24: step 3 checkpoint result and fixes.**
+
+Hassan's result (Edge 153, Yeti, headphones, voice Ava Multilingual Natural, `npm run dev` on port 3000):
+- **Worked:** Part 3 ran and "felt good".
+  - Two model follow-ups, both on point: "Why does it depend on the neighbor?" and "You mentioned that some people enjoy feeling surrounded by lots of activity – can you give an example of what kind of activity appeals to them?"
+  - 4 speculative requests: 3 reused, 1 aborted.
+  - The first examiner call timed out and fell back correctly.
+- **Problem 1:** in Part 2, finishing before 2:00 didn't move on. The back-up prompt came (15:33:50); he answered briefly and waited; nothing happened until the 2:00 hard stop (15:34:44). Two stall restarts happened in that window.
+- **Problem 2:** after the Wi-Fi test the transcript stopped and only the error banner showed. Wi-Fi off caused 3 recognizer `network` errors, then the switch to push-to-talk (15:36:39). Nothing switched it back when Wi-Fi returned, and the engine then repeat-skipped q3-follow-up to q6 as "no answer".
+
+Numbers:
+
+| Metric (ms) | n | p50 | p95 | Budget |
+|---|---|---|---|---|
+| Commit → examiner audio (scripted) | 16 | 255 | 845 | 400 / 800, **p95 over** |
+| Commit → examiner audio (Part 3 AI) | 3 | 1,060 | 1,814 | 700 / 1,200, **over** |
+| Examiner request → reply (model) | 2 | 1,619 | 2,056 | |
+| Click → examiner speaking | 1 | 917 | 917 | 500 / 1,000 |
+
+Diagnosis and fixes (commit 162dd3b):
+1. **Silence clock:** it counted from the last recognizer *event*. Edge sends events that repeat the same text, and every restart (monologue-pause, stall) finalizes pending text with another event, so the 6 s never completed. It now counts from the last time the current turn's *words* changed (case and punctuation ignored). This is the most likely cause of problem 1, but it isn't proven. The report now records, at every back-up prompt, hard stop, time limit and no-speech repeat, what the silence clock saw (`vad …, words changed … ago, last event … ago, rec state/mode`), so the retest will confirm or refute it.
+2. **Recovery after network failures:** after a `network`/`start` failure, the controller retries continuous recognition when the browser fires `online`, and every 20 s. If it fails again, 3 errors put it back in push-to-talk. Report events: `rec-retry`, `rec-recovered`. The Spanish banner now says the app will listen again by itself when the connection returns.
+3. **No auto-skipping while the app can't hear** (push-to-talk): no-speech repeats and move-ons are suspended. Answers given by holding the button, or Space, still commit normally, and the Part 2 hard stop still applies.
+- 252 tests; typecheck and build pass.
 
 **2026-09-23 (eighth part): step 3 built.** `npm run typecheck` (browser and `/api` projects), `npm test` (246 tests) and `npm run build` pass. The browser bundle contains neither the Anthropic SDK nor any secret name (checked).
 
@@ -221,36 +246,15 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Matching guide sections: **HUMAN_GUIDE.md Stage 4a first (about 5 minutes), then Stage 3c.** Budget about 25 minutes. Estimated API cost: about 1 US cent per full test (Haiku 4.5, around 10 to 15 small requests).
+**Retest of the step 3 fixes** (about 15 minutes, Edge, same setup). Matching guide section: HUMAN_GUIDE.md Stage 3c.
 
-**Before testing (Stage 4a):**
-1. Pick the passphrase for Julio (no ñ or accents), for example `enfermero2027`.
-2. Generate a secret: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
-3. In Vercel, Project > Settings > Environment Variables, add `APP_PASSPHRASE`, `SESSION_SECRET` and `DAILY_SESSION_CAP` = `12` for all environments.
-4. In the repo folder: `vercel env pull .env.local`.
-5. **Don't push.** GitHub is connected to Vercel.
+Run `npm run dev` (restart it if it's still running from before), open http://localhost:3000, press Shift+D and click "Reset numbers", then "Empezar examen". Press Space to move quickly through Part 1.
 
-**Start:** stop any old dev server, then run `npm run dev` and open **http://localhost:3000** (the port changed from 5173) in **Edge with headphones**. Home asks for the "Clave de acceso": type the passphrase once. Press Shift+D and click "Reset numbers". Then click "Empezar examen". To get to Part 3 fast, answer briefly or press Space in Parts 1 and 2.
+1. **Part 2, finishing early:** talk for about a minute and stop. After about 4 s: "Can you tell me any more about …?" Add a sentence or two, then stay quiet. About **6 s** after your last word the exam should move on ("Thank you." and the round-off question), well before 2:00.
+2. **Wi-Fi in Part 3:** turn Wi-Fi off during an answer. The yellow banner and push-to-talk should appear, and the exam should **wait** instead of skipping questions. Turn Wi-Fi back on. Within a few seconds (at most 20) the banner should go away and your answers should show up again without the button.
+3. Finish the exam and copy "Copy report" from Shift+D.
 
-**What to check in Part 3:**
-1. After the Part 2 round-off question: "We've been talking about a noisy place you have been to…" and the first Part 3 question.
-2. The questions stay on the theme (noise and cities) and get broader.
-3. Sometimes the examiner asks a follow-up about **what you said** ("You mentioned X. Why…?"). It never praises or corrects you.
-4. The gap after your answers feels about as quick as Part 1 (Part 3 waits 3.5 s of silence, a little longer than Part 1).
-5. Say "I think it's important because…" and pause about 4 seconds. It should **not** move on (Part 3 waits 5 s after "because").
-6. "Sorry?" gets a **reworded** version of the question.
-7. Turn Wi-Fi off in the middle of Part 3. The exam keeps going with the next prepared question, without freezing. Turn Wi-Fi back on.
-8. Part 3 ends after about 4½ to 5 minutes with "That is the end of the speaking test." The transcript screen shows the Part 3 answers, follow-ups included.
-
-**Good looks like:**
-- In Shift+D, "Commit → examiner audio (Part 3 AI)" is mostly under about 1 s (p50 ≤ 700 ms, p95 ≤ 1,200 ms).
-- `spec_reused` is well above `spec_discarded`.
-- `examiner_fallback:*` appears only during the Wi-Fi test.
-
-**Report back:**
-- pass/fail for items 1 to 8
-- whether the follow-ups felt natural (paste one or two)
-- "Copy report" from Shift+D; its event list shows every AI reply and fallback.
+**Report back:** pass/fail for 1 and 2, and the full "Copy report" text. For item 1 the report now shows exactly what the silence clock saw.
 
 ## Decisions
 
@@ -309,6 +313,12 @@ New decisions during the build go below with a date.
   - `npm run dev` goes through `scripts/dev.mjs` (Vercel refuses a `dev` script that calls `vercel dev`) and serves on port 3000.
 
 ## Open questions
+
+- **Part 3 AI latency is over budget** (needs a decision, but best made after real deployed numbers):
+  - **The numbers:** commit → examiner audio (AI) was 1,060 / 1,814 ms (p50 / p95, n = 3) against 700 / 1,200. The model's reply took 1.6 to 2.1 s end to end. That was under `vercel dev` on Hassan's PC, where the function runs locally and compiles on first use, so the deployed iad1 function may well be faster.
+  - **Built in by design:** SPEC 8's 1.2 s deadline is on the *reply*. Adding the voice's own start time (~0.3 to 0.8 s), a fallback line can reach ~1.8 s, so the SPEC 3 limit of 1.2 s for *audio* can't be met whenever the deadline is used.
+  - **Options:** (a) lower the reply deadline to about 0.8 s so a fallback still starts within ~1.2 s, at the cost of more scripted fallbacks; (b) keep 1.2 s and accept a slower fallback; (c) decide after measuring the deployed function in step 6.
+  - **Recommendation:** (c), then (a) if deployed replies still miss.
 
 - "Commit → examiner audio (scripted)" p95 was 822 ms in the first step 2 run, then 449 ms in the final retest. It's driven by how fast Edge's online voice starts. Keep watching; if it goes over again, Hassan decides between accepting it and using a local voice when the online one is slow.
 - Echo trim (SPEC 6) strips a leading run of the answer that matches the end of the question. A real answer that repeats the question's last words ("Do you like buying shoes?" / "Buying shoes is fun") loses them ("is fun"). It's rare and the spec is followed as written; restricting the trim to text that began during the examiner's audio would avoid it. To propose to Hassan after the retest.
