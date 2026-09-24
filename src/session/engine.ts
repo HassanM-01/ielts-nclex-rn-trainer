@@ -46,6 +46,8 @@ export type SpeechPort = Pick<
   | "turnText"
   | "silenceMs"
   | "voicedRecently"
+  | "canHear"
+  | "silenceDiag"
   | "setMonologue"
   | "setRate"
   | "onTick"
@@ -351,6 +353,7 @@ export class ExamEngine {
       text,
       silenceMs: this.speech.silenceMs(now),
       voicedRecently: this.speech.voicedRecently(now),
+      hearing: this.speech.canHear,
       rules: step.rules,
       extraPatienceMs: LEVELS[this.opts.level].extraPatienceMs,
       defaults: this.opts.defaults,
@@ -364,7 +367,7 @@ export class ExamEngine {
         return;
       case "time-limit":
         m.count("time_limits");
-        m.log("time-limit", step.id);
+        m.log("time-limit", `${step.id} (${this.speech.silenceDiag(now)})`);
         this.complete(p.stepIndex, "time-limit", now, { text: LINES.thankYou, interruptible: false });
         return;
       case "repeat-request":
@@ -383,7 +386,7 @@ export class ExamEngine {
       case "no-speech-repeat":
         rec.repeats++;
         m.count("no_speech_repeats");
-        m.log("no-speech-repeat", step.id);
+        m.log("no-speech-repeat", `${step.id} (${this.speech.silenceDiag(now)})`);
         void this.relisten(p.stepIndex, step.repeatText, true);
         return;
       case "move-on":
@@ -406,6 +409,7 @@ export class ExamEngine {
       text,
       silenceMs: this.speech.silenceMs(now),
       voicedRecently: this.speech.voicedRecently(now),
+      hearing: this.speech.canHear,
       rules: step.rules,
       noSpeechMs: this.opts.defaults.noSpeechMs,
     });
@@ -415,7 +419,7 @@ export class ExamEngine {
         return;
       case "hard-stop":
         m.count("hard_stops");
-        m.log("hard-stop", step.id);
+        m.log("hard-stop", `${step.id} (${this.speech.silenceDiag(now)})`);
         this.speech.setMonologue(false);
         this.complete(p.stepIndex, "hard-stop", now, { text: LINES.thankYou, interruptible: false });
         return;
@@ -428,7 +432,7 @@ export class ExamEngine {
         p.m.backupUsed = true;
         rec.backupPrompt = true;
         m.count("backup_prompts");
-        m.log("backup-prompt", bullet);
+        m.log("backup-prompt", `${bullet} (${this.speech.silenceDiag(now)})`);
         void this.relisten(p.stepIndex, LINES.backup(bullet), false);
         return;
       }
@@ -530,6 +534,7 @@ export class ExamEngine {
       text,
       silenceMs,
       voicedRecently: this.speech.voicedRecently(now),
+      hearing: this.speech.canHear,
       rules: p3.step.rules.answer,
       extraPatienceMs: LEVELS[this.opts.level].extraPatienceMs,
       defaults: this.opts.defaults,
@@ -562,7 +567,7 @@ export class ExamEngine {
       case "no-speech-repeat":
         rec.repeats++;
         m.count("no_speech_repeats");
-        m.log("no-speech-repeat", p3.recordId);
+        m.log("no-speech-repeat", `${p3.recordId} (${this.speech.silenceDiag(now)})`);
         this.abortSpeculative();
         void this.relisten(p.stepIndex, repeatLine, true);
         return;

@@ -19,6 +19,9 @@ class FakeRecognition {
   start(): void {
     FakeRecognition.last = this;
   }
+  error(code: string): void {
+    this.onerror?.({ error: code, message: "" });
+  }
   stop(): void {}
   abort(): void {}
   begin(): void {
@@ -47,10 +50,14 @@ async function setup(headphones: boolean) {
   return { speech, rec };
 }
 
+let win: EventTarget & { webkitSpeechRecognition: typeof FakeRecognition };
+
 beforeEach(() => {
-  vi.stubGlobal("window", { webkitSpeechRecognition: FakeRecognition });
+  win = Object.assign(new EventTarget(), { webkitSpeechRecognition: FakeRecognition });
+  vi.stubGlobal("window", win);
 });
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
@@ -87,6 +94,47 @@ describe("SpeechController turns", () => {
     const answerTurn = speech.currentTurn;
     rec.hear("I am a nurse", true);
     expect(speech.turnText(answerTurn.id)).toBe("I am a nurse");
+    speech.stop();
+  });
+});
+
+describe("SpeechController silence and recovery", () => {
+  it("counts silence from the last change in his words, not from repeated events", async () => {
+    let now = 0;
+    vi.spyOn(performance, "now").mockImplementation(() => now);
+    const { speech, rec } = await setup(false);
+    await speech.say(QUESTION);
+    now = 1_000;
+    rec.hear("I work as a nurse");
+    now = 4_000;
+    rec.hear("I work as a nurse"); // same words again: not speaking
+    rec.hear("I work as a nurse.", true); // finalized with punctuation: still the same words
+    now = 6_000;
+    expect(speech.silenceMs(now)).toBe(5_000);
+    rec.hear("and I like it");
+    expect(speech.silenceMs(now)).toBe(0);
+    speech.stop();
+  });
+
+  it("goes back to continuous recognition when the network returns", async () => {
+    const { speech, rec } = await setup(true);
+    for (let i = 0; i < 3; i++) rec.error("network");
+    expect(speech.recognizer.mode).toBe("push-to-talk");
+    expect(speech.canHear).toBe(false);
+    expect(speech.failure).toBe("network");
+    win.dispatchEvent(new Event("online"));
+    expect(speech.recognizer.mode).toBe("continuous");
+    expect(speech.failure).toBeNull();
+    expect(speech.metrics.getCounters().rec_retries).toBe(1);
+    speech.stop();
+  });
+
+  it("doesn't retry after a permission failure", async () => {
+    const { speech, rec } = await setup(true);
+    rec.error("not-allowed");
+    win.dispatchEvent(new Event("online"));
+    expect(speech.recognizer.mode).toBe("push-to-talk");
+    expect(speech.failure).toBe("not-allowed");
     speech.stop();
   });
 });

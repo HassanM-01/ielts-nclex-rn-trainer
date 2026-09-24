@@ -67,6 +67,7 @@ describe("decideAnswer", () => {
     text: LONG,
     silenceMs: 0,
     voicedRecently: false,
+    hearing: true,
     rules: PART1_RULES,
     extraPatienceMs: 0,
     defaults: D,
@@ -113,6 +114,13 @@ describe("decideAnswer", () => {
     expect(decideAnswer({ ...turn, speechStartedAt: null, repeated: true }, { ...silent, now: 18_000 }).type).toBe("move-on");
   });
 
+  it("never gives up on an answer while the app can't hear (push-to-talk)", () => {
+    const quiet = { ...turn, speechStartedAt: null };
+    expect(decideAnswer(quiet, tick({ text: "", now: 60_000, hearing: false })).type).toBe("wait");
+    // Once he holds the button and speaks, the answer commits normally.
+    expect(decideAnswer(turn, tick({ silenceMs: 2_500, hearing: false })).type).toBe("commit");
+  });
+
   it("waits while the VAD hears voice that has no text yet, but not forever", () => {
     const quiet = { ...turn, speechStartedAt: null };
     expect(decideAnswer(quiet, tick({ text: "", now: 20_000, voicedRecently: true })).type).toBe("wait");
@@ -129,6 +137,7 @@ describe("decideMonologue", () => {
     text: LONG,
     silenceMs: 0,
     voicedRecently: false,
+    hearing: true,
     rules,
     noSpeechMs: 8_000,
     ...over,
@@ -150,6 +159,12 @@ describe("decideMonologue", () => {
     expect(decideMonologue(m, tick({ now: 70_000, silenceMs: 4_500, rules: lowerLevel })).type).toBe("wait");
     expect(decideMonologue(m, tick({ now: 70_000, silenceMs: 6_000, rules: lowerLevel })).type).toBe("commit");
   });
+  it("doesn't skip the long turn while the app can't hear, but still stops at 2:00", () => {
+    const silent = { ...m, speechStartedAt: null };
+    expect(decideMonologue(silent, tick({ text: "", now: 30_000, hearing: false })).type).toBe("wait");
+    expect(decideMonologue(silent, tick({ text: "", now: 120_000, hearing: false })).type).toBe("hard-stop");
+  });
+
   it("repeats 'Please start speaking now' after 8 s of nothing, then moves on", () => {
     const silent = { ...m, speechStartedAt: null };
     expect(decideMonologue(silent, tick({ text: "", now: 8_000 })).type).toBe("repeat-start");

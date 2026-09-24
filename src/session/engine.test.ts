@@ -23,6 +23,7 @@ class FakeSpeech implements SpeechPort {
   rate = 1;
   stopped = false;
   bargeInNext = false;
+  canHear = true;
   private seq = 0;
   private ticks = new Set<(now: number) => void>();
 
@@ -63,6 +64,9 @@ class FakeSpeech implements SpeechPort {
   }
   voicedRecently(): boolean {
     return this.voiced;
+  }
+  silenceDiag(): string {
+    return "diag";
   }
   setMonologue(on: boolean): void {
     this.monologue = on;
@@ -278,6 +282,21 @@ describe("ExamEngine", () => {
     await flush();
     expect(cp.answers.find((a) => a.stepId === "p1-work-q1")?.outcome).toBe("no-answer");
     expect(speech.lastSaid).toBe("What do you like most about your job?");
+  });
+
+  it("doesn't skip questions while the app can't hear (push-to-talk after a failure)", async () => {
+    const { speech, engine, cp } = setup({ nextStep: 2 });
+    speech.canHear = false;
+    engine.start();
+    await flush();
+    const asked = speech.said.length;
+    clock += 30_000;
+    speech.tick(clock);
+    await flush();
+    expect(speech.said.length).toBe(asked);
+    // He holds the button and answers: it commits as usual.
+    await answer(speech, LONG);
+    expect(cp.answers.find((a) => a.stepId === "p1-work-q1")?.outcome).toBe("answered");
   });
 
   it("cuts in politely after 40 s and the interruption can't be talked over", async () => {

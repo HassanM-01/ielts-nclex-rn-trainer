@@ -15,6 +15,7 @@ import { effectiveSilenceMs, isStall, shouldPreemptOnExaminerStart, shouldRestar
 import { loadPrefs, savePrefs, type SpeechPrefs } from "./prefs";
 import { Recognizer, type RecognizerFailure, type RestartReason } from "./recognizer";
 import { Synthesizer, type LineResult } from "./synthesizer";
+import { normalizeWords } from "./text";
 import { TranscriptBuffer, type FinalSegment } from "./transcript";
 import { Vad, type VadOptions } from "./vad";
 import type { VadEvent, VadFrame } from "./vad-detector";
@@ -48,6 +49,8 @@ export interface SayResult extends LineResult {
 }
 
 const TICK_MS = 100;
+/** While in push-to-talk after a network failure, try continuous recognition again this often. */
+const RECOVERY_RETRY_MS = 20_000;
 export const LANG = "en-US";
 
 export class SpeechController {
@@ -80,6 +83,12 @@ export class SpeechController {
   private tickListeners = new Set<(now: number) => void>();
   private ticker: ReturnType<typeof setInterval> | null = null;
   private lastStallAt = -Infinity;
+  /** When the current turn's words last changed (not just any recognizer event). */
+  private lastTextChangeAt = -Infinity;
+  private lastTurnWords = "";
+  private recoveryTimer: ReturnType<typeof setInterval> | null = null;
+  private onlineHandler: (() => void) | null = null;
+  private recovering = false;
   private stallStreak = 0;
   private awaitingFirstText: number | null = null;
   private awaitingFinal: number | null = null;
@@ -344,6 +353,7 @@ export class SpeechController {
 
   stop(): void {
     this.started = false;
+    this.stopRecovery();
     this.synth.cancel();
     this.recognizer.stop();
     this.closeVad();
@@ -363,6 +373,27 @@ export class SpeechController {
     this.recognizer.setMode("push-to-talk");
     this.metrics.setInfo("recognizer_mode", "push-to-talk");
     this.changed();
+  }
+
+  /**
+   * Continuous recognition is working, so silence means Julio isn't talking.
+   * False in push-to-talk (after a failure): the app can't hear him unless he
+   * holds the button, so the exam must not treat silence as "no answer".
+   */
+  get canHear(): boolean {
+    return this.recognizer.mode === "continuous" && this.recognizer.state !== "failed";
+  }
+
+  /** One line for the report: what the silence clock sees right now. */
+  silenceDiag(now: number): string {
+    const d = this.vad?.detector;
+    const ms = (x: number) => (Number.isFinite(x) ? `${Math.round(x)} ms` : "never");
+    return [
+      d ? `vad ${d.voiced ? "voice" : "quiet"} ${ms(d.silenceMs(now))}` : "vad off",
+      `words changed ${ms(now - this.lastTextChangeAt)} ago`,
+      `last event ${ms(now - this.recognizer.lastResultAt)} ago`,
+      `rec ${this.recognizer.state}/${this.recognizer.mode}`,
+    ].join(", ");
   }
 
   useContinuous(): void {
@@ -394,6 +425,7 @@ export class SpeechController {
   newTurn(kind: TurnKind, line = this.lastExaminerLine()): Turn {
     const t = this.makeTurn(kind, line);
     this.turns.push(t);
+    this.lastTurnWords = "";
     if (this.turns.length > 200) this.turns.shift();
     this.recognizer.setTurn(t.id);
     this.changed();
@@ -428,12 +460,14 @@ export class SpeechController {
 
   /**
    * Silence since Julio last spoke. Uses the shorter of the VAD silence and
-   * the time since the last recognition result, so a VAD threshold that
-   * misses a quiet voice can't end a turn while text is still arriving.
+   * the time since his words last changed, so a VAD threshold that misses a
+   * quiet voice can't end a turn while text is still arriving. Recognizer
+   * events that repeat the same text (Edge sends some, and every restart
+   * finalizes pending text) don't count as speaking.
    */
   silenceMs(now: number): number {
-    const sinceResult = Number.isFinite(this.recognizer.lastResultAt) ? now - this.recognizer.lastResultAt : Infinity;
-    return effectiveSilenceMs(this.vad ? this.vad.detector.silenceMs(now) : null, sinceResult);
+    const sinceWords = Number.isFinite(this.lastTextChangeAt) ? now - this.lastTextChangeAt : Infinity;
+    return effectiveSilenceMs(this.vad ? this.vad.detector.silenceMs(now) : null, sinceWords);
   }
 
   // ---- examiner ------------------------------------------------------------
@@ -529,6 +563,16 @@ export class SpeechController {
     }
     this.interims = interims;
 
+    const words = normalizeWords(this.turnText(this.currentTurn.id)).join(" ");
+    if (words !== this.lastTurnWords) {
+      this.lastTurnWords = words;
+      if (words) this.lastTextChangeAt = now;
+    }
+    if (this.recovering && (finals.length > 0 || interims.size > 0)) {
+      this.recovering = false;
+      this.metrics.log("rec-recovered", "continuous recognition is back");
+    }
+
     if (this.awaitingFirstText !== null && (finals.length > 0 || interims.size > 0)) {
       this.metrics.record("rec_first_interim", now - this.awaitingFirstText);
       this.awaitingFirstText = null;
@@ -578,13 +622,48 @@ export class SpeechController {
 
   private onFailure(f: RecognizerFailure): void {
     this.failure = f;
+    this.recovering = false;
     this.metrics.count(`rec_failure:${f}`);
     this.metrics.log("rec-failure", f);
     if (f !== "unsupported") {
       this.recognizer.setMode("push-to-talk");
       this.metrics.setInfo("recognizer_mode", "push-to-talk");
     }
+    if (f === "network" || f === "start") this.scheduleRecovery();
     this.changed();
+  }
+
+  /**
+   * Network failures are usually temporary (Wi-Fi drops; Edge and Chrome
+   * recognize speech online). Go back to continuous recognition when the
+   * connection returns, and retry every 20 s; if it still fails, three
+   * errors put it back in push-to-talk.
+   */
+  private scheduleRecovery(): void {
+    if (typeof window !== "undefined" && !this.onlineHandler && typeof window.addEventListener === "function") {
+      this.onlineHandler = () => this.tryRecover("online");
+      window.addEventListener("online", this.onlineHandler);
+    }
+    this.recoveryTimer ??= setInterval(() => this.tryRecover("retry"), RECOVERY_RETRY_MS);
+  }
+
+  private tryRecover(why: "online" | "retry"): void {
+    const retryable = this.failure === "network" || this.failure === "start";
+    if (this.recognizer.mode !== "push-to-talk" || !retryable) {
+      this.stopRecovery();
+      return;
+    }
+    if (!this.started) return;
+    if (typeof navigator !== "undefined" && navigator.onLine === false) return;
+    this.metrics.count("rec_retries");
+    this.metrics.log("rec-retry", why);
+    this.recovering = true;
+    this.useContinuous();
+  }
+
+  private stopRecovery(): void {
+    if (this.recoveryTimer) clearInterval(this.recoveryTimer);
+    this.recoveryTimer = null;
   }
 
   // ---- tick ----------------------------------------------------------------

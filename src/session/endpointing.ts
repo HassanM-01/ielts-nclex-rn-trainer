@@ -64,6 +64,8 @@ export interface AnswerTick {
   silenceMs: number;
   /** VAD heard voice in the last second (text may not have arrived yet). */
   voicedRecently: boolean;
+  /** Continuous recognition works. In push-to-talk, silence isn't "no answer". */
+  hearing: boolean;
   rules: AnswerRules;
   extraPatienceMs: number;
   defaults: EndpointingDefaults;
@@ -95,6 +97,7 @@ export function decideAnswer(turn: AnswerTurn, t: AnswerTick): AnswerAction {
     return { type: "wait" };
   }
 
+  if (!t.hearing) return { type: "wait" };
   // The VAD can postpone the no-speech repeat (words may be on their way),
   // but only by one more no-speech period: room noise must not stall the exam.
   if (t.voicedRecently && t.now - turn.listenStartedAt < 2 * t.defaults.noSpeechMs) return { type: "wait" };
@@ -122,6 +125,7 @@ export interface MonologueTick {
   text: string;
   silenceMs: number;
   voicedRecently: boolean;
+  hearing: boolean;
   rules: MonologueRules;
   noSpeechMs: number;
 }
@@ -142,6 +146,7 @@ export function decideMonologue(m: MonologueTurn, t: MonologueTick): MonologueAc
   const silence = Math.min(t.silenceMs, t.now - m.listenStartedAt);
 
   if (!hasSpeech) {
+    if (!t.hearing) return { type: "wait" };
     if (t.voicedRecently && t.now - m.listenStartedAt < 2 * t.noSpeechMs) return { type: "wait" };
     if (t.now - m.listenStartedAt >= t.noSpeechMs) return m.startRepeated ? { type: "move-on" } : { type: "repeat-start" };
     return { type: "wait" };

@@ -41,7 +41,7 @@ export const es = {
 
   recognition: {
     network:
-      "El reconocimiento de voz no responde en este navegador. Puedes seguir usando el botón “Mantén presionado para hablar”, o abrir la aplicación en {other}.",
+      "El reconocimiento de voz no responde (¿se fue el internet?). Mientras tanto, mantén presionado el botón para hablar. Cuando vuelva la conexión te escucharemos solos otra vez. Si sigue fallando, abre la aplicación en {other}.",
     notAllowed:
       "El navegador bloqueó el micrófono. Haz clic en el candado junto a la dirección de la página, permite el micrófono y vuelve a cargar la página.",
     audioCapture: "No encontramos un micrófono. Conecta uno (o tus audífonos con micrófono) y vuelve a cargar la página.",

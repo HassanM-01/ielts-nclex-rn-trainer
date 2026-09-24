@@ -65,7 +65,7 @@ const MAX_EVENTS = 200;
 const NOTABLE_EVENTS = new Set([
   "stall", "rec-error", "rec-failure", "mic-change", "tts-fallback", "tts-watchdog", "tts-stuck", "vad",
   "barge-in", "carry", "echo-trim", "commit", "repeat-request", "no-speech-repeat", "no-answer", "time-limit",
-  "backup-prompt", "hard-stop", "ai-reply", "ai-fallback", "part3-end",
+  "backup-prompt", "hard-stop", "ai-reply", "ai-fallback", "part3-end", "rec-retry", "rec-recovered",
 ]);
 const REPORT_EVENTS = 80;
 const MAX_SAMPLES = 500;
