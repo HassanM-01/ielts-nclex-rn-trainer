@@ -5,9 +5,51 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 5 (grading, streamed and structured, and the results screen)
-- **State:** planned, not started
-- **Waiting on:** Hassan's go-ahead on the step 5 plan and answers to its questions.
+- **State:** plan APPROVED by Hassan (2026-09-25), not started. The next session should start building straight away (it counts as mid-step; no need to re-ask). The plan is under "Step 5 plan (approved)" below.
+- **Waiting on:** nothing. `api/prompts/ielts-descriptors.md` is in place.
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
+
+## Step 5 plan (approved 2026-09-25)
+
+- **`/api/grade`** (SPEC 11): token check; streams `GRADE_MODEL` (claude-opus-5-5) with structured outputs (`output_config.format`, the SPEC 11 schema, fields in schema order so `evidence` comes before `band`); `maxDuration` 300 in `vercel.json`; one retry on `max_tokens`, a refusal or a network error.
+  - Prompt: `api/prompts/grade-ielts.md` plus `api/prompts/ielts-descriptors.md` (verbatim official descriptors).
+  - Input: the transcript labelled by part and question; per-turn metrics (speaking time, words, words per minute, pauses over 1 s and 2 s, time to first word; Edge confidence is always 1, so no low-confidence words); saved words (none until step 6); level; "Ayuda" use (none until step 7).
+  - Rules: quote evidence, then a whole band; when torn, choose the lower band; don't penalise obvious recognition errors; nonsense words may be pronunciation problems; use the fluency metrics.
+- **Overall band** in code: mean of the 3 criteria, rounded DOWN to the nearest 0.5, labelled "Banda estimada, sin pronunciación". Unit tested.
+- **Timing:** start the grade request when the closing line begins. Parse the stream with a small partial-JSON parser and render each criterion as its object closes.
+- **Engine additions:** record per-answer metrics on `AnswerRecord` (speech start/end, words, pauses, time to first word); record Part 2 audio with MediaRecorder (kept in memory, never uploaded).
+- **Results screen** (SPEC 13, replaces the transcript screen as the post-exam page):
+  - local stats instantly (target ≤ 200 ms);
+  - criteria streaming in (first band ~30 s, p95 90 s);
+  - top 3 fixes and the next focus;
+  - 2 upgraded answers side by side at the level's target band;
+  - "Reintentar": the examiner re-asks, Julio answers, and `/api/examiner` with a new `kind: "compare"` uses `EXAMINER_MODEL` to compare the two attempts in 2 lines of Spanish;
+  - "vocab to learn" with "Guardar";
+  - Part 2 replay;
+  - partial modes labelled as a partial sample;
+  - a Spanish error message with a retry.
+- **Metrics:** new latency rows `stats_on_screen` and `grade_first_band` (SPEC 3 budget: 0 / 200 ms and 30 / 90 s).
+- **Tests:** rounding, schema, partial JSON, local stats, prompt input, `/api/grade` and compare with the SDK mocked (never the real API).
+- **Checkpoint** = HUMAN_GUIDE Stage 5 (Test A as himself: about 8+, below 7.5 means off; Test B as a B1 speaker: 4.5 to 5.5, above 6 means off). About $0.10 to $0.20 per graded test.
+- **Hassan's answers:**
+  - "Guardar" saves to localStorage now (moved to Supabase in step 6).
+  - Feedback targets Nivel 2 (upgraded answers at band 7) until placement in step 7.
+  - The grade-time daily cap waits for step 6.
+
+## Deferred to later steps (don't forget)
+
+Step 6 (Supabase, History, Vocab, deploy):
+- [ ] `/api/session-start`: the one RPC (today's count, recent topic ids, profile row); refuse a token at `DAILY_SESSION_CAP`; pass `recent` (last 5 sessions' Part 1 ids, last 10 sessions' card ids) to `selectItems`; return the level and up to 30 saved words due. On Supabase failure keep today's behaviour (token plus questions, no cap, no filter).
+- [ ] `/api/grade`: one atomic increment-and-check against the daily cap before calling the model.
+- [ ] Vocab: move words saved in localStorage (step 5 "Guardar") into the `vocab` table, then read and write through `/api/vocab`.
+- [ ] Profile: store `pause_p90` after each session and apply `personalBaseMs()` (already written and tested in `src/session/endpointing.ts`) to the next session's endpointing.
+- [ ] Save sessions (upsert by client uuid) with transcript, metrics snapshot and grade; keep the finished checkpoint in localStorage until the save succeeds.
+- [ ] Deploy: SPA rewrite to `index.html` for `/lab`, `/examen`, `/transcripcion` (and the results route); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
+
+Step 7 (levels, Ayuda, quick practice):
+- [ ] Level from `profile` (placement from the first full test) instead of `DEFAULT_LEVEL`; the move-up / move-down suggestions.
+- [ ] Send the card's `useful_words` and `help` (already in the bank, not yet in `IeltsItems`) to the browser for the cue card and the Ayuda panel; log Ayuda use per question and pass it to the grader.
+- [ ] "Práctica rápida" mode (one card plus the first 2 questions of its Part 3 set) in the mode selector and `buildIeltsScript`.
 
 ## Step status
 
@@ -40,6 +82,8 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-25 (fifth part): step 5 prep and handoff.** Hassan approved the step 5 plan (defaults for Guardar, level and cap; see "Step 5 plan"). He supplied the official IELTS Speaking band descriptors PDF; its text was extracted verbatim into `api/prompts/ielts-descriptors.md` (bands 9 to 0, four criteria each, plus the two notes), and the PDF was moved to the Windows Recycle Bin as he asked. The session ended here because the chat context was nearly full. The next session starts building step 5.
 
 **2026-09-25 (fourth part): step 4 done.** Hassan's Stage 4c review passed. Step 5 is planned and waiting for the go-ahead.
 
