@@ -4,13 +4,13 @@
 
 import { useFrameSubscription } from "../app/speech";
 import { FIXED_SET } from "../exams/ielts-fixed-set";
-import { buildIeltsScript, IELTS_ENDPOINTING } from "../exams/ielts";
+import { buildIeltsScript, IELTS_ENDPOINTING, type ScriptMode } from "../exams/ielts";
 import { conditionsLevel, DEFAULT_LEVEL } from "../levels/levels";
 import type { SpeechController } from "../speech/controller";
 import { newSessionId, saveCheckpoint, type ExamCheckpoint } from "./checkpoint";
 import { ExamEngine } from "./engine";
 import { ExaminerClient } from "./examiner-client";
-import { getToken } from "./token-client";
+import { getToken, takePreparedItems } from "./token-client";
 
 const FALLBACK_EXAMINER_NAME = "Alex";
 
@@ -20,9 +20,12 @@ export function getActiveExam(): ExamEngine | null {
   return active;
 }
 
-/** "Empezar examen". Call from the click handler (it unlocks audio). */
-export function startNewExam(speech: SpeechController, clickAt: number): ExamEngine {
-  const mode = "full" as const;
+/**
+ * "Empezar examen". Call from the click handler (it unlocks audio). Uses the
+ * questions /api/session-start prepared on Home, or the fixed set offline.
+ */
+export function startNewExam(speech: SpeechController, clickAt: number, mode: ScriptMode = "full"): ExamEngine {
+  const prepared = takePreparedItems();
   const now = new Date().toISOString();
   const cp: ExamCheckpoint = {
     v: 1,
@@ -32,7 +35,7 @@ export function startNewExam(speech: SpeechController, clickAt: number): ExamEng
     level: conditionsLevel(mode, DEFAULT_LEVEL),
     startedAt: now,
     updatedAt: now,
-    items: FIXED_SET,
+    items: prepared?.items ?? FIXED_SET,
     examinerName: speech.examiner.name || FALLBACK_EXAMINER_NAME,
     voiceURI: speech.synth.voice?.voiceURI ?? null,
     nextStep: 0,
@@ -50,12 +53,17 @@ export function resumeExam(speech: SpeechController, cp: ExamCheckpoint, clickAt
   return launch(speech, cp, clickAt);
 }
 
+function scriptMode(mode: ExamCheckpoint["mode"]): ScriptMode {
+  return mode === "part1" || mode === "parts23" ? mode : "full";
+}
+
 function launch(speech: SpeechController, cp: ExamCheckpoint, clickAt: number): ExamEngine {
   active?.dispose();
   const steps = buildIeltsScript(cp.items, {
     examinerName: cp.examinerName,
     level: cp.level,
     hour: new Date(cp.startedAt).getHours(),
+    mode: scriptMode(cp.mode),
   });
   const engine = new ExamEngine(speech, steps, cp, {
     level: cp.level,

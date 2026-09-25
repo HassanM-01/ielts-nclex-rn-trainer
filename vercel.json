@@ -5,6 +5,9 @@
   "functions": {
     "api/examiner.ts": {
       "includeFiles": "api/prompts/**"
+    },
+    "api/session-start.ts": {
+      "includeFiles": "data/bank/ielts/*.json"
     }
   }
 }

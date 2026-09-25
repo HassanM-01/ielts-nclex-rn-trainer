@@ -1,8 +1,10 @@
-// Home (SPEC 13, step 2 version): "Empezar examen", the mic check, resume
-// after a reload. Mode selector, level and last score come in steps 4 to 7.
+// Home (SPEC 13, step 4 version): mode selector, "Empezar examen", the mic
+// check, resume after a reload. Level, last score and quick practice come in
+// steps 5 to 7.
 //
-// Prewarm (SPEC 3.5): load the voice list and ask for mic permission as soon
-// as Home loads, so the "Empezar examen" click can start speaking at once.
+// Prewarm (SPEC 3.5): load the voice list, ask for mic permission, and fetch
+// a token plus this session's questions as soon as Home loads, so the
+// "Empezar examen" click can start speaking at once.
 
 import { useEffect, useState } from "react";
 import { BrowserBanner } from "../components/BrowserBanner";
@@ -11,9 +13,30 @@ import { RecognitionBanner } from "../components/RecognitionBanner";
 import { t } from "../i18n";
 import { canResume, clearCheckpoint, loadCheckpoint } from "../session/checkpoint";
 import { resumeExam, startNewExam } from "../session/exam-session";
-import { getToken, login, loginStatus, storedPassphrase, type LoginResult } from "../session/token-client";
+import type { ScriptMode } from "../exams/ielts";
+import { login, loginStatus, prepareSession, storedPassphrase, type LoginResult } from "../session/token-client";
 import { navigate } from "./router";
 import { useSpeech } from "./speech";
+
+const MODES: ScriptMode[] = ["full", "part1", "parts23"];
+const MODE_KEY = "exam.mode.v1";
+
+function loadMode(): ScriptMode {
+  try {
+    const m = localStorage.getItem(MODE_KEY);
+    return (MODES as string[]).includes(m ?? "") ? (m as ScriptMode) : "full";
+  } catch {
+    return "full";
+  }
+}
+
+function saveMode(m: ScriptMode): void {
+  try {
+    localStorage.setItem(MODE_KEY, m);
+  } catch {
+    // Remembered for this page only.
+  }
+}
 
 async function requestMicPermission(): Promise<boolean> {
   try {
@@ -32,12 +55,13 @@ export function Home() {
   const [showMicCheck, setShowMicCheck] = useState(!speech.prefs.micCheckDone);
   const [pass, setPass] = useState("");
   const [passState, setPassState] = useState<LoginResult | "none" | "checking">(storedPassphrase() ? (loginStatus() ?? "ok") : "none");
+  const [mode, setMode] = useState<ScriptMode>(loadMode);
 
   useEffect(() => {
     void speech.init();
     if (!speech.started) void requestMicPermission().then((ok) => setMicBlocked(!ok));
-    // Prewarm the session token (SPEC 3.5).
-    if (storedPassphrase()) void getToken().then(() => setPassState(loginStatus() ?? "ok"));
+    // Prewarm a token and this session's questions (SPEC 3.5).
+    void prepareSession().then((r) => setPassState(r));
   }, [speech]);
 
   const submitPass = async () => {
@@ -47,7 +71,7 @@ export function Home() {
   };
 
   const start = () => {
-    startNewExam(speech, performance.now());
+    startNewExam(speech, performance.now(), mode);
     navigate("/examen");
   };
 
@@ -118,10 +142,34 @@ export function Home() {
       )}
 
       <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <fieldset className="mb-4">
+          <legend className="mb-2 font-medium">{t.home.modeLabel}</legend>
+          <div className="flex flex-wrap gap-2">
+            {MODES.map((m) => (
+              <label
+                key={m}
+                className={`cursor-pointer rounded-lg border px-3 py-2 ${mode === m ? "border-emerald-700 bg-emerald-50 font-medium" : "border-slate-300"}`}
+              >
+                <input
+                  type="radio"
+                  name="mode"
+                  className="sr-only"
+                  checked={mode === m}
+                  onChange={() => {
+                    setMode(m);
+                    saveMode(m);
+                  }}
+                />
+                {t.home.modes[m]}
+              </label>
+            ))}
+          </div>
+          <p className="mt-2 text-sm text-slate-600">{t.home.modeHints[mode]}</p>
+        </fieldset>
         <button type="button" className="w-full rounded-xl bg-emerald-700 px-6 py-4 text-xl font-semibold text-white hover:bg-emerald-800" onClick={start}>
           {t.home.start}
         </button>
-        <p className="mt-2 text-sm text-slate-600">{t.home.startHint}</p>
+        <p className="mt-2 text-sm text-slate-600">{t.home.headphonesTip}</p>
         {cp?.finished && (
           <button type="button" className="mt-3 text-sm text-slate-600 underline" onClick={() => navigate("/transcripcion")}>
             {t.home.lastExam}

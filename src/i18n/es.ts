@@ -58,7 +58,18 @@ export const es = {
 
   home: {
     start: "Empezar examen",
-    startHint: "Examen completo: presentación y Partes 1, 2 y 3 (unos 12 a 14 minutos). Usa audífonos si puedes.",
+    modeLabel: "¿Qué quieres practicar?",
+    modes: {
+      full: "Examen completo",
+      part1: "Solo Parte 1",
+      parts23: "Partes 2 y 3",
+    },
+    modeHints: {
+      full: "Como el examen real: presentación y Partes 1, 2 y 3 (12 a 14 minutos).",
+      part1: "Presentación y preguntas cortas de la Parte 1 (unos 5 minutos).",
+      parts23: "La tarjeta de la Parte 2 y la conversación de la Parte 3 (unos 9 minutos).",
+    },
+    headphonesTip: "Usa audífonos si puedes.",
     micCheckAgain: "Probar el micrófono",
     hideMicCheck: "Ocultar la prueba del micrófono",
     resumeTitle: "Tienes un examen sin terminar",

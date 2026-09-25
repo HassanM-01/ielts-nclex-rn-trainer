@@ -73,6 +73,35 @@ describe("buildIeltsScript", () => {
   });
 });
 
+describe("practice modes", () => {
+  const kinds = (mode: "part1" | "parts23") =>
+    buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 2, hour: 15, mode }).map((s) => `${s.kind}:${s.state}`);
+
+  it("Solo Parte 1: opening, Part 1, practice closing", () => {
+    const k = kinds("part1");
+    expect(k.slice(0, 2)).toEqual(["ask:opening", "ask:opening"]);
+    expect(k.filter((x) => x.endsWith(":part1"))).toHaveLength(12);
+    expect(k.some((x) => x.includes("part2") || x.includes("part3"))).toBe(false);
+    const last = buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 2, hour: 15, mode: "part1" }).at(-1);
+    expect(last?.kind === "say" && last.text).toBe(LINES.closingPractice);
+  });
+
+  it("Partes 2 y 3: a short greeting, Part 2, Part 3, practice closing", () => {
+    const script = buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 2, hour: 15, mode: "parts23" });
+    expect(script[0]).toEqual({ kind: "say", state: "opening", text: LINES.practiceParts23(15, "Sonia") });
+    expect(kinds("parts23").slice(1)).toEqual([
+      "say:part2_prep",
+      "prep:part2_prep",
+      "monologue:part2_speak",
+      "ask:part2_roundoff",
+      "discussion:part3",
+      "say:closing",
+    ]);
+    const prep = script.find((s) => s.kind === "prep");
+    expect(prep?.kind === "prep" && prep.ms).toBe(90_000); // Nivel 2
+  });
+});
+
 describe("cardTopic", () => {
   it("turns the cue card prompt into a topic phrase", () => {
     expect(cardTopic("Describe a noisy place you have been to.")).toBe("a noisy place you have been to");

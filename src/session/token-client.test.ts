@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getToken, login, resetTokenCache, storedPassphrase } from "./token-client";
+import { FIXED_SET } from "../exams/ielts-fixed-set";
+import { getToken, login, prepareSession, resetTokenCache, storedPassphrase, takePreparedItems } from "./token-client";
 
 let store: Map<string, string>;
 
@@ -43,6 +44,21 @@ describe("token client", () => {
     expect(await login("x", down as unknown as typeof fetch)).toBe("unavailable");
     const notConfigured = vi.fn(async () => new Response("{}", { status: 500 }));
     expect(await login("x", notConfigured as unknown as typeof fetch)).toBe("unavailable");
+  });
+
+  it("keeps the questions the server selected, for one exam", async () => {
+    const f = vi.fn(async () => new Response(JSON.stringify({ token: "t", expiresAt: Date.now() + 45 * 60_000, items: FIXED_SET, season: "2026-09" }), { status: 200 }));
+    await login("p", f as unknown as typeof fetch);
+    expect(takePreparedItems()).toEqual({ items: FIXED_SET, season: "2026-09" });
+    expect(takePreparedItems()).toBeNull(); // used once
+  });
+
+  it("prepares a fresh session with the stored passphrase", async () => {
+    expect(await prepareSession(ok() as typeof fetch)).toBe("none");
+    await login("p", ok("t1") as typeof fetch);
+    const f = ok("t2");
+    expect(await prepareSession(f as typeof fetch)).toBe("ok");
+    expect(f).toHaveBeenCalledOnce();
   });
 
   it("returns null without a stored passphrase", async () => {

@@ -1,0 +1,80 @@
+# Evergreen IELTS Speaking topics: the classic Part 1 topics and Part 2
+# categories that recur every year, plus the health cards (SPEC 9).
+# Titles only. scripts/build-bank.ts writes everything else.
+#
+# Format: "key: value" header lines, then sections. In [health], each line is
+# "title | NCLEX Client Needs area"; in [part1-opening], "title | id".
+season: evergreen
+
+[part1-opening]
+Work | work
+Home and accommodation | home
+Hometown | hometown
+
+[part1]
+Watches
+Cars
+Websites
+Mirrors
+Parks and gardens
+Shopping
+Tidiness
+Music
+Teachers
+Social media
+Clothing
+Films
+Dreams and ambitions
+The sky and stars
+Art
+Singing
+Evenings
+Old buildings
+Sports on TV
+Science
+Headphones
+Jokes and comedy
+History
+Morning routines
+Weather
+Food and cooking
+Reading
+Sleep
+Public transport
+Holidays
+
+[part2]
+a family member you admire
+a teacher who influenced you
+a place you would like to visit in the future
+a memorable journey you have made
+a piece of technology you use every day
+a gift you received that was important to you
+a traditional festival in your country
+a hobby you enjoy
+a restaurant you like to go to
+a website you often use
+a goal you would like to achieve
+a sport you enjoy watching or playing
+a building you think is beautiful
+a time you were late for something important
+a piece of good advice you received
+an old friend you got in touch with again
+a place where you like to relax
+a time you had to wait for something
+
+[health]
+a time you had to decide quickly who needed help first | Management of Care
+a time you taught someone to do something important | Health Promotion and Maintenance
+a safety rule at your workplace that you think matters | Safety and Infection Prevention and Control
+a time you calmed down someone who was worried or upset | Psychosocial Integrity
+a small change you noticed that turned out to be important | Reduction of Risk Potential
+a mistake you made and what you learned from it | Safety and Infection Prevention and Control
+a healthy habit you started | Health Promotion and Maintenance
+a time you worked in a team under pressure | Management of Care
+a person who takes care of others in your community | Basic Care and Comfort
+a time you had to stay calm in an emergency | Physiological Adaptation
+a time you had to follow instructions very carefully | Pharmacological and Parenteral Therapies
+a time you helped someone feel more comfortable | Basic Care and Comfort
+a new medicine or medical technology you heard about | Pharmacological and Parenteral Therapies
+a time you explained something complicated in simple words | Management of Care

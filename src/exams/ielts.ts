@@ -74,6 +74,10 @@ export const LINES = {
   /** Examiner interruption (Part 1 time limit, Part 2 hard stop) and neutral transition. */
   thankYou: "Thank you.",
   closing: "Thank you. That is the end of the speaking test.",
+  /** Partial practice modes. */
+  practiceParts23: (hour: number, name: string) =>
+    `${greeting(hour)}. My name is ${name}. In this practice, we'll do Part 2 and Part 3 of the speaking test.`,
+  closingPractice: "Thank you. That is the end of this practice.",
   resume: "Let's continue.",
   /** Printed on the cue card. */
   cueCardLead: "You should say:",
@@ -93,19 +97,30 @@ export function topicIntro(t: Part1Topic): string {
   return t.intro ?? `Now let's talk about ${t.topic.toLowerCase()}.`;
 }
 
+/** Modes with a script in step 4; quick practice and Clinical arrive later. */
+export type ScriptMode = "full" | "part1" | "parts23";
+
 export interface ScriptOptions {
   examinerName: string;
   level: LevelId;
   /** Local hour, for the greeting. */
   hour: number;
+  /** Default "full". */
+  mode?: ScriptMode;
 }
 
 /** Compiles the selected items into the steps the engine runs. */
 export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[] {
   const level = LEVELS[opts.level];
+  const mode = opts.mode ?? "full";
   const steps: Step[] = [];
+  const withOpening = mode !== "parts23";
+  const withPart1 = mode !== "parts23";
+  const withParts23 = mode !== "part1";
 
-  steps.push({
+  if (!withOpening) {
+    steps.push({ kind: "say", state: "opening", text: LINES.practiceParts23(opts.hour, opts.examinerName) });
+  } else steps.push({
     kind: "ask",
     state: "opening",
     id: "opening-name",
@@ -114,9 +129,11 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
     repeatText: LINES.openingRepeat,
     rules: OPENING_RULES,
   });
-  steps.push({ kind: "ask", state: "opening", id: "opening-id", part: 0, text: LINES.id, repeatText: LINES.idRepeat, rules: OPENING_RULES });
+  if (withOpening) {
+    steps.push({ kind: "ask", state: "opening", id: "opening-id", part: 0, text: LINES.id, repeatText: LINES.idRepeat, rules: OPENING_RULES });
+  }
 
-  const topics = [...items.part1].sort((a, b) => Number(b.opening) - Number(a.opening));
+  const topics = withPart1 ? [...items.part1].sort((a, b) => Number(b.opening) - Number(a.opening)) : [];
   topics.forEach((topic, ti) => {
     topic.questions.forEach((q, qi) => {
       const lead = qi === 0 ? [ti === 0 ? LINES.part1Intro : "", topicIntro(topic)] : [];
@@ -131,6 +148,11 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
       });
     });
   });
+
+  if (!withParts23) {
+    steps.push({ kind: "say", state: "closing", text: LINES.closingPractice, interruptible: false });
+    return steps;
+  }
 
   const card = items.part2;
   const rules: MonologueRules = {
@@ -160,6 +182,6 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
     });
   }
 
-  steps.push({ kind: "say", state: "closing", text: LINES.closing, interruptible: false });
+  steps.push({ kind: "say", state: "closing", text: mode === "full" ? LINES.closing : LINES.closingPractice, interruptible: false });
   return steps;
 }

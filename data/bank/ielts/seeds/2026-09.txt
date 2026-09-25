@@ -1,0 +1,58 @@
+# IELTS Speaking season September–December 2026: reported topic titles only.
+# Seeds from SPEC 9, completed from the season's reported "new topics" list:
+# https://www.readingielts.com/ielts-speaking-part-1-from-september-to-december-2026
+# https://www.readingielts.com/ielts-speaking-part-2-from-september-to-december-2026
+# (checked 2026-09-25). scripts/build-bank.ts writes everything else.
+season: 2026-09
+ends: 2026-12-31
+
+[part1]
+Computers
+Lost and found
+Secondary school
+Paper
+Shoes
+Advertisements
+Feeling bored
+Collecting things
+Street markets
+Opportunities
+Fruit and vegetables
+Politeness
+Tiredness
+Rubbish and recycling
+Travelling
+Friends
+Names
+
+[part2]
+a noisy place you have been to
+someone older than you whom you admire
+an activity you do regularly that you think wastes time
+a time you received good service in a shop
+a city you would like to visit again
+someone who did something difficult and succeeded
+a famous person in your area
+a time you changed an important decision
+a happy person you know
+a very organized person you know
+a natural place in your city
+a skill you learned as a child
+a risk that turned out well
+a place where you have taken photos more than once
+a way that helps you save a lot of time
+an occasion when you lost something in public
+a person you met only once and would like to know more about
+a course that impressed you a lot
+a gift you would like to buy for a friend
+a book you read that made you happy
+a party for a special event that impressed you
+a public building you enjoy visiting
+a film you did not like
+a person who loves history
+a person who is good at making things by hand
+a person who taught you a new skill
+an enjoyable evening you had with friends
+
+[health]
+a person whose health and fitness you have helped to improve | Health Promotion and Maintenance

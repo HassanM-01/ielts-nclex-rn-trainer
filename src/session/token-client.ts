@@ -2,6 +2,7 @@
 // passphrase is typed once and kept in localStorage; tokens are refreshed
 // when older than 30 minutes (they expire after 45).
 
+import type { IeltsItems } from "../exams/ielts";
 import type { SessionStartResponse } from "../shared/examiner-api";
 
 export type LoginResult = "ok" | "wrong" | "unavailable";
@@ -16,6 +17,8 @@ interface Cached {
 }
 
 let cached: Cached | null = null;
+/** Questions the server selected with the last token, not yet used by an exam. */
+let prepared: { items: IeltsItems; season: string | null; fetchedAt: number } | null = null;
 let pending: Promise<LoginResult> | null = null;
 let lastResult: LoginResult | null = null;
 
@@ -54,6 +57,7 @@ export function login(passphrase: string, fetchImpl: typeof fetch = fetch): Prom
       const data = (await res.json()) as SessionStartResponse;
       if (typeof data.token !== "string") return "unavailable";
       cached = { token: data.token, fetchedAt: Date.now(), expiresAt: data.expiresAt };
+      if (data.items) prepared = { items: data.items, season: data.season, fetchedAt: Date.now() };
       storePassphrase(passphrase);
       return "ok";
     } catch {
@@ -77,9 +81,26 @@ export async function getToken(fetchImpl: typeof fetch = fetch): Promise<string 
   return r === "ok" && cached ? cached.token : null;
 }
 
+/**
+ * Prewarm on Home (SPEC 3.5): a fresh token and a fresh question selection.
+ * Returns "none" when no passphrase is stored yet.
+ */
+export function prepareSession(fetchImpl: typeof fetch = fetch): Promise<LoginResult | "none"> {
+  const pass = storedPassphrase();
+  return pass ? login(pass, fetchImpl) : Promise.resolve("none");
+}
+
+/** The prepared questions, once (an exam uses them); null if none or stale. */
+export function takePreparedItems(): { items: IeltsItems; season: string | null } | null {
+  const p = prepared;
+  prepared = null;
+  return p && Date.now() - p.fetchedAt < TOKEN_REFRESH_MS ? { items: p.items, season: p.season } : null;
+}
+
 /** Tests only. */
 export function resetTokenCache(): void {
   cached = null;
+  prepared = null;
   pending = null;
   lastResult = null;
 }

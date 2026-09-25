@@ -3,6 +3,8 @@
 // and its own copies of the limits, so nothing here reaches the server bundle
 // at runtime and nothing server-side reaches the browser.
 
+import type { IeltsItems } from "../exams/ielts";
+
 export interface ExchangeEntry {
   role: "examiner" | "candidate";
   text: string;
@@ -41,6 +43,10 @@ export interface SessionStartResponse {
   token: string;
   /** Epoch ms. */
   expiresAt: number;
+  /** This session's questions; null if the bank is unavailable (the browser uses its fixed set). */
+  items: IeltsItems | null;
+  /** The season file the questions came from, if any. */
+  season: string | null;
 }
 
 export type ApiErrorCode = "unauthorized" | "bad-request" | "not-configured" | "upstream" | "wrong-passphrase";
