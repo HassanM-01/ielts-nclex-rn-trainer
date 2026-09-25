@@ -155,6 +155,11 @@ describe("validation", () => {
     expect(checkPart1Topic({ ...topic("p1-a"), questions: ["Hi"] })).toContain("needs 3 to 5 questions");
   });
 
+  it("warns when the same Part 3 question appears in 3 or more sets", () => {
+    const bank = fullBank(); // every fixture set shares the same questions
+    expect(validateBank(bank, SEP).warnings.join(" | ")).toMatch(/Part 3 question used in \d+ sets/);
+  });
+
   it("finds duplicate ids across files", () => {
     const [ever, season] = fullBank();
     season!.part1.push(topic("p1-work"));

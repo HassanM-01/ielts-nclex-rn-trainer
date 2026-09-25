@@ -123,6 +123,15 @@ export function validateBank(files: readonly BankFile[], now: Date): ValidationR
   if (!current) errors.push(`no season file covers ${now.toISOString().slice(0, 10)}`);
   else if (seasonCards < MINIMUMS.seasonCards) errors.push(`only ${seasonCards} current-season cards (need ${MINIMUMS.seasonCards})`);
   if (health.length < MINIMUMS.healthCards) errors.push(`only ${health.length} health cards (need ${MINIMUMS.healthCards})`);
+  // The same Part 3 question in many sets makes practice repetitive.
+  const seen = new Map<string, number>();
+  for (const s of files.flatMap((f) => f.part3)) {
+    for (const q of s.questions) {
+      const key = q.q.toLowerCase().replace(/[^a-z ]/g, "").replace(/\s+/g, " ").trim();
+      seen.set(key, (seen.get(key) ?? 0) + 1);
+    }
+  }
+  for (const [q, n] of seen) if (n >= 3) warnings.push(`Part 3 question used in ${n} sets: "${q}"`);
   const missingAreas = NCLEX_AREAS.filter((a) => !healthByArea[a]);
   if (missingAreas.length) warnings.push(`no health card for: ${missingAreas.join(", ")}`);
 

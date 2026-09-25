@@ -41,6 +41,15 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 
 ## Last session
 
+**2026-09-25 (third part): bank review fixes.** Hassan asked for a sample (8 cards, 5 topics). Three problems turned up; he approved the fixes:
+1. **The health cards' Part 3 sets were nearly identical:** 14 of 15 asked "Why do some people ignore health advice…?", all 15 asked about prevention vs treatment, and 13 about technology. The cause was the example questions in the build prompt. The 15 sets were rebuilt with `bank:build --health --part3-only`: the cue cards were kept, and each new set was told which questions the other health sets use. Each now has its own theme (priorities and quick decisions, teaching and learning, teamwork, communities in a crisis, trusting new discoveries…). Cue cards, Part 1 topics and the other sets are unchanged (checked).
+2. **Spanish help phrases used feminine forms for the speaker** ("honesta", "convencida", "cuidadosa"). Julio is "he" in the spec, so 6 strings were patched to masculine forms.
+3. **One help phrase named Guadalajara** (in English and Spanish). Now "In big cities…" / "En las ciudades grandes…".
+- **Prevention for future builds:**
+  - The prompt asks for masculine forms, no city names, and Part 3 questions tied to each card's own theme, with at most one question about the future.
+  - `bank:validate` warns about any Part 3 question used in 3 or more sets (none now).
+  - `bank:build` gained `--health` and `--part3-only`.
+
 **2026-09-25 (second part): step 4 built.** `npm run typecheck` (app, `/api`, scripts), `npm test` (282 tests), `npm run build` and `npm run bank:validate` all pass. The browser bundle is clean.
 
 Built:
@@ -404,4 +413,5 @@ New decisions during the build go below with a date.
 |---|---|---|
 | 2026-09-25 | Bank build sample, 4 items (claude-opus-5-5) | US$0.11 |
 | 2026-09-25 | Bank build, remaining 106 items (145k input, 128k output tokens) | US$3.14 |
+| 2026-09-25 | Rebuild of the 15 health cards' Part 3 sets (estimated ~$0.50; more because of the avoid list) | US$1.06 |
 | 2026-09-23 to 25 | Part 3 examiner testing (Haiku 4.5, a few dozen calls) | under US$0.10 (estimate) |

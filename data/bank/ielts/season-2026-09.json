@@ -1300,7 +1300,7 @@
         },
         {
           "en": "To be honest, the main reason I haven't bought it yet is...",
-          "es": "Para ser honesta, la razón principal por la que todavía no lo he comprado es..."
+          "es": "Para ser honesto, la razón principal por la que todavía no lo he comprado es..."
         }
       ]
     },
@@ -2062,8 +2062,8 @@
               "es": "Depende mucho de la persona, pero en términos generales..."
             },
             {
-              "en": "In big cities like Guadalajara, a lot of people tend to...",
-              "es": "En ciudades grandes como Guadalajara, mucha gente suele..."
+              "en": "In big cities, a lot of people tend to...",
+              "es": "En las ciudades grandes, mucha gente suele..."
             },
             {
               "en": "Family plays a big part, so many people...",
@@ -3603,7 +3603,7 @@
           "help": [
             {
               "en": "In theory it should, but I'm not entirely convinced.",
-              "es": "En teoría debería, pero no estoy del todo convencida."
+              "es": "En teoría debería, pero no estoy del todo convencido."
             },
             {
               "en": "The problem is that saving time often leads to people working even more.",
@@ -4064,7 +4064,7 @@
           "help": [
             {
               "en": "Personally, I'm convinced that the thought matters far more, because...",
-              "es": "Personalmente, estoy convencida de que la intención importa mucho más, porque..."
+              "es": "Personalmente, estoy convencido de que la intención importa mucho más, porque..."
             },
             {
               "en": "Having said that, I can understand why some people...",
@@ -5071,120 +5071,120 @@
     },
     {
       "id": "p3-person-whose-health-and-fitness-you-have",
-      "theme": "Health and prevention",
+      "theme": "Motivation and changing habits",
       "questions": [
         {
-          "q": "What do people in your country usually do to stay healthy?",
+          "q": "In your country, do friends and family often encourage each other to live more healthily?",
           "kind": "concrete",
-          "rephrase": "How do people where you live try to keep healthy?",
+          "rephrase": "Where you come from, do people in a family or group of friends help each other to be healthier?",
           "followups": [
-            "Has this changed in recent years?",
-            "Is it different for younger and older people?"
+            "Why do you think that is?",
+            "Can you give me an example?"
           ],
           "help": [
             {
-              "en": "Generally speaking, most people I know try to...",
-              "es": "En términos generales, la mayoría de la gente que conozco intenta..."
+              "en": "On the whole, I'd say families play a big role in this, because...",
+              "es": "En general, diría que las familias tienen un papel importante en esto, porque..."
             },
             {
-              "en": "It depends a lot on where people live and how much free time they have.",
-              "es": "Depende mucho de dónde vive la gente y de cuánto tiempo libre tiene."
+              "en": "It's quite common, for instance, for relatives to...",
+              "es": "Es bastante común, por ejemplo, que los familiares..."
             },
             {
-              "en": "A good example of this would be...",
-              "es": "Un buen ejemplo de esto sería..."
+              "en": "That said, it isn't always done in a positive way.",
+              "es": "Dicho esto, no siempre se hace de una manera positiva."
             }
           ]
         },
         {
-          "q": "Where do people in your country usually get information about health and diet?",
+          "q": "Do people where you live generally prefer to exercise alone or with other people?",
           "kind": "concrete",
-          "rephrase": "Where do people in your country learn about health and food?",
+          "rephrase": "Where you live, do people like doing exercise on their own or in a group?",
           "followups": [
-            "Do you think these sources are reliable?",
-            "Why do you think that is?"
+            "Why might some people prefer the other option?",
+            "Which do you prefer yourself?"
           ],
           "help": [
             {
-              "en": "These days, a lot of people turn to social media for advice.",
-              "es": "Hoy en día, mucha gente recurre a las redes sociales para buscar consejos."
+              "en": "From what I've seen, most people tend to...",
+              "es": "Por lo que he visto, la mayoría de la gente suele..."
             },
             {
-              "en": "Older people, on the other hand, tend to trust their doctor more.",
-              "es": "La gente mayor, en cambio, suele confiar más en su médico."
+              "en": "Group activities are popular because they make it easier to...",
+              "es": "Las actividades en grupo son populares porque facilitan..."
             },
             {
-              "en": "The problem with that is that...",
-              "es": "El problema con eso es que..."
+              "en": "It really depends on the person's age and schedule.",
+              "es": "Realmente depende de la edad y del horario de cada persona."
             }
           ]
         },
         {
-          "q": "Why do some people ignore health advice even when they know it is good for them?",
+          "q": "Why do some people find it easier to change their habits when someone else supports them?",
           "kind": "abstract",
-          "rephrase": "Why do some people not follow good advice about their health?",
+          "rephrase": "Why is it easier for some people to change the way they live when another person helps them?",
           "followups": [
-            "Can you give me an example?",
-            "What could be done to change this?"
+            "Can you give me an example from your own experience?",
+            "Is support from a stranger as useful as support from a friend?"
           ],
           "help": [
             {
-              "en": "I think one of the main reasons is that the benefits are not immediate.",
-              "es": "Creo que una de las razones principales es que los beneficios no son inmediatos."
+              "en": "I think the main reason is that people feel accountable to someone else.",
+              "es": "Creo que la razón principal es que la gente se siente responsable ante otra persona."
             },
             {
-              "en": "Habits are very hard to break, especially when...",
-              "es": "Los hábitos son muy difíciles de romper, sobre todo cuando..."
+              "en": "Having someone check on your progress can make a huge difference.",
+              "es": "Tener a alguien que revise tus avances puede hacer una gran diferencia."
             },
             {
-              "en": "On top of that, some people simply can't afford a healthier lifestyle.",
-              "es": "Además, algunas personas simplemente no pueden permitirse un estilo de vida más saludable."
+              "en": "On the other hand, some people prefer to rely on themselves.",
+              "es": "Por otro lado, algunas personas prefieren depender de sí mismas."
             }
           ]
         },
         {
-          "q": "Do you think governments should spend more money on preventing illness than on treating it?",
+          "q": "Do you think it is ever wrong to try to persuade someone to change their lifestyle?",
           "kind": "abstract",
-          "rephrase": "Should governments pay more to stop people getting ill than to cure them?",
+          "rephrase": "Is it sometimes a bad idea to push another person to live in a different way?",
           "followups": [
-            "Why do you think that?",
-            "Are there any disadvantages to that approach?"
+            "Where would you draw the line?",
+            "Why do you think some people react badly to this?"
           ],
           "help": [
             {
-              "en": "In my view, prevention is far more cost-effective in the long run.",
-              "es": "En mi opinión, la prevención es mucho más rentable a largo plazo."
+              "en": "I'm convinced it depends on how it's done.",
+              "es": "Estoy convencido de que depende de cómo se haga."
             },
             {
-              "en": "Having said that, we can't simply neglect people who are already sick.",
-              "es": "Dicho esto, no podemos simplemente descuidar a quienes ya están enfermos."
+              "en": "If it's done with respect, I don't see a problem, but...",
+              "es": "Si se hace con respeto, no le veo problema, pero..."
             },
             {
-              "en": "Ideally, there should be a balance between the two.",
-              "es": "Lo ideal sería que hubiera un equilibrio entre ambas cosas."
+              "en": "Ultimately, adults have the right to make their own choices.",
+              "es": "Al final, los adultos tienen derecho a tomar sus propias decisiones."
             }
           ]
         },
         {
-          "q": "How might technology change the way people look after their health in the future?",
+          "q": "Which is more effective in changing people's behaviour: encouraging them or warning them about the dangers?",
           "kind": "abstract",
-          "rephrase": "How could technology change how people take care of their health later on?",
+          "rephrase": "What works better to make people change what they do: saying positive things or telling them about the risks?",
           "followups": [
-            "Do you think this will be a positive change?",
-            "Could it create any problems?"
+            "Why do you think that works better?",
+            "Does the answer change for young people and older people?"
           ],
           "help": [
             {
-              "en": "I imagine that wearable devices will become much more common.",
-              "es": "Me imagino que los dispositivos portátiles serán mucho más comunes."
+              "en": "In my view, encouragement tends to work better in the long run.",
+              "es": "En mi opinión, animar a la gente suele funcionar mejor a largo plazo."
             },
             {
-              "en": "One possible drawback is that people might rely too much on technology.",
-              "es": "Una posible desventaja es que la gente podría depender demasiado de la tecnología."
+              "en": "Warnings can be powerful, but people often get used to them.",
+              "es": "Las advertencias pueden ser eficaces, pero la gente a menudo se acostumbra a ellas."
             },
             {
-              "en": "It's hard to predict, but I suspect that...",
-              "es": "Es difícil predecirlo, pero sospecho que..."
+              "en": "Perhaps the best approach is a combination of the two.",
+              "es": "Quizás el mejor enfoque sea una combinación de ambos."
             }
           ]
         }

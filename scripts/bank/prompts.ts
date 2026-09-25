@@ -43,7 +43,9 @@ export const SYSTEM = `You write practice material for the IELTS Academic Speaki
 
 Never copy sample answers or passages from IELTS preparation websites or books. Write every question and phrase yourself.
 
-Spanish text is Mexican Spanish with correct accents and punctuation (¿?, ¡!). Glosses are short and natural, the way a Mexican teacher would translate the word or phrase in context.`;
+Spanish text is Mexican Spanish with correct accents and punctuation (¿?, ¡!). Glosses are short and natural, the way a Mexican teacher would translate the word or phrase in context. The candidate is a man: when a Spanish phrase refers to the speaker, use masculine forms ("estoy convencido", "fui muy cuidadoso").
+
+Never assume where the candidate lives: no city or region names in help phrases ("in my city", "where I live" instead).`;
 
 export function part1Prompt(seed: Extract<SeedItem, { kind: "part1" }>): string {
   const opening = seed.opening
@@ -58,10 +60,16 @@ ${opening}
 Write exactly 4 questions, in the order an examiner would ask them. Part 1 questions are short (usually 5 to 12 words) and about the candidate's own life: habits, preferences, likes and dislikes, frequency, the past ("when you were a child"), and one gently hypothetical or future question at most. Vary the forms: "Do you ...?", "How often ...?", "What kind of ...?", "Why ...?", "Did you ... when you were younger?", "Would you like to ...?". No two questions may ask the same thing. No abstract or society-level questions (those belong to Part 3).`;
 }
 
+/** Appended when rebuilding, so each Part 3 set differs from the rest of the bank. */
+export function avoidList(questions: readonly string[]): string {
+  if (questions.length === 0) return "";
+  return `\n\nOther cards in the bank already use these Part 3 questions. Do not reuse them or ask the same thing in other words:\n${questions.map((q) => `- ${q}`).join("\n")}`;
+}
+
 export function cardPrompt(seed: Extract<SeedItem, { kind: "part2" }>): string {
   const health = seed.health
     ? `
-This is a HEALTH card, tagged with the NCLEX-RN Client Needs area "${seed.area}". It must still be an ordinary IELTS cue card that any candidate could answer from everyday life, but one a nurse can answer richly from work, using the kind of language that area involves. The Part 3 questions stay general and abstract (society, prevention versus treatment, why people ignore health advice, the future of care), as in the real test, never clinical exam questions.`
+This is a HEALTH card, tagged with the NCLEX-RN Client Needs area "${seed.area}". It must still be an ordinary IELTS cue card that any candidate could answer from everyday life, but one a nurse can answer richly from work, using the kind of language that area involves. The Part 3 questions stay general, as in the real test, never clinical exam questions, and they grow out of THIS card's own theme (a card about teaching someone leads to learning and education; one about an emergency, to how people and communities cope with crises; one about a mistake, to responsibility and learning from failure). Avoid generic health-policy questions that would fit any health card.`
     : "";
   return `Write one IELTS Speaking Part 2 cue card with its linked Part 3 discussion.
 
@@ -79,7 +87,8 @@ Part 3 (the two-way discussion that follows):
 - theme: 2 to 5 words naming the broader theme (e.g. "Noise and cities").
 - questions: exactly 5, broader than the card and not personal repeats of it, in the order an examiner would ask them (concrete first, then abstract):
   - at least 2 "concrete": about people's experience in the candidate's country or city ("Do people in your country ...?", "What kinds of ... are popular where you live?").
-  - at least 2 "abstract": causes, comparisons, advantages and disadvantages, society, the future ("Why do some people ...?", "How might ... change in the future?", "Should governments ...?").
+  - at least 2 "abstract": causes, comparisons, advantages and disadvantages, society, values, the future.
+  - specific to this card's theme and varied in form; at most one question about the future, and don't default to technology.
   - each 8 to 22 words, neutral examiner style, one question only.
   - rephrase: the same question in simpler words (said if the candidate asks for a repeat); same meaning, easier vocabulary.
   - followups: exactly 2 short follow-up questions that push for a reason, an example or a comparison (e.g. "Why do you think that is?", "Can you give me an example from your city?").

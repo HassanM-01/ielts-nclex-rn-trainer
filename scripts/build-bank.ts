@@ -9,6 +9,9 @@
 //   --limit=N          build only the first N missing items (for a sample)
 //   --only=id1,id2     (re)build exactly these items
 //   --concurrency=N    parallel requests (default 3)
+//   --health           with --only: select every health card
+//   --part3-only       keep existing cue cards, replace only their Part 3 sets
+//                      (each new set is told which questions the others use)
 
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
@@ -17,7 +20,7 @@ import { join } from "node:path";
 import { createInterface } from "node:readline/promises";
 import type { BankFile } from "../src/exams/bank";
 import { emptyBankFile, estimateCost, planBuild, usageCost, type BuildTask } from "./bank/plan";
-import { cardPrompt, CardOutput, part1Prompt, Part1Output, SYSTEM, toCard, toPart1Topic } from "./bank/prompts";
+import { avoidList, cardPrompt, CardOutput, part1Prompt, Part1Output, SYSTEM, toCard, toPart1Topic } from "./bank/prompts";
 import { parseSeeds, part3IdFor, type SeedFile } from "./bank/seeds";
 import { checkCard, checkPart1Topic } from "./bank/validate";
 
@@ -59,6 +62,13 @@ function writeBankFile(sf: SeedFile, file: BankFile): void {
   renameSync(`${path}.tmp`, path);
 }
 
+/** Keeps the avoid list to the health sets (the ones being made distinct) and short. */
+let healthSetIds = new Set<string>();
+function onlyHealthOthers(questions: string[]): string[] {
+  return questions.filter((q) => healthQuestions.has(q)).slice(0, 80);
+}
+let healthQuestions = new Set<string>();
+
 async function main(): Promise<void> {
   const model = process.env.GRADE_MODEL ?? "";
   if (!model || !process.env.ANTHROPIC_API_KEY) {
@@ -67,7 +77,16 @@ async function main(): Promise<void> {
   }
   const seeds = readSeeds();
   const bank = readBank(seeds);
+  const refreshHealth = () => {
+    healthSetIds = new Set([...bank.values()].flatMap((f) => f.part2.filter((c) => c.tags.includes("health")).map((c) => c.part3_id)));
+    healthQuestions = new Set([...bank.values()].flatMap((f) => f.part3.filter((s) => healthSetIds.has(s.id)).flatMap((s) => s.questions.map((q) => q.q))));
+  };
+  refreshHealth();
   const only = (arg("only") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (arg("health")) {
+    for (const sf of seeds) for (const it of sf.items) if (it.kind === "part2" && it.health) only.push(it.id);
+  }
+  const part3Only = !!arg("part3-only");
   let tasks = planBuild(seeds, bank, only);
   const limit = Number(arg("limit") ?? 0);
   if (limit > 0) tasks = tasks.slice(0, limit);
@@ -105,7 +124,13 @@ async function main(): Promise<void> {
     const file = bank.get(task.output)!;
     const tag = file.season === "evergreen" ? "evergreen" : "season";
     const seed = task.seed;
-    let prompt = seed.kind === "part1" ? part1Prompt(seed) : cardPrompt(seed);
+    // Questions the other cards use (for --part3-only rebuilds).
+    const others = () =>
+      part3Only
+        ? [...bank.values()].flatMap((f) => f.part3.filter((s) => s.id !== part3IdFor(seed.id)).flatMap((s) => s.questions.map((q) => q.q)))
+        : [];
+    const basePrompt = () => (seed.kind === "part1" ? part1Prompt(seed) : cardPrompt(seed) + avoidList(onlyHealthOthers(others())));
+    let prompt = basePrompt();
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       const format = seed.kind === "part1" ? zodOutputFormat(Part1Output) : zodOutputFormat(CardOutput);
       const res = await client.messages.parse({
@@ -131,16 +156,20 @@ async function main(): Promise<void> {
           return;
         }
       } else {
-        const { card, set } = toCard(seed, res.parsed_output as ReturnType<typeof CardOutput.parse>, tag);
+        const built = toCard(seed, res.parsed_output as ReturnType<typeof CardOutput.parse>, tag);
+        const existingCard = file.part2.find((c) => c.id === built.card.id);
+        const card = part3Only && existingCard ? existingCard : built.card;
+        const set = built.set;
         problems = checkCard(card, set);
         if (problems.length === 0) {
           file.part2 = [...file.part2.filter((c) => c.id !== card.id), card];
           file.part3 = [...file.part3.filter((s) => s.id !== part3IdFor(card.id)), set];
           writeBankFile(seedFile.get(task.output)!, file);
+          refreshHealth();
           return;
         }
       }
-      prompt = `${seed.kind === "part1" ? part1Prompt(seed) : cardPrompt(seed as Extract<typeof seed, { kind: "part2" }>)}\n\nA previous attempt had these problems. Avoid them:\n${problems.map((p) => `- ${p}`).join("\n")}`;
+      prompt = `${basePrompt()}\n\nA previous attempt had these problems. Avoid them:\n${problems.map((p) => `- ${p}`).join("\n")}`;
     }
     throw new Error("still invalid after a retry");
   }
