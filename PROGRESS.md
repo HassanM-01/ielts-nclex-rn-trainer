@@ -4,10 +4,10 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 
 ## Current status
 
-- **Current step:** 4 (bank build and validation scripts, seasonal selection, `/api/session-start`)
-- **State:** built, awaiting checkpoint (bank built and validated)
-- **Waiting on:** Hassan's review of the bank (HUMAN_GUIDE Stage 4c). See "Checkpoint for Hassan" below.
-- **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
+- **Current step:** 5 (grading, streamed and structured, and the results screen)
+- **State:** planned, not started
+- **Waiting on:** Hassan's go-ahead on the step 5 plan and answers to its questions.
+- **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
 ## Step status
 
@@ -17,7 +17,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
-| 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | built (awaiting checkpoint) | |
+| 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
 | 5 | Grading (streamed, structured) and results screen | pending | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
@@ -40,6 +40,8 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-25 (fourth part): step 4 done.** Hassan's Stage 4c review passed. Step 5 is planned and waiting for the go-ahead.
 
 **2026-09-25 (third part): bank review fixes.** Hassan asked for a sample (8 cards, 5 topics). Three problems turned up; he approved the fixes:
 1. **The health cards' Part 3 sets were nearly identical:** 14 of 15 asked "Why do some people ignore health advice…?", all 15 asked about prevention vs treatment, and 13 about technology. The cause was the example questions in the build prompt. The 15 sets were rebuilt with `bank:build --health --part3-only`: the cue cards were kept, and each new set was told which questions the other health sets use. Each now has its own theme (priorities and quick decisions, teaching and learning, teamwork, communities in a crisis, trusting new discoveries…). Cue cards, Part 1 topics and the other sets are unchanged (checked).
@@ -290,32 +292,7 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Matching guide section: **HUMAN_GUIDE.md Stage 4c** (Stage 4b, the cost approval, is done: $3.25 spent). Budget about 30 minutes.
-
-**1. Review the bank** (in the repo folder):
-- `npm run bank:validate`: should end with "✓ The bank passes validation."
-- `npm run bank:sample`: prints 8 random cue cards with their Part 3 sets and 5 random Part 1 topics. Run it 2 or 3 times for variety. To see specific items: `npm run bank:sample -- --id=p2-noisy-place-you-have-been-to,p1-work`.
-
-  Check, as in 4c:
-  - Cards read like real IELTS cue cards ("Describe …", "You should say:", 3 bullets, "and explain …").
-  - Part 3 questions are on the card's theme but broader (society, comparisons, the future), with some concrete and some abstract.
-  - Help phrases sound like a strong candidate.
-  - The Spanish glosses look right.
-  - Nothing reads as copied from a prep site.
-  - The season file has the Sep–Dec 2026 topics (all 14 cards from SPEC 9 are in it).
-
-**2. Try it in the app:**
-- `npm run dev`, open http://localhost:3000.
-- Home now has **"¿Qué quieres practicar?"** with Examen completo / Solo Parte 1 / Partes 2 y 3.
-- Start two exams in a row (click "Terminar" after a few questions each). The questions should differ each time and come from the bank, not the old Work/Shoes/Computers set.
-- Try "Solo Parte 1" and "Partes 2 y 3" once each. They're practice modes at Nivel 2, so the voice is a little slower and Part 2 prep is 1½ minutes.
-
-**Report back:**
-- any card or topic that sounds off (with its id);
-- any Spanish gloss you doubt;
-- whether the questions changed between exams and the modes behaved.
-
-I can regenerate single items with `npm run bank:build -- --only=<id>` (a few cents each).
+Step 4 is done. The step 5 checkpoint will be written when step 5 is built (HUMAN_GUIDE.md Stage 5).
 
 ## Decisions
 
