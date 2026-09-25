@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 4 (bank build and validation scripts, seasonal selection, `/api/session-start`)
-- **State:** in progress
-- **Waiting on:** nothing to build; Hassan approves the bank build cost when the script asks (Stage 4b).
+- **State:** built, awaiting checkpoint (bank built and validated)
+- **Waiting on:** Hassan's review of the bank (HUMAN_GUIDE Stage 4c). See "Checkpoint for Hassan" below.
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
 
 ## Step status
@@ -17,7 +17,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
-| 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | in progress | |
+| 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | built (awaiting checkpoint) | |
 | 5 | Grading (streamed, structured) and results screen | pending | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
@@ -40,6 +40,34 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-25 (second part): step 4 built.** `npm run typecheck` (app, `/api`, scripts), `npm test` (282 tests), `npm run build` and `npm run bank:validate` all pass. The browser bundle is clean.
+
+Built:
+- **Seeds** (`data/bank/ielts/seeds/`, titles only):
+  - `evergreen.txt`: 3 opening and 30 classic Part 1 topics, 18 general cards, and 14 health cards with NCLEX areas.
+  - `2026-09.txt`: the 6 SPEC Part 1 seeds plus 11 more, and the 14 SPEC Part 2 seeds plus 13 more (and one season health card). The additions are the season's reported "new topics" from readingielts.com (Part 1 and Part 2 pages, checked 2026-09-25). Titles only.
+- **The bank** (`data/bank/ielts/evergreen.json`, `season-2026-09.json`), built with `claude-opus-5-5` using structured outputs:
+  - 50 Part 1 topics (3 opening), each with an intro and 4 questions.
+  - 60 cards (28 current season, 15 health covering all 8 NCLEX areas), each with 3 bullets, an explain line, 2 round-off questions, 5 useful words and 3 help phrases.
+  - 60 linked Part 3 sets of 5 questions (at least 2 concrete and 2 abstract), each question with a rephrase, 2 follow-ups and 3 help phrases.
+  - A 4-item sample was built and checked for quality first; the other 106 followed, with no failures.
+- **Scripts** (run with `tsx`):
+  - `npm run bank:build`: estimate, confirmation, per-item checks with one retry, incremental atomic writes, re-runs build only what's missing; options `--dry-run`, `--limit`, `--only`, `--yes`.
+  - `npm run bank:validate`: SPEC 16 counts, links, the concrete/abstract mix, glosses, health tagging, and seeds not yet built.
+  - `npm run bank:sample`: a readable review of random cards and topics.
+  - Pure modules in `scripts/bank/` (seeds, plan, prompts, validate), all tested.
+- **Selection** (`api/_lib/select.ts`, `season.ts`):
+  - Part 1: an opening topic (Work 50%, Home 25%, Hometown 25%) plus 2 season topics.
+  - Part 2: 60% season / 25% health / 15% general; when the season has ended, its share goes to general.
+  - A test date picks its own season file.
+  - A repeat filter is ready for step 6's history.
+  - Tested, including the draw proportions over 2,000 runs.
+- **`/api/session-start`** now returns `items` and `season` alongside the token (`items: null` if the bank is unavailable). The bank ships with the function (`vercel.json` `includeFiles`). Checked locally against the real bank: three calls gave three different, well-formed selections.
+- **Browser:**
+  - Home prewarms a token plus questions (`prepareSession`); `startNewExam` uses them once, or the fixed set offline.
+  - Mode selector "Examen completo / Solo Parte 1 / Partes 2 y 3" (remembered).
+  - The script builder supports the practice modes: Part 1 only; Parts 2 and 3 with a short greeting. Both end with a practice closing line and run at Nivel 2 (the default level until placement).
 
 **2026-09-25: step 3 done.** Hassan's retest passed both fixes:
 - **Part 2:** the back-up prompt fired on a real 4 s silence (diagnostic "words changed 4042 ms ago"), and the long turn moved on by itself 12 s later.
@@ -253,7 +281,32 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Step 3 is done. The step 4 checkpoint will be written when step 4 is built (HUMAN_GUIDE.md Stage 4b and 4c).
+Matching guide section: **HUMAN_GUIDE.md Stage 4c** (Stage 4b, the cost approval, is done: $3.25 spent). Budget about 30 minutes.
+
+**1. Review the bank** (in the repo folder):
+- `npm run bank:validate`: should end with "✓ The bank passes validation."
+- `npm run bank:sample`: prints 8 random cue cards with their Part 3 sets and 5 random Part 1 topics. Run it 2 or 3 times for variety. To see specific items: `npm run bank:sample -- --id=p2-noisy-place-you-have-been-to,p1-work`.
+
+  Check, as in 4c:
+  - Cards read like real IELTS cue cards ("Describe …", "You should say:", 3 bullets, "and explain …").
+  - Part 3 questions are on the card's theme but broader (society, comparisons, the future), with some concrete and some abstract.
+  - Help phrases sound like a strong candidate.
+  - The Spanish glosses look right.
+  - Nothing reads as copied from a prep site.
+  - The season file has the Sep–Dec 2026 topics (all 14 cards from SPEC 9 are in it).
+
+**2. Try it in the app:**
+- `npm run dev`, open http://localhost:3000.
+- Home now has **"¿Qué quieres practicar?"** with Examen completo / Solo Parte 1 / Partes 2 y 3.
+- Start two exams in a row (click "Terminar" after a few questions each). The questions should differ each time and come from the bank, not the old Work/Shoes/Computers set.
+- Try "Solo Parte 1" and "Partes 2 y 3" once each. They're practice modes at Nivel 2, so the voice is a little slower and Part 2 prep is 1½ minutes.
+
+**Report back:**
+- any card or topic that sounds off (with its id);
+- any Spanish gloss you doubt;
+- whether the questions changed between exams and the modes behaved.
+
+I can regenerate single items with `npm run bank:build -- --only=<id>` (a few cents each).
 
 ## Decisions
 
@@ -334,6 +387,8 @@ New decisions during the build go below with a date.
 
 ## Known issues
 
+- The bank:build cost estimate is conservative: it assumed 6k output tokens per card, while Opus 5.5 at medium effort used about 2k. The real cost was a third of the estimate.
+
 - SPA routes (`/lab`, `/examen`, `/transcripcion`) need a rewrite to `index.html` on the deployed site. `vercel dev` serves them through Vite, so this only matters at deploy (step 6).
 
 - Edge reports a recognition confidence of 1 for every result, so confidence isn't a useful signal on Edge (SPEC 11's "low-confidence words" input for grading will be empty there). Grading must lean on words that make no sense in context. Check Chrome's numbers at the retest.
@@ -347,3 +402,6 @@ New decisions during the build go below with a date.
 
 | Date | What | Approx. cost |
 |---|---|---|
+| 2026-09-25 | Bank build sample, 4 items (claude-opus-5-5) | US$0.11 |
+| 2026-09-25 | Bank build, remaining 106 items (145k input, 128k output tokens) | US$3.14 |
+| 2026-09-23 to 25 | Part 3 examiner testing (Haiku 4.5, a few dozen calls) | under US$0.10 (estimate) |
