@@ -4,9 +4,9 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 
 ## Current status
 
-- **Current step:** 3 (Part 3 examiner endpoint, speculative prefetch, fallback)
-- **State:** checkpoint run once; fixes built for two problems; awaiting a short retest
-- **Waiting on:** Hassan's retest (see "Checkpoint for Hassan"), and his decision on the Part 3 latency question under "Open questions".
+- **Current step:** 4 (bank build and validation scripts, seasonal selection, `/api/session-start`)
+- **State:** planned, not started
+- **Waiting on:** Hassan's go-ahead on the step 4 plan and answers to its questions.
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
 
 ## Step status
@@ -16,7 +16,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 | 0 | Hassan's setup: repo, tools (HUMAN_GUIDE stage 0) | done | |
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
-| 3 | Part 3 examiner endpoint, speculative prefetch, fallback | built (awaiting retest) | 2026-09-24: Part 3 felt good, follow-ups worked, the Wi-Fi-off fallback worked. Problems: Part 2 didn't move on after finishing early; after the Wi-Fi test the app stayed in push-to-talk. Fixes built. |
+| 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
 | 5 | Grading (streamed, structured) and results screen | pending | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
@@ -40,6 +40,13 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-25: step 3 done.** Hassan's retest passed both fixes:
+- **Part 2:** the back-up prompt fired on a real 4 s silence (diagnostic "words changed 4042 ms ago"), and the long turn moved on by itself 12 s later.
+- **Wi-Fi off in Part 3:** push-to-talk at 11:25:12, retry on `online` at 11:25:16, recognition back at 11:25:21; both examiner calls made while offline fell back instantly.
+- **Latency:** within budget (scripted 250 / 710 ms; Part 3 AI 214 / 823 ms, n = 2; 0 stalls).
+- **Metric fix:** "voice end → final text" showed a 52 s p95. That was the Wi-Fi outage counted as recognizer lag, so the first-interim and final-lag metrics now ignore waits over 10 s.
+- Step 4 is planned and waiting for the go-ahead.
 
 **2026-09-24: step 3 checkpoint result and fixes.**
 
@@ -246,15 +253,7 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Retest of the step 3 fixes** (about 15 minutes, Edge, same setup). Matching guide section: HUMAN_GUIDE.md Stage 3c.
-
-Run `npm run dev` (restart it if it's still running from before), open http://localhost:3000, press Shift+D and click "Reset numbers", then "Empezar examen". Press Space to move quickly through Part 1.
-
-1. **Part 2, finishing early:** talk for about a minute and stop. After about 4 s: "Can you tell me any more about …?" Add a sentence or two, then stay quiet. About **6 s** after your last word the exam should move on ("Thank you." and the round-off question), well before 2:00.
-2. **Wi-Fi in Part 3:** turn Wi-Fi off during an answer. The yellow banner and push-to-talk should appear, and the exam should **wait** instead of skipping questions. Turn Wi-Fi back on. Within a few seconds (at most 20) the banner should go away and your answers should show up again without the button.
-3. Finish the exam and copy "Copy report" from Shift+D.
-
-**Report back:** pass/fail for 1 and 2, and the full "Copy report" text. For item 1 the report now shows exactly what the silence clock saw.
+Step 3 is done. The step 4 checkpoint will be written when step 4 is built (HUMAN_GUIDE.md Stage 4b and 4c).
 
 ## Decisions
 
@@ -314,7 +313,7 @@ New decisions during the build go below with a date.
 
 ## Open questions
 
-- **Part 3 AI latency is over budget** (needs a decision, but best made after real deployed numbers):
+- **Part 3 AI latency** (2026-09-25: within budget on the retest, 214 / 823 ms with n = 2, because the speculative replies were ready at commit; re-measure once deployed in step 6). Earlier notes:
   - **The numbers:** commit → examiner audio (AI) was 1,060 / 1,814 ms (p50 / p95, n = 3) against 700 / 1,200. The model's reply took 1.6 to 2.1 s end to end. That was under `vercel dev` on Hassan's PC, where the function runs locally and compiles on first use, so the deployed iad1 function may well be faster.
   - **Built in by design:** SPEC 8's 1.2 s deadline is on the *reply*. Adding the voice's own start time (~0.3 to 0.8 s), a fallback line can reach ~1.8 s, so the SPEC 3 limit of 1.2 s for *audio* can't be met whenever the deadline is used.
   - **Options:** (a) lower the reply deadline to about 0.8 s so a fallback still starts within ~1.2 s, at the cost of more scripted fallbacks; (b) keep 1.2 s and accept a slower fallback; (c) decide after measuring the deployed function in step 6.

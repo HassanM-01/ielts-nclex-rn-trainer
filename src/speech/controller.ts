@@ -573,12 +573,15 @@ export class SpeechController {
       this.metrics.log("rec-recovered", "continuous recognition is back");
     }
 
+    // Waits longer than this aren't recognizer lag (the network dropped, or the
+    // voice was noise that never became text): drop them instead of skewing p95.
+    const MAX_LAG_MS = 10_000;
     if (this.awaitingFirstText !== null && (finals.length > 0 || interims.size > 0)) {
-      this.metrics.record("rec_first_interim", now - this.awaitingFirstText);
+      if (now - this.awaitingFirstText <= MAX_LAG_MS) this.metrics.record("rec_first_interim", now - this.awaitingFirstText);
       this.awaitingFirstText = null;
     }
     if (this.awaitingFinal !== null && finals.some((f) => !f.promoted) && !this.vad?.detector.voiced) {
-      this.metrics.record("rec_final_lag", now - this.awaitingFinal);
+      if (now - this.awaitingFinal <= MAX_LAG_MS) this.metrics.record("rec_final_lag", now - this.awaitingFinal);
       this.awaitingFinal = null;
     }
     if (finals.length) {
