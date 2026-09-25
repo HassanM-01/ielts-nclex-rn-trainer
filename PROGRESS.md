@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 4 (bank build and validation scripts, seasonal selection, `/api/session-start`)
-- **State:** planned, not started
-- **Waiting on:** Hassan's go-ahead on the step 4 plan and answers to its questions.
+- **State:** in progress
+- **Waiting on:** nothing to build; Hassan approves the bank build cost when the script asks (Stage 4b).
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens (step 4) are working and Hassan says so.
 
 ## Step status
@@ -17,7 +17,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 | 1 | Speech layer and `/lab` page | done | 2026-09-23: all tests passed on Edge and Chrome. The mic-selection problem was fixed, and the retest passed ("everything worked as expected"). |
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
-| 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | pending | |
+| 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | in progress | |
 | 5 | Grading (streamed, structured) and results screen | pending | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
@@ -310,6 +310,11 @@ New decisions during the build go below with a date.
   - When the model reply decides what comes next (follow-up, `[NEXT]` or `[END]`), the latency counts as "Part 3 AI", fallbacks included.
   - A minimal passphrase card on Home (Spanish), shown only until a passphrase works. It does not block practice: without a token, Part 3 is scripted. The real gate comes in step 6.
   - `npm run dev` goes through `scripts/dev.mjs` (Vercel refuses a `dev` script that calls `vercel dev`) and serves on port 3000.
+
+- 2026-09-25 (step 4 plan, Hassan agreed):
+  - Claude compiles the reported Sep–Dec 2026 Part 2 titles from 2–3 prep sites (titles only, sources noted here) to complete the season file; Hassan reviews them in 4c.
+  - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
+  - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
 
 ## Open questions
 
