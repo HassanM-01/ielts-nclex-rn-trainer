@@ -1,0 +1,5194 @@
+{
+  "season": "2026-09",
+  "ends": "2026-12-31",
+  "part1": [
+    {
+      "id": "p1-computers",
+      "topic": "Computers",
+      "opening": false,
+      "intro": "Now let's talk about computers.",
+      "questions": [
+        "How often do you use a computer?",
+        "What do you usually use a computer for?",
+        "Did you use computers much when you were a child?",
+        "Would you like to learn more about computers in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-lost-and-found",
+      "topic": "Lost and found",
+      "opening": false,
+      "intro": "Now let's talk about losing and finding things.",
+      "questions": [
+        "How often do you lose things in your daily life?",
+        "What kind of things do you usually misplace?",
+        "Did you ever lose something important when you were a child?",
+        "Have you ever found something that belonged to someone else?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-secondary-school",
+      "topic": "Secondary school",
+      "opening": false,
+      "intro": "Now let's talk about secondary school.",
+      "questions": [
+        "Where did you go to secondary school?",
+        "What was your favourite subject at secondary school?",
+        "Did you take part in any activities after school?",
+        "Would you like to visit your old school again?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-paper",
+      "topic": "Paper",
+      "opening": false,
+      "intro": "Now let's talk about paper.",
+      "questions": [
+        "Do you use a lot of paper in your daily life?",
+        "What kind of things do you usually write on paper?",
+        "Did you enjoy making things out of paper when you were a child?",
+        "Would you like to use less paper in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-shoes",
+      "topic": "Shoes",
+      "opening": false,
+      "intro": "Now let's talk about shoes.",
+      "questions": [
+        "What kind of shoes do you usually wear?",
+        "How often do you buy new shoes?",
+        "Did you have a favourite pair of shoes when you were a child?",
+        "Would you ever spend a lot of money on shoes?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-advertisements",
+      "topic": "Advertisements",
+      "opening": false,
+      "intro": "Now let's talk about advertisements.",
+      "questions": [
+        "Do you often notice advertisements when you are outside?",
+        "What kind of advertisements do you find most interesting?",
+        "Did you enjoy watching adverts on TV when you were a child?",
+        "Have you ever bought something because of an advertisement?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-feeling-bored",
+      "topic": "Feeling bored",
+      "opening": false,
+      "intro": "Now let's talk about feeling bored.",
+      "questions": [
+        "Do you often feel bored?",
+        "What do you usually do when you feel bored?",
+        "Did you get bored easily when you were a child?",
+        "Do you think you will have more free time in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-collecting-things",
+      "topic": "Collecting things",
+      "opening": false,
+      "intro": "Now let's talk about collecting things.",
+      "questions": [
+        "Do you collect anything at the moment?",
+        "Did you collect anything when you were a child?",
+        "Why do you think some people enjoy collecting things?",
+        "Would you like to start a collection in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-street-markets",
+      "topic": "Street markets",
+      "opening": false,
+      "intro": "Now let's talk about street markets.",
+      "questions": [
+        "Are there any street markets near where you live?",
+        "How often do you go to a street market?",
+        "What kinds of things do you like to buy there?",
+        "Did you go to street markets when you were a child?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-opportunities",
+      "topic": "Opportunities",
+      "opening": false,
+      "intro": "Now let's talk about opportunities.",
+      "questions": [
+        "Do you usually take new opportunities when they come along?",
+        "Have you ever missed a good opportunity?",
+        "Did you have many chances to try new things as a child?",
+        "What kind of opportunity would you like to have in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-fruit-and-vegetables",
+      "topic": "Fruit and vegetables",
+      "opening": false,
+      "intro": "Now let's talk about fruit and vegetables.",
+      "questions": [
+        "Do you eat a lot of fruit and vegetables?",
+        "What kind of fruit do you like best?",
+        "Did you enjoy eating vegetables when you were a child?",
+        "Would you like to grow your own vegetables in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-politeness",
+      "topic": "Politeness",
+      "opening": false,
+      "intro": "Now let's talk about politeness.",
+      "questions": [
+        "Do you think you are a polite person?",
+        "How do you usually thank someone who has helped you?",
+        "Did your parents teach you good manners when you were a child?",
+        "What do you usually do when someone is rude to you?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-tiredness",
+      "topic": "Tiredness",
+      "opening": false,
+      "intro": "Now let's talk about tiredness.",
+      "questions": [
+        "What time of day do you usually feel most tired?",
+        "What do you usually do when you feel tired?",
+        "Did you often feel tired at school when you were younger?",
+        "Would you like to have more time to rest in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-rubbish-and-recycling",
+      "topic": "Rubbish and recycling",
+      "opening": false,
+      "intro": "Now let's talk about rubbish and recycling.",
+      "questions": [
+        "Do you recycle things at home?",
+        "What kind of things do you usually throw away?",
+        "Did you learn about recycling when you were a child?",
+        "Would you like to produce less rubbish in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-travelling",
+      "topic": "Travelling",
+      "opening": false,
+      "intro": "Now let's talk about travelling.",
+      "questions": [
+        "Do you enjoy travelling?",
+        "How often do you travel to other places?",
+        "Did you travel much with your family when you were a child?",
+        "Is there a country you would like to visit in the future?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-friends",
+      "topic": "Friends",
+      "opening": false,
+      "intro": "Now let's talk about friends.",
+      "questions": [
+        "Do you have a lot of friends, or just a few close ones?",
+        "How often do you spend time with your friends?",
+        "What kind of things do you usually do together?",
+        "Did you have many friends when you were a child?"
+      ],
+      "tags": [
+        "season"
+      ]
+    },
+    {
+      "id": "p1-names",
+      "topic": "Names",
+      "opening": false,
+      "intro": "Now let's talk about names.",
+      "questions": [
+        "Does your name have any special meaning?",
+        "Did you like your name when you were a child?",
+        "How often do people spell or pronounce your name wrongly?",
+        "Would you ever like to change your name?"
+      ],
+      "tags": [
+        "season"
+      ]
+    }
+  ],
+  "part2": [
+    {
+      "id": "p2-noisy-place-you-have-been-to",
+      "prompt": "Describe a noisy place you have been to.",
+      "bullets": [
+        "where it was",
+        "when you went there",
+        "what made it so noisy"
+      ],
+      "explain": "and explain how you felt about being there.",
+      "roundoff": [
+        "Do you usually prefer quiet places or busy ones?",
+        "Would you go back to that place again?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-noisy-place-you-have-been-to",
+      "useful_words": [
+        {
+          "en": "deafening",
+          "es": "ensordecedor"
+        },
+        {
+          "en": "to drown out",
+          "es": "tapar (un sonido con otro)"
+        },
+        {
+          "en": "background noise",
+          "es": "ruido de fondo"
+        },
+        {
+          "en": "hustle and bustle",
+          "es": "ajetreo, bullicio"
+        },
+        {
+          "en": "to raise your voice",
+          "es": "alzar la voz"
+        }
+      ],
+      "help": [
+        {
+          "en": "The place I'd like to talk about is...",
+          "es": "El lugar del que me gustaría hablar es..."
+        },
+        {
+          "en": "What made it particularly noisy was the fact that...",
+          "es": "Lo que lo hacía especialmente ruidoso era que..."
+        },
+        {
+          "en": "Looking back, I have to admit that...",
+          "es": "Pensándolo bien, tengo que admitir que..."
+        }
+      ]
+    },
+    {
+      "id": "p2-someone-older-than-you-whom-you-admire",
+      "prompt": "Describe a person older than you whom you admire.",
+      "bullets": [
+        "who this person is",
+        "how you know this person",
+        "what this person is like"
+      ],
+      "explain": "and explain why you admire this person.",
+      "roundoff": [
+        "Do you often ask older people for advice?",
+        "Do you see this person very often?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-someone-older-than-you-whom-you-admire",
+      "useful_words": [
+        {
+          "en": "a role model",
+          "es": "un modelo a seguir"
+        },
+        {
+          "en": "to look up to someone",
+          "es": "admirar a alguien"
+        },
+        {
+          "en": "down-to-earth",
+          "es": "sencillo, con los pies en la tierra"
+        },
+        {
+          "en": "resilient",
+          "es": "que sale adelante ante las dificultades"
+        },
+        {
+          "en": "to set an example",
+          "es": "dar el ejemplo"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is...",
+          "es": "La persona de la que me gustaría hablar es..."
+        },
+        {
+          "en": "What really stands out about her is...",
+          "es": "Lo que realmente destaca de ella es..."
+        },
+        {
+          "en": "To give you an example of this, ...",
+          "es": "Para darle un ejemplo de esto, ..."
+        }
+      ]
+    },
+    {
+      "id": "p2-activity-you-do-regularly-that-you-think",
+      "prompt": "Describe an activity you do regularly that you think wastes your time.",
+      "bullets": [
+        "what the activity is",
+        "how often you do it",
+        "why you keep doing it"
+      ],
+      "explain": "and explain why you think it is a waste of time.",
+      "roundoff": [
+        "Have you ever tried to stop doing this activity?",
+        "Do your friends or family think it wastes time too?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-activity-you-do-regularly-that-you-think",
+      "useful_words": [
+        {
+          "en": "mindlessly scroll",
+          "es": "deslizar la pantalla sin pensar"
+        },
+        {
+          "en": "lose track of time",
+          "es": "perder la noción del tiempo"
+        },
+        {
+          "en": "a force of habit",
+          "es": "la fuerza de la costumbre"
+        },
+        {
+          "en": "unwind after a shift",
+          "es": "relajarme después de un turno"
+        },
+        {
+          "en": "counterproductive",
+          "es": "contraproducente"
+        }
+      ],
+      "help": [
+        {
+          "en": "The activity I'd like to talk about is something I'm not particularly proud of.",
+          "es": "La actividad de la que me gustaría hablar es algo de lo que no estoy muy orgulloso."
+        },
+        {
+          "en": "What usually happens is that I tell myself it'll only take five minutes, but...",
+          "es": "Lo que suele pasar es que me digo que solo serán cinco minutos, pero..."
+        },
+        {
+          "en": "Looking back, I realise I could have spent that time far more productively.",
+          "es": "En retrospectiva, me doy cuenta de que pude haber aprovechado ese tiempo mucho mejor."
+        }
+      ]
+    },
+    {
+      "id": "p2-time-you-received-good-service-in-a-shop",
+      "prompt": "Describe a time when you received good service in a shop.",
+      "bullets": [
+        "which shop it was",
+        "when you went there",
+        "what the staff did for you"
+      ],
+      "explain": "and explain why you thought the service was so good.",
+      "roundoff": [
+        "Do you often go back to shops where you have had good service?",
+        "Have you ever told other people about this shop?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-time-you-received-good-service-in-a-shop",
+      "useful_words": [
+        {
+          "en": "go out of one's way",
+          "es": "esforzarse más de lo necesario"
+        },
+        {
+          "en": "knowledgeable staff",
+          "es": "personal bien informado"
+        },
+        {
+          "en": "attentive",
+          "es": "atento"
+        },
+        {
+          "en": "exceed my expectations",
+          "es": "superar mis expectativas"
+        },
+        {
+          "en": "loyal customer",
+          "es": "cliente fiel"
+        }
+      ],
+      "help": [
+        {
+          "en": "The occasion I'd like to talk about happened a couple of years ago, when...",
+          "es": "La ocasión de la que me gustaría hablar sucedió hace un par de años, cuando..."
+        },
+        {
+          "en": "What really stood out for me was the fact that...",
+          "es": "Lo que realmente me llamó la atención fue que..."
+        },
+        {
+          "en": "Looking back, I think the main reason it impressed me was...",
+          "es": "Ahora que lo pienso, creo que la razón principal por la que me impresionó fue..."
+        }
+      ]
+    },
+    {
+      "id": "p2-city-you-would-like-to-visit-again",
+      "prompt": "Describe a city you have visited and would like to visit again.",
+      "bullets": [
+        "which city it is",
+        "when you went there and who you went with",
+        "what you did while you were there"
+      ],
+      "explain": "and explain why you would like to go back to this city.",
+      "roundoff": [
+        "Do you prefer visiting new places or returning to places you already know?",
+        "Would you like to live in that city one day?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-city-you-would-like-to-visit-again",
+      "useful_words": [
+        {
+          "en": "vibrant atmosphere",
+          "es": "ambiente animado"
+        },
+        {
+          "en": "historic quarter",
+          "es": "centro histórico"
+        },
+        {
+          "en": "within walking distance",
+          "es": "a poca distancia a pie"
+        },
+        {
+          "en": "leave a lasting impression",
+          "es": "dejar una huella duradera"
+        },
+        {
+          "en": "off the beaten track",
+          "es": "poco turístico, fuera de lo común"
+        }
+      ],
+      "help": [
+        {
+          "en": "The city I'd like to talk about is...",
+          "es": "La ciudad de la que me gustaría hablar es..."
+        },
+        {
+          "en": "What really stood out for me was...",
+          "es": "Lo que más me llamó la atención fue..."
+        },
+        {
+          "en": "The main reason I'd love to go back is that...",
+          "es": "La razón principal por la que me encantaría regresar es que..."
+        }
+      ]
+    },
+    {
+      "id": "p2-someone-who-did-something-difficult-and",
+      "prompt": "Describe a person you know who did something difficult and succeeded.",
+      "bullets": [
+        "who this person is",
+        "what the difficult thing was",
+        "how they managed to do it"
+      ],
+      "explain": "and explain how you felt about their success.",
+      "roundoff": [
+        "Did you help this person in any way?",
+        "Would you like to do something similar yourself?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-someone-who-did-something-difficult-and",
+      "useful_words": [
+        {
+          "en": "overcome obstacles",
+          "es": "superar obstáculos"
+        },
+        {
+          "en": "perseverance",
+          "es": "perseverancia, constancia"
+        },
+        {
+          "en": "against all odds",
+          "es": "contra todo pronóstico"
+        },
+        {
+          "en": "a setback",
+          "es": "un revés, un contratiempo"
+        },
+        {
+          "en": "a sense of achievement",
+          "es": "una sensación de logro"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is...",
+          "es": "La persona de la que me gustaría hablar es..."
+        },
+        {
+          "en": "What really impressed me was that...",
+          "es": "Lo que realmente me impresionó fue que..."
+        },
+        {
+          "en": "Despite all the setbacks, she kept going.",
+          "es": "A pesar de todos los contratiempos, siguió adelante."
+        }
+      ]
+    },
+    {
+      "id": "p2-famous-person-in-your-area",
+      "prompt": "Describe a well-known person who lives or used to live in your area.",
+      "bullets": [
+        "who this person is",
+        "how you know about them",
+        "what they are known for"
+      ],
+      "explain": "and explain how you feel about this person.",
+      "roundoff": [
+        "Have you ever met this person?",
+        "Would you like to be famous in your local area?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-famous-person-in-your-area",
+      "useful_words": [
+        {
+          "en": "a household name",
+          "es": "alguien muy conocido por todos"
+        },
+        {
+          "en": "to make a name for oneself",
+          "es": "hacerse de un nombre"
+        },
+        {
+          "en": "to give back to the community",
+          "es": "retribuir a la comunidad"
+        },
+        {
+          "en": "highly regarded",
+          "es": "muy respetado"
+        },
+        {
+          "en": "a local figure",
+          "es": "una figura local"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is someone quite well known in my city.",
+          "es": "La persona de la que me gustaría hablar es alguien bastante conocido en mi ciudad."
+        },
+        {
+          "en": "What really stands out about her is that...",
+          "es": "Lo que realmente destaca de ella es que..."
+        },
+        {
+          "en": "To give you an example of what I mean,...",
+          "es": "Para darle un ejemplo de lo que quiero decir,..."
+        }
+      ]
+    },
+    {
+      "id": "p2-time-you-changed-an-important-decision",
+      "prompt": "Describe a time when you changed an important decision you had made.",
+      "bullets": [
+        "what the original decision was",
+        "when you made it",
+        "what made you change your mind"
+      ],
+      "explain": "and explain how you felt about changing this decision.",
+      "roundoff": [
+        "Are you glad that you changed your mind?",
+        "Do you usually find it easy to make decisions?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-time-you-changed-an-important-decision",
+      "useful_words": [
+        {
+          "en": "to have second thoughts",
+          "es": "tener dudas, pensarlo dos veces"
+        },
+        {
+          "en": "to weigh up the pros and cons",
+          "es": "sopesar los pros y los contras"
+        },
+        {
+          "en": "to reconsider",
+          "es": "reconsiderar"
+        },
+        {
+          "en": "a turning point",
+          "es": "un parteaguas, un punto de inflexión"
+        },
+        {
+          "en": "in hindsight",
+          "es": "en retrospectiva"
+        }
+      ],
+      "help": [
+        {
+          "en": "I'd like to talk about a time when I had to rethink a big decision.",
+          "es": "Me gustaría hablar de una ocasión en la que tuve que replantear una decisión importante."
+        },
+        {
+          "en": "At first I was completely convinced, but then something happened that made me hesitate.",
+          "es": "Al principio no tenía ninguna duda, pero luego pasó algo que me hizo dudar."
+        },
+        {
+          "en": "Looking back, I'm really glad I listened to my instincts.",
+          "es": "Viéndolo en retrospectiva, me alegra mucho haber hecho caso a mi intuición."
+        }
+      ]
+    },
+    {
+      "id": "p2-happy-person-you-know",
+      "prompt": "Describe a happy person you know.",
+      "bullets": [
+        "who this person is",
+        "how you know this person",
+        "what this person is usually like"
+      ],
+      "explain": "and explain why you think this person is so happy.",
+      "roundoff": [
+        "Would you describe yourself as a happy person?",
+        "Do you spend much time with this person?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-happy-person-you-know",
+      "useful_words": [
+        {
+          "en": "cheerful",
+          "es": "alegre"
+        },
+        {
+          "en": "upbeat",
+          "es": "optimista, animado"
+        },
+        {
+          "en": "to look on the bright side",
+          "es": "ver el lado bueno de las cosas"
+        },
+        {
+          "en": "easy-going",
+          "es": "relajado, tranquilo"
+        },
+        {
+          "en": "to lift someone's spirits",
+          "es": "levantarle el ánimo a alguien"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is...",
+          "es": "La persona de la que me gustaría hablar es..."
+        },
+        {
+          "en": "What really stands out about her is...",
+          "es": "Lo que realmente destaca de ella es..."
+        },
+        {
+          "en": "To give you an example, ...",
+          "es": "Para darte un ejemplo, ..."
+        }
+      ]
+    },
+    {
+      "id": "p2-very-organized-person-you-know",
+      "prompt": "Describe a very organized person you know.",
+      "bullets": [
+        "who this person is",
+        "how you know him or her",
+        "what this person does to stay organized"
+      ],
+      "explain": "and explain how you feel about this person's way of organizing things.",
+      "roundoff": [
+        "Would you say you are an organized person yourself?",
+        "Do you think being organized is something people can learn?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-very-organized-person-you-know",
+      "useful_words": [
+        {
+          "en": "meticulous",
+          "es": "meticuloso, muy detallista"
+        },
+        {
+          "en": "to keep track of",
+          "es": "llevar el control de"
+        },
+        {
+          "en": "to prioritize tasks",
+          "es": "priorizar tareas"
+        },
+        {
+          "en": "a tight schedule",
+          "es": "una agenda apretada"
+        },
+        {
+          "en": "to plan ahead",
+          "es": "planear con anticipación"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is a colleague of mine who...",
+          "es": "La persona de la que me gustaría hablar es un colega mío que..."
+        },
+        {
+          "en": "What really stands out about her is the way she...",
+          "es": "Lo que más destaca de ella es la manera en que..."
+        },
+        {
+          "en": "To give you an example, whenever we have a busy shift, she...",
+          "es": "Para darte un ejemplo, siempre que tenemos un turno pesado, ella..."
+        }
+      ]
+    },
+    {
+      "id": "p2-natural-place-in-your-city",
+      "prompt": "Describe a natural place in your city that you like to visit.",
+      "bullets": [
+        "where it is",
+        "how often you go there",
+        "what you usually do there"
+      ],
+      "explain": "and explain why you enjoy spending time in this place.",
+      "roundoff": [
+        "Do many people from your city go there too?",
+        "Would you prefer to live closer to a place like this?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-natural-place-in-your-city",
+      "useful_words": [
+        {
+          "en": "tree-lined path",
+          "es": "sendero bordeado de árboles"
+        },
+        {
+          "en": "a breath of fresh air",
+          "es": "un respiro, aire fresco"
+        },
+        {
+          "en": "unwind",
+          "es": "relajarse, desconectarse"
+        },
+        {
+          "en": "well maintained",
+          "es": "bien cuidado"
+        },
+        {
+          "en": "get away from the hustle and bustle",
+          "es": "alejarse del ajetreo"
+        }
+      ],
+      "help": [
+        {
+          "en": "The place I'd like to talk about is a park not far from where I live.",
+          "es": "El lugar del que me gustaría hablar es un parque no muy lejos de donde vivo."
+        },
+        {
+          "en": "What I particularly like about it is that it feels very peaceful.",
+          "es": "Lo que más me gusta de él es que se siente muy tranquilo."
+        },
+        {
+          "en": "On top of that, it's a great place to clear my head after a long shift.",
+          "es": "Además, es un gran lugar para despejarme después de un turno largo."
+        }
+      ]
+    },
+    {
+      "id": "p2-skill-you-learned-as-a-child",
+      "prompt": "Describe a skill you learned when you were a child.",
+      "bullets": [
+        "what the skill was",
+        "who taught you or how you learned it",
+        "how long it took you to learn it"
+      ],
+      "explain": "and explain why this skill has been useful to you.",
+      "roundoff": [
+        "Do you still use this skill today?",
+        "Would you like to teach this skill to someone else?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-skill-you-learned-as-a-child",
+      "useful_words": [
+        {
+          "en": "to pick up a skill",
+          "es": "aprender una habilidad (sin mucho esfuerzo)"
+        },
+        {
+          "en": "trial and error",
+          "es": "ensayo y error"
+        },
+        {
+          "en": "to get the hang of something",
+          "es": "agarrarle la onda a algo"
+        },
+        {
+          "en": "patient and encouraging",
+          "es": "paciente y motivador"
+        },
+        {
+          "en": "second nature",
+          "es": "algo que haces sin pensar"
+        }
+      ],
+      "help": [
+        {
+          "en": "I'd like to talk about a skill I picked up when I was about eight years old.",
+          "es": "Me gustaría hablar de una habilidad que aprendí cuando tenía unos ocho años."
+        },
+        {
+          "en": "At first I found it quite difficult, but little by little I got the hang of it.",
+          "es": "Al principio me costó bastante trabajo, pero poco a poco le agarré la onda."
+        },
+        {
+          "en": "Looking back, I think the main reason it has been so useful is that...",
+          "es": "Viéndolo en retrospectiva, creo que la razón principal por la que me ha sido tan útil es que..."
+        }
+      ]
+    },
+    {
+      "id": "p2-risk-that-turned-out-well",
+      "prompt": "Describe a time when you took a risk that turned out well.",
+      "bullets": [
+        "what the risk was",
+        "when and where you took it",
+        "why you decided to take it"
+      ],
+      "explain": "and explain how you felt when it turned out well.",
+      "roundoff": [
+        "Do you usually enjoy taking risks?",
+        "Would you take a similar risk again?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-risk-that-turned-out-well",
+      "useful_words": [
+        {
+          "en": "take a calculated risk",
+          "es": "correr un riesgo calculado"
+        },
+        {
+          "en": "step out of my comfort zone",
+          "es": "salir de mi zona de confort"
+        },
+        {
+          "en": "have second thoughts",
+          "es": "tener dudas, pensarlo dos veces"
+        },
+        {
+          "en": "it paid off",
+          "es": "valió la pena, dio resultado"
+        },
+        {
+          "en": "a leap of faith",
+          "es": "un acto de fe"
+        }
+      ],
+      "help": [
+        {
+          "en": "I'd like to talk about the time I decided to...",
+          "es": "Me gustaría hablar de la vez que decidí..."
+        },
+        {
+          "en": "At first I was quite hesitant because...",
+          "es": "Al principio dudaba bastante porque..."
+        },
+        {
+          "en": "Looking back, I'm really glad I did it, because...",
+          "es": "En retrospectiva, me alegra mucho haberlo hecho, porque..."
+        }
+      ]
+    },
+    {
+      "id": "p2-place-where-you-have-taken-photos-more",
+      "prompt": "Describe a place where you have taken photos more than once.",
+      "bullets": [
+        "where the place is",
+        "how often you have been there",
+        "what kinds of photos you took"
+      ],
+      "explain": "and explain why you keep taking photos in this place.",
+      "roundoff": [
+        "Do you usually look at the photos you take again later?",
+        "Do you prefer taking photos with a phone or a camera?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-place-where-you-have-taken-photos-more",
+      "useful_words": [
+        {
+          "en": "breathtaking view",
+          "es": "vista impresionante"
+        },
+        {
+          "en": "to capture the moment",
+          "es": "captar el momento"
+        },
+        {
+          "en": "changing light",
+          "es": "la luz cambiante"
+        },
+        {
+          "en": "a sense of nostalgia",
+          "es": "un sentimiento de nostalgia"
+        },
+        {
+          "en": "from a different angle",
+          "es": "desde otro ángulo"
+        }
+      ],
+      "help": [
+        {
+          "en": "The place I'd like to talk about is...",
+          "es": "El lugar del que me gustaría hablar es..."
+        },
+        {
+          "en": "What makes it special for me is that...",
+          "es": "Lo que lo hace especial para mí es que..."
+        },
+        {
+          "en": "Every time I go back, I notice something new, such as...",
+          "es": "Cada vez que regreso, noto algo nuevo, como..."
+        }
+      ]
+    },
+    {
+      "id": "p2-way-that-helps-you-save-a-lot-of-time",
+      "prompt": "Describe a method you use that helps you save a lot of time.",
+      "bullets": [
+        "what the method is",
+        "how you learned about it",
+        "how often you use it"
+      ],
+      "explain": "and explain how it helps you save time.",
+      "roundoff": [
+        "Do you think you manage your time well?",
+        "Would you recommend this method to other people?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-way-that-helps-you-save-a-lot-of-time",
+      "useful_words": [
+        {
+          "en": "time-consuming",
+          "es": "que consume mucho tiempo"
+        },
+        {
+          "en": "streamline a process",
+          "es": "agilizar un proceso"
+        },
+        {
+          "en": "prioritise tasks",
+          "es": "priorizar tareas"
+        },
+        {
+          "en": "cut down on",
+          "es": "reducir"
+        },
+        {
+          "en": "a shortcut",
+          "es": "un atajo"
+        }
+      ],
+      "help": [
+        {
+          "en": "The method I'd like to talk about is something I use almost every day.",
+          "es": "El método del que me gustaría hablar es algo que uso casi todos los días."
+        },
+        {
+          "en": "I first came across it when I was working long shifts at the hospital.",
+          "es": "Lo conocí por primera vez cuando trabajaba turnos largos en el hospital."
+        },
+        {
+          "en": "What I find most useful about it is that it saves me at least an hour a day.",
+          "es": "Lo que me parece más útil es que me ahorra por lo menos una hora al día."
+        }
+      ]
+    },
+    {
+      "id": "p2-occasion-when-you-lost-something-in",
+      "prompt": "Describe an occasion when you lost something in a public place.",
+      "bullets": [
+        "what you lost",
+        "where and when you lost it",
+        "what you did to try to find it"
+      ],
+      "explain": "and explain how you felt about losing it.",
+      "roundoff": [
+        "Do you often lose things?",
+        "Are you usually careful with your belongings?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-occasion-when-you-lost-something-in",
+      "useful_words": [
+        {
+          "en": "misplace",
+          "es": "extraviar, perder (por descuido)"
+        },
+        {
+          "en": "lost property office",
+          "es": "oficina de objetos perdidos"
+        },
+        {
+          "en": "retrace my steps",
+          "es": "volver sobre mis pasos"
+        },
+        {
+          "en": "panic-stricken",
+          "es": "presa del pánico"
+        },
+        {
+          "en": "hand something in",
+          "es": "entregar algo (a quien corresponda)"
+        }
+      ],
+      "help": [
+        {
+          "en": "This happened a couple of years ago, when I was on my way to work.",
+          "es": "Esto pasó hace un par de años, cuando iba camino al trabajo."
+        },
+        {
+          "en": "What made it even worse was that...",
+          "es": "Lo que lo hizo todavía peor fue que..."
+        },
+        {
+          "en": "Looking back, I realise that I should have been more careful.",
+          "es": "Ahora que lo pienso, me doy cuenta de que debí tener más cuidado."
+        }
+      ]
+    },
+    {
+      "id": "p2-person-you-met-only-once-and-would-like",
+      "prompt": "Describe a person you met only once and would like to know more about.",
+      "bullets": [
+        "who this person was",
+        "where and when you met them",
+        "what you talked about"
+      ],
+      "explain": "and explain why you would like to know more about this person.",
+      "roundoff": [
+        "Do you find it easy to talk to people you have just met?",
+        "Have you ever tried to contact this person again?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-person-you-met-only-once-and-would-like",
+      "useful_words": [
+        {
+          "en": "a chance encounter",
+          "es": "un encuentro casual"
+        },
+        {
+          "en": "strike up a conversation",
+          "es": "entablar una conversación"
+        },
+        {
+          "en": "make a lasting impression",
+          "es": "dejar una huella duradera"
+        },
+        {
+          "en": "intriguing",
+          "es": "intrigante"
+        },
+        {
+          "en": "exchange contact details",
+          "es": "intercambiar datos de contacto"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is someone I met a few years ago while I was...",
+          "es": "La persona de la que me gustaría hablar es alguien que conocí hace unos años cuando estaba..."
+        },
+        {
+          "en": "What really struck me about her was the way she...",
+          "es": "Lo que realmente me llamó la atención de ella fue la manera en que..."
+        },
+        {
+          "en": "Looking back, I really regret not asking her...",
+          "es": "Pensándolo bien, de verdad me arrepiento de no haberle preguntado..."
+        }
+      ]
+    },
+    {
+      "id": "p2-course-that-impressed-you-a-lot",
+      "prompt": "Describe a course that impressed you a lot.",
+      "bullets": [
+        "what the course was about",
+        "when and where you took it",
+        "who taught it and how it was taught"
+      ],
+      "explain": "and explain why it impressed you so much.",
+      "roundoff": [
+        "Would you recommend this course to other people?",
+        "Do you prefer learning in a classroom or online?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-course-that-impressed-you-a-lot",
+      "useful_words": [
+        {
+          "en": "hands-on training",
+          "es": "formación práctica"
+        },
+        {
+          "en": "well-structured",
+          "es": "bien organizado"
+        },
+        {
+          "en": "to broaden my knowledge",
+          "es": "ampliar mis conocimientos"
+        },
+        {
+          "en": "an engaging instructor",
+          "es": "un instructor que te mantiene interesado"
+        },
+        {
+          "en": "to put something into practice",
+          "es": "poner algo en práctica"
+        }
+      ],
+      "help": [
+        {
+          "en": "The course I'd like to talk about is one I took a few years ago.",
+          "es": "El curso del que me gustaría hablar es uno que tomé hace algunos años."
+        },
+        {
+          "en": "What really stood out for me was the way it was taught.",
+          "es": "Lo que más me llamó la atención fue la manera en que se impartía."
+        },
+        {
+          "en": "Looking back, I'd say it completely changed the way I work.",
+          "es": "Viéndolo en retrospectiva, diría que cambió por completo mi forma de trabajar."
+        }
+      ]
+    },
+    {
+      "id": "p2-gift-you-would-like-to-buy-for-a-friend",
+      "prompt": "Describe a gift you would like to buy for a friend.",
+      "bullets": [
+        "who the friend is",
+        "what the gift would be",
+        "why you have not bought it yet"
+      ],
+      "explain": "and explain why you think this gift would be suitable for your friend.",
+      "roundoff": [
+        "Do you usually enjoy choosing gifts for other people?",
+        "Is it easy to find a present your friend would like?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-gift-you-would-like-to-buy-for-a-friend",
+      "useful_words": [
+        {
+          "en": "thoughtful present",
+          "es": "regalo pensado con cariño"
+        },
+        {
+          "en": "to be on a tight budget",
+          "es": "andar corto de dinero"
+        },
+        {
+          "en": "sentimental value",
+          "es": "valor sentimental"
+        },
+        {
+          "en": "to treat someone",
+          "es": "consentir a alguien"
+        },
+        {
+          "en": "to have something in mind",
+          "es": "tener algo en mente"
+        }
+      ],
+      "help": [
+        {
+          "en": "The friend I'd like to talk about is someone I've known since...",
+          "es": "El amigo del que me gustaría hablar es alguien a quien conozco desde..."
+        },
+        {
+          "en": "What makes it the perfect choice is that...",
+          "es": "Lo que lo hace la opción perfecta es que..."
+        },
+        {
+          "en": "To be honest, the main reason I haven't bought it yet is...",
+          "es": "Para ser honesta, la razón principal por la que todavía no lo he comprado es..."
+        }
+      ]
+    },
+    {
+      "id": "p2-book-you-read-that-made-you-happy",
+      "prompt": "Describe a book you read that made you happy.",
+      "bullets": [
+        "what the book was",
+        "when you read it",
+        "what it was about"
+      ],
+      "explain": "and explain why it made you happy.",
+      "roundoff": [
+        "Do you often read books like this one?",
+        "Would you recommend this book to other people?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-book-you-read-that-made-you-happy",
+      "useful_words": [
+        {
+          "en": "uplifting",
+          "es": "que levanta el ánimo"
+        },
+        {
+          "en": "a page-turner",
+          "es": "un libro que no puedes dejar de leer"
+        },
+        {
+          "en": "feel-good (story)",
+          "es": "(historia) que te hace sentir bien"
+        },
+        {
+          "en": "relatable characters",
+          "es": "personajes con los que te identificas"
+        },
+        {
+          "en": "to escape into a story",
+          "es": "evadirse en una historia"
+        }
+      ],
+      "help": [
+        {
+          "en": "The book I'd like to talk about is...",
+          "es": "El libro del que me gustaría hablar es..."
+        },
+        {
+          "en": "What really stood out for me was...",
+          "es": "Lo que más me llamó la atención fue..."
+        },
+        {
+          "en": "On top of that, ...",
+          "es": "Además de eso, ..."
+        }
+      ]
+    },
+    {
+      "id": "p2-party-for-a-special-event-that-impressed",
+      "prompt": "Describe a party for a special event that impressed you.",
+      "bullets": [
+        "what the event was",
+        "where the party took place",
+        "who you went with"
+      ],
+      "explain": "and explain why the party impressed you.",
+      "roundoff": [
+        "Do you often go to parties?",
+        "Do you prefer small gatherings or large parties?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-party-for-a-special-event-that-impressed",
+      "useful_words": [
+        {
+          "en": "milestone",
+          "es": "acontecimiento importante"
+        },
+        {
+          "en": "festive atmosphere",
+          "es": "ambiente festivo"
+        },
+        {
+          "en": "attention to detail",
+          "es": "cuidado en los detalles"
+        },
+        {
+          "en": "to go all out",
+          "es": "echar la casa por la ventana"
+        },
+        {
+          "en": "memorable occasion",
+          "es": "ocasión memorable"
+        }
+      ],
+      "help": [
+        {
+          "en": "I'd like to talk about a party I went to a couple of years ago.",
+          "es": "Me gustaría hablar de una fiesta a la que fui hace un par de años."
+        },
+        {
+          "en": "What really stood out for me was...",
+          "es": "Lo que más me llamó la atención fue..."
+        },
+        {
+          "en": "On top of that, the organisers had clearly put a lot of thought into...",
+          "es": "Además, era evidente que los organizadores habían pensado mucho en..."
+        }
+      ]
+    },
+    {
+      "id": "p2-public-building-you-enjoy-visiting",
+      "prompt": "Describe a public building you enjoy visiting.",
+      "bullets": [
+        "what the building is",
+        "where it is located",
+        "how often you go there"
+      ],
+      "explain": "and explain why you enjoy visiting it.",
+      "roundoff": [
+        "Do many other people visit this building?",
+        "Would you recommend it to a visitor to your city?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-public-building-you-enjoy-visiting",
+      "useful_words": [
+        {
+          "en": "architecture",
+          "es": "arquitectura"
+        },
+        {
+          "en": "a peaceful atmosphere",
+          "es": "un ambiente tranquilo"
+        },
+        {
+          "en": "open to the public",
+          "es": "abierto al público"
+        },
+        {
+          "en": "well maintained",
+          "es": "bien cuidado"
+        },
+        {
+          "en": "a landmark",
+          "es": "un sitio emblemático"
+        }
+      ],
+      "help": [
+        {
+          "en": "The place I'd like to talk about is...",
+          "es": "El lugar del que me gustaría hablar es..."
+        },
+        {
+          "en": "What really stands out about it is...",
+          "es": "Lo que realmente destaca de él es..."
+        },
+        {
+          "en": "On top of that, ...",
+          "es": "Además de eso, ..."
+        }
+      ]
+    },
+    {
+      "id": "p2-film-you-did-not-like",
+      "prompt": "Describe a film you watched but did not enjoy.",
+      "bullets": [
+        "what the film was",
+        "when and where you watched it",
+        "what it was about"
+      ],
+      "explain": "and explain why you did not like it.",
+      "roundoff": [
+        "Did you watch the whole film?",
+        "Would you recommend it to anyone?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-film-you-did-not-like",
+      "useful_words": [
+        {
+          "en": "a predictable plot",
+          "es": "una trama predecible"
+        },
+        {
+          "en": "poorly acted",
+          "es": "mal actuado"
+        },
+        {
+          "en": "to drag on",
+          "es": "hacerse eterno, alargarse demasiado"
+        },
+        {
+          "en": "overrated",
+          "es": "sobrevalorado"
+        },
+        {
+          "en": "to fall flat",
+          "es": "no funcionar, no causar el efecto esperado"
+        }
+      ],
+      "help": [
+        {
+          "en": "The film I'd like to talk about is one I saw a couple of years ago.",
+          "es": "La película de la que me gustaría hablar es una que vi hace un par de años."
+        },
+        {
+          "en": "What really put me off was the fact that...",
+          "es": "Lo que realmente me desanimó fue el hecho de que..."
+        },
+        {
+          "en": "To give you an idea of how disappointing it was,...",
+          "es": "Para que se dé una idea de lo decepcionante que fue,..."
+        }
+      ]
+    },
+    {
+      "id": "p2-person-who-loves-history",
+      "prompt": "Describe a person you know who loves history.",
+      "bullets": [
+        "who this person is",
+        "how you know him or her",
+        "what kind of history he or she is interested in"
+      ],
+      "explain": "and explain why you think this person is so interested in history.",
+      "roundoff": [
+        "Do you share this person's interest in history?",
+        "Did you enjoy studying history at school?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-person-who-loves-history",
+      "useful_words": [
+        {
+          "en": "to be fascinated by",
+          "es": "estar fascinado por"
+        },
+        {
+          "en": "ancient civilisations",
+          "es": "civilizaciones antiguas"
+        },
+        {
+          "en": "a keen reader",
+          "es": "un lector apasionado"
+        },
+        {
+          "en": "historical sites",
+          "es": "sitios históricos"
+        },
+        {
+          "en": "to bring the past to life",
+          "es": "darle vida al pasado"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is...",
+          "es": "La persona de la que me gustaría hablar es..."
+        },
+        {
+          "en": "What really stands out about him is that...",
+          "es": "Lo que realmente destaca de él es que..."
+        },
+        {
+          "en": "I think the main reason for this is that...",
+          "es": "Creo que la razón principal de esto es que..."
+        }
+      ]
+    },
+    {
+      "id": "p2-person-who-is-good-at-making-things-by",
+      "prompt": "Describe a person you know who is good at making things by hand.",
+      "bullets": [
+        "who this person is",
+        "what kinds of things they make",
+        "how they learned to do it"
+      ],
+      "explain": "and explain what you think of this person's skill.",
+      "roundoff": [
+        "Have you ever tried to make something by hand yourself?",
+        "Would you like to learn a skill like this one day?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-person-who-is-good-at-making-things-by",
+      "useful_words": [
+        {
+          "en": "handmade",
+          "es": "hecho a mano"
+        },
+        {
+          "en": "attention to detail",
+          "es": "atención al detalle"
+        },
+        {
+          "en": "to have a knack for (something)",
+          "es": "tener facilidad para (algo)"
+        },
+        {
+          "en": "painstaking",
+          "es": "minucioso, laborioso"
+        },
+        {
+          "en": "to pass down a skill",
+          "es": "transmitir una habilidad (de generación en generación)"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is ...",
+          "es": "La persona de la que me gustaría hablar es ..."
+        },
+        {
+          "en": "What really stands out about her work is ...",
+          "es": "Lo que realmente destaca de su trabajo es ..."
+        },
+        {
+          "en": "I remember one particular occasion when ...",
+          "es": "Recuerdo una ocasión en particular en la que ..."
+        }
+      ]
+    },
+    {
+      "id": "p2-person-who-taught-you-a-new-skill",
+      "prompt": "Describe a person who taught you a new skill.",
+      "bullets": [
+        "who this person was",
+        "what skill they taught you",
+        "how they taught it to you"
+      ],
+      "explain": "and explain how you felt about learning this skill from them.",
+      "roundoff": [
+        "Do you still use this skill today?",
+        "Would you like to teach this skill to someone else?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-person-who-taught-you-a-new-skill",
+      "useful_words": [
+        {
+          "en": "hands-on practice",
+          "es": "práctica directa"
+        },
+        {
+          "en": "patient and encouraging",
+          "es": "paciente y alentador"
+        },
+        {
+          "en": "to pick up a skill",
+          "es": "aprender una habilidad"
+        },
+        {
+          "en": "step by step",
+          "es": "paso a paso"
+        },
+        {
+          "en": "to gain confidence",
+          "es": "ganar confianza"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is someone who had a real influence on me.",
+          "es": "La persona de la que me gustaría hablar es alguien que realmente influyó en mí."
+        },
+        {
+          "en": "What I appreciated most was the way she explained things.",
+          "es": "Lo que más valoré fue la forma en que explicaba las cosas."
+        },
+        {
+          "en": "Looking back, I realise how much that experience helped me.",
+          "es": "En retrospectiva, me doy cuenta de cuánto me ayudó esa experiencia."
+        }
+      ]
+    },
+    {
+      "id": "p2-enjoyable-evening-you-had-with-friends",
+      "prompt": "Describe an enjoyable evening you spent with your friends.",
+      "bullets": [
+        "when and where it was",
+        "who you were with",
+        "what you did together"
+      ],
+      "explain": "and explain why you enjoyed this evening so much.",
+      "roundoff": [
+        "Do you often spend evenings with your friends?",
+        "Would you like to have an evening like that again?"
+      ],
+      "tags": [
+        "season"
+      ],
+      "nclex_area": "none",
+      "part3_id": "p3-enjoyable-evening-you-had-with-friends",
+      "useful_words": [
+        {
+          "en": "catch up with someone",
+          "es": "ponerse al día con alguien"
+        },
+        {
+          "en": "a relaxed atmosphere",
+          "es": "un ambiente relajado"
+        },
+        {
+          "en": "lose track of time",
+          "es": "perder la noción del tiempo"
+        },
+        {
+          "en": "unwind after a long shift",
+          "es": "relajarse después de un turno largo"
+        },
+        {
+          "en": "a memorable occasion",
+          "es": "una ocasión memorable"
+        }
+      ],
+      "help": [
+        {
+          "en": "I'd like to talk about an evening that took place a few months ago.",
+          "es": "Me gustaría hablar de una noche que pasó hace unos meses."
+        },
+        {
+          "en": "What made it really special was that…",
+          "es": "Lo que la hizo realmente especial fue que…"
+        },
+        {
+          "en": "Looking back, I think the main reason I enjoyed it was…",
+          "es": "Ahora que lo pienso, creo que la razón principal por la que lo disfruté fue…"
+        }
+      ]
+    },
+    {
+      "id": "p2-person-whose-health-and-fitness-you-have",
+      "prompt": "Describe a person whose health and fitness you have helped to improve.",
+      "bullets": [
+        "who this person is",
+        "what health or fitness problem they had",
+        "what you did to help them"
+      ],
+      "explain": "and explain how you felt about the changes in this person.",
+      "roundoff": [
+        "Do you find it easy to give other people advice about their health?",
+        "Is this person still following the advice you gave them?"
+      ],
+      "tags": [
+        "season",
+        "health"
+      ],
+      "nclex_area": "Health Promotion and Maintenance",
+      "part3_id": "p3-person-whose-health-and-fitness-you-have",
+      "useful_words": [
+        {
+          "en": "make lifestyle changes",
+          "es": "hacer cambios en el estilo de vida"
+        },
+        {
+          "en": "stick to a routine",
+          "es": "mantener una rutina"
+        },
+        {
+          "en": "keep track of progress",
+          "es": "llevar un registro del progreso"
+        },
+        {
+          "en": "motivated",
+          "es": "motivado"
+        },
+        {
+          "en": "cut down on",
+          "es": "reducir el consumo de"
+        }
+      ],
+      "help": [
+        {
+          "en": "The person I'd like to talk about is someone I met through my work.",
+          "es": "La persona de la que me gustaría hablar es alguien que conocí por mi trabajo."
+        },
+        {
+          "en": "At first, he was quite reluctant, but little by little he started to see results.",
+          "es": "Al principio no estaba muy convencido, pero poco a poco empezó a ver resultados."
+        },
+        {
+          "en": "What really made a difference was that we set small, realistic goals together.",
+          "es": "Lo que realmente hizo la diferencia fue que fijamos juntos metas pequeñas y realistas."
+        }
+      ]
+    }
+  ],
+  "part3": [
+    {
+      "id": "p3-noisy-place-you-have-been-to",
+      "theme": "Noise and city life",
+      "questions": [
+        {
+          "q": "What kinds of places tend to be the noisiest in your city?",
+          "kind": "concrete",
+          "rephrase": "Which places in your city are usually very loud?",
+          "followups": [
+            "Why do you think those places are so loud?",
+            "Do you try to avoid them?"
+          ],
+          "help": [
+            {
+              "en": "Without a doubt, the noisiest places are...",
+              "es": "Sin duda, los lugares más ruidosos son..."
+            },
+            {
+              "en": "This is mainly because...",
+              "es": "Esto se debe principalmente a que..."
+            },
+            {
+              "en": "A good example would be...",
+              "es": "Un buen ejemplo sería..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country generally complain about noise from their neighbours?",
+          "kind": "concrete",
+          "rephrase": "In your country, do people often complain when their neighbours are loud?",
+          "followups": [
+            "How do people usually deal with that problem?",
+            "Is it different in cities and in villages?"
+          ],
+          "help": [
+            {
+              "en": "It depends to some extent on...",
+              "es": "Depende en cierta medida de..."
+            },
+            {
+              "en": "In my experience, most people tend to...",
+              "es": "Según mi experiencia, la mayoría de la gente suele..."
+            },
+            {
+              "en": "That said, some people would rather...",
+              "es": "Dicho esto, algunas personas prefieren..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people enjoy lively, noisy places while others strongly prefer peace and quiet?",
+          "kind": "abstract",
+          "rephrase": "Why do some people like busy, loud places but others like quiet places?",
+          "followups": [
+            "Do you think age plays a part in this?",
+            "Which group do you belong to, and why?"
+          ],
+          "help": [
+            {
+              "en": "I think it largely comes down to personality.",
+              "es": "Creo que depende en gran parte de la personalidad."
+            },
+            {
+              "en": "On the one hand... on the other hand...",
+              "es": "Por un lado... por otro lado..."
+            },
+            {
+              "en": "Another factor could be...",
+              "es": "Otro factor podría ser..."
+            }
+          ]
+        },
+        {
+          "q": "What effects can living in a noisy environment have on people's health and well-being?",
+          "kind": "abstract",
+          "rephrase": "How can living in a loud place be bad for people's health?",
+          "followups": [
+            "Can you give me an example?",
+            "Are some people affected more than others?"
+          ],
+          "help": [
+            {
+              "en": "One of the most serious consequences is...",
+              "es": "Una de las consecuencias más graves es..."
+            },
+            {
+              "en": "From what I've seen in my work...",
+              "es": "Por lo que he visto en mi trabajo..."
+            },
+            {
+              "en": "In the long run, this can lead to...",
+              "es": "A la larga, esto puede provocar..."
+            }
+          ]
+        },
+        {
+          "q": "Should governments do more to reduce noise in cities, and if so, what could they do?",
+          "kind": "abstract",
+          "rephrase": "Should the government try harder to make cities quieter? How?",
+          "followups": [
+            "Who should be responsible, the government or individuals?",
+            "Do you think cities will become quieter in the future?"
+          ],
+          "help": [
+            {
+              "en": "I'm convinced that the authorities should...",
+              "es": "Estoy convencido de que las autoridades deberían..."
+            },
+            {
+              "en": "One practical measure would be to...",
+              "es": "Una medida práctica sería..."
+            },
+            {
+              "en": "However, it's not only up to the government.",
+              "es": "Sin embargo, no depende solo del gobierno."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-someone-older-than-you-whom-you-admire",
+      "theme": "Older generations and society",
+      "questions": [
+        {
+          "q": "Do young people in your country often spend time with their grandparents?",
+          "kind": "concrete",
+          "rephrase": "Do young people where you live see their grandparents a lot?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different in cities and in the countryside?"
+          ],
+          "help": [
+            {
+              "en": "In my experience, it's quite common for...",
+              "es": "Según mi experiencia, es bastante común que..."
+            },
+            {
+              "en": "It largely depends on whether...",
+              "es": "Depende en gran medida de si..."
+            },
+            {
+              "en": "In many Mexican families, for instance, ...",
+              "es": "En muchas familias mexicanas, por ejemplo, ..."
+            }
+          ]
+        },
+        {
+          "q": "What kinds of people do young people in your country tend to admire?",
+          "kind": "concrete",
+          "rephrase": "What sort of people do young people where you live admire most?",
+          "followups": [
+            "Why are these people so popular?",
+            "Was it the same when your parents were young?"
+          ],
+          "help": [
+            {
+              "en": "These days, a lot of young people seem to look up to...",
+              "es": "Hoy en día, muchos jóvenes parecen admirar a..."
+            },
+            {
+              "en": "I'd say this is mainly because of...",
+              "es": "Yo diría que esto se debe principalmente a..."
+            },
+            {
+              "en": "That said, there are still many who admire...",
+              "es": "Dicho esto, todavía hay muchos que admiran a..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people believe older people deserve more respect than younger people?",
+          "kind": "abstract",
+          "rephrase": "Why do some people think we should respect older people more?",
+          "followups": [
+            "Do you agree with this idea?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "One reason could be that older people have...",
+              "es": "Una razón podría ser que las personas mayores tienen..."
+            },
+            {
+              "en": "It's often seen as a matter of...",
+              "es": "A menudo se considera una cuestión de..."
+            },
+            {
+              "en": "Personally, I believe respect should be earned, regardless of...",
+              "es": "Personalmente, creo que el respeto se debe ganar, sin importar..."
+            }
+          ]
+        },
+        {
+          "q": "In what ways can older and younger generations learn from each other?",
+          "kind": "abstract",
+          "rephrase": "How can old and young people learn things from each other?",
+          "followups": [
+            "Which generation do you think learns more?",
+            "Can you think of an example from your work?"
+          ],
+          "help": [
+            {
+              "en": "On the one hand, older people can pass on...",
+              "es": "Por un lado, las personas mayores pueden transmitir..."
+            },
+            {
+              "en": "On the other hand, younger people are usually better at...",
+              "es": "Por otro lado, los jóvenes suelen ser mejores para..."
+            },
+            {
+              "en": "A good example of this would be...",
+              "es": "Un buen ejemplo de esto sería..."
+            }
+          ]
+        },
+        {
+          "q": "How might the role of older people in society change in the future?",
+          "kind": "abstract",
+          "rephrase": "Do you think older people will be treated differently in the future?",
+          "followups": [
+            "Why do you think so?",
+            "Is this a positive or a negative change?"
+          ],
+          "help": [
+            {
+              "en": "Given that people are living longer, it's likely that...",
+              "es": "Dado que la gente vive más años, es probable que..."
+            },
+            {
+              "en": "I suspect that in the coming decades...",
+              "es": "Sospecho que en las próximas décadas..."
+            },
+            {
+              "en": "This could lead to both benefits and challenges, such as...",
+              "es": "Esto podría traer tanto beneficios como retos, como..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-activity-you-do-regularly-that-you-think",
+      "theme": "Time and daily habits",
+      "questions": [
+        {
+          "q": "What do people in your country usually do in their free time after work?",
+          "kind": "concrete",
+          "rephrase": "What do people where you live normally do after they finish work?",
+          "followups": [
+            "Is that different at weekends?",
+            "Why do you think those activities are popular?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on the person, but generally speaking...",
+              "es": "Depende mucho de la persona, pero en términos generales..."
+            },
+            {
+              "en": "In big cities like Guadalajara, a lot of people tend to...",
+              "es": "En ciudades grandes como Guadalajara, mucha gente suele..."
+            },
+            {
+              "en": "Family plays a big part, so many people...",
+              "es": "La familia tiene un papel importante, así que mucha gente..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country spend more time on their phones than they did ten years ago?",
+          "kind": "concrete",
+          "rephrase": "Do people where you live use their phones more now than in the past?",
+          "followups": [
+            "Can you give me an example from your own experience?",
+            "Is this true for older people as well?"
+          ],
+          "help": [
+            {
+              "en": "Without a doubt, and you can see it everywhere, for example...",
+              "es": "Sin duda, y se nota en todas partes, por ejemplo..."
+            },
+            {
+              "en": "Ten years ago, phones were mainly used for..., whereas now...",
+              "es": "Hace diez años, los teléfonos se usaban sobre todo para..., mientras que ahora..."
+            },
+            {
+              "en": "One thing I've noticed at work is that...",
+              "es": "Algo que he notado en el trabajo es que..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people find it difficult to stop doing things they know waste their time?",
+          "kind": "abstract",
+          "rephrase": "Why is it hard for some people to stop doing things that waste time?",
+          "followups": [
+            "Why do you think that is?",
+            "Is it harder for young people or for adults?"
+          ],
+          "help": [
+            {
+              "en": "I think the main reason is that these activities give us instant gratification.",
+              "es": "Creo que la razón principal es que estas actividades nos dan una gratificación inmediata."
+            },
+            {
+              "en": "Another factor is that people are often exhausted, so...",
+              "es": "Otro factor es que la gente suele estar agotada, así que..."
+            },
+            {
+              "en": "It's partly a question of willpower, but it's also about...",
+              "es": "En parte es cuestión de fuerza de voluntad, pero también tiene que ver con..."
+            }
+          ]
+        },
+        {
+          "q": "Is it always a bad thing to spend time on activities that are not productive?",
+          "kind": "abstract",
+          "rephrase": "Is it always wrong to do things that don't have a useful result?",
+          "followups": [
+            "Can you give me an example of a useful 'unproductive' activity?",
+            "How much of this kind of time do people need?"
+          ],
+          "help": [
+            {
+              "en": "Not necessarily. I'd argue that rest is essential for our mental health.",
+              "es": "No necesariamente. Yo diría que el descanso es esencial para nuestra salud mental."
+            },
+            {
+              "en": "On the one hand..., but on the other hand...",
+              "es": "Por un lado..., pero por otro lado..."
+            },
+            {
+              "en": "The problem only arises when it starts to affect...",
+              "es": "El problema solo surge cuando empieza a afectar..."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people manage their time change in the future?",
+          "kind": "abstract",
+          "rephrase": "How could people organise their time differently in the future?",
+          "followups": [
+            "Do you think technology will help or make things worse?",
+            "Why do you think so?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to predict, but I imagine that...",
+              "es": "Es difícil predecirlo, pero me imagino que..."
+            },
+            {
+              "en": "If current trends continue, we're likely to see...",
+              "es": "Si las tendencias actuales continúan, es probable que veamos..."
+            },
+            {
+              "en": "There may also be a reaction against this, with more people choosing to...",
+              "es": "También podría haber una reacción en contra, con más gente que elija..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-time-you-received-good-service-in-a-shop",
+      "theme": "Customer service and shopping",
+      "questions": [
+        {
+          "q": "What kinds of shops do people in your country usually prefer to visit, large stores or small local ones?",
+          "kind": "concrete",
+          "rephrase": "Do people where you live like to shop in big stores or in small local shops?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different for older and younger people?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on what people are buying, but generally...",
+              "es": "Realmente depende de lo que la gente compre, pero en general..."
+            },
+            {
+              "en": "In my city, for instance, a lot of people still go to...",
+              "es": "En mi ciudad, por ejemplo, mucha gente todavía va a..."
+            },
+            {
+              "en": "That said, big supermarkets have become much more common recently.",
+              "es": "Dicho eso, los supermercados grandes se han vuelto mucho más comunes últimamente."
+            }
+          ]
+        },
+        {
+          "q": "How do people in your country usually react when they receive poor service in a shop?",
+          "kind": "concrete",
+          "rephrase": "What do people where you live do when a shop gives them bad service?",
+          "followups": [
+            "Can you give me an example?",
+            "Do you think people complain enough?"
+          ],
+          "help": [
+            {
+              "en": "From what I've seen, most people tend to...",
+              "es": "Por lo que he visto, la mayoría de la gente suele..."
+            },
+            {
+              "en": "Rather than complaining directly, many people prefer to...",
+              "es": "En lugar de quejarse directamente, mucha gente prefiere..."
+            },
+            {
+              "en": "These days it's quite common to leave a negative review online.",
+              "es": "Hoy en día es bastante común dejar una reseña negativa en internet."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some businesses provide much better customer service than others?",
+          "kind": "abstract",
+          "rephrase": "Why are some shops and companies better at helping customers than others?",
+          "followups": [
+            "Is training the most important factor?",
+            "Can you compare two businesses you know?"
+          ],
+          "help": [
+            {
+              "en": "I'd say one of the main reasons is...",
+              "es": "Yo diría que una de las principales razones es..."
+            },
+            {
+              "en": "It largely comes down to how staff are trained and treated.",
+              "es": "Depende en gran medida de cómo se capacita y se trata al personal."
+            },
+            {
+              "en": "If employees feel valued, they're far more likely to...",
+              "es": "Si los empleados se sienten valorados, es mucho más probable que..."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of shopping online compared with shopping in person?",
+          "kind": "abstract",
+          "rephrase": "What is good and bad about buying things on the internet instead of in a shop?",
+          "followups": [
+            "Which do you think is better for the customer?",
+            "Why do some people still prefer physical shops?"
+          ],
+          "help": [
+            {
+              "en": "On the one hand, online shopping is undeniably convenient...",
+              "es": "Por un lado, comprar en línea es sin duda cómodo..."
+            },
+            {
+              "en": "On the other hand, you miss out on the personal contact.",
+              "es": "Por otro lado, te pierdes el contacto personal."
+            },
+            {
+              "en": "Overall, I think it depends on the type of product.",
+              "es": "En general, creo que depende del tipo de producto."
+            }
+          ]
+        },
+        {
+          "q": "How might technology change the way customers are served in shops in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how could technology change the way shops help their customers?",
+          "followups": [
+            "Do you think this would be a positive change?",
+            "Will people still want to talk to real staff?"
+          ],
+          "help": [
+            {
+              "en": "It's quite likely that we'll see more...",
+              "es": "Es bastante probable que veamos más..."
+            },
+            {
+              "en": "One possible downside is that service could become less personal.",
+              "es": "Una posible desventaja es que la atención podría volverse menos personal."
+            },
+            {
+              "en": "Even so, I doubt machines will ever completely replace human staff.",
+              "es": "Aun así, dudo que las máquinas lleguen a reemplazar por completo al personal humano."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-city-you-would-like-to-visit-again",
+      "theme": "Travel and city tourism",
+      "questions": [
+        {
+          "q": "Which cities in your country are most popular with tourists, and why do people visit them?",
+          "kind": "concrete",
+          "rephrase": "Which cities in your country do tourists like to visit, and why?",
+          "followups": [
+            "Are they popular with foreign visitors or mainly with local people?",
+            "Can you give me an example of a famous attraction there?"
+          ],
+          "help": [
+            {
+              "en": "Probably the most popular one is...",
+              "es": "Probablemente la más popular es..."
+            },
+            {
+              "en": "People are mainly attracted by...",
+              "es": "A la gente le atrae principalmente..."
+            },
+            {
+              "en": "On top of that, it's well known for...",
+              "es": "Además, es muy conocida por..."
+            }
+          ]
+        },
+        {
+          "q": "How do people in your country usually plan a trip to another city?",
+          "kind": "concrete",
+          "rephrase": "How do people in your country normally get ready for a trip to a different city?",
+          "followups": [
+            "Has this changed compared with when your parents were young?",
+            "Why do you think that is?"
+          ],
+          "help": [
+            {
+              "en": "These days, most people tend to...",
+              "es": "Hoy en día, la mayoría de la gente suele..."
+            },
+            {
+              "en": "It's quite common to...",
+              "es": "Es bastante común..."
+            },
+            {
+              "en": "Whereas in the past, people used to...",
+              "es": "Mientras que antes, la gente solía..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people prefer to return to the same place rather than visit somewhere new?",
+          "kind": "abstract",
+          "rephrase": "Why do some people like going back to a place they know instead of trying a new one?",
+          "followups": [
+            "Do you think this is more common among older people?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "I suppose one reason is that...",
+              "es": "Supongo que una razón es que..."
+            },
+            {
+              "en": "For some people, familiarity gives them a sense of security.",
+              "es": "Para algunas personas, lo conocido les da una sensación de seguridad."
+            },
+            {
+              "en": "On the other hand, others might feel that...",
+              "es": "Por otro lado, otros podrían sentir que..."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of a city attracting large numbers of tourists?",
+          "kind": "abstract",
+          "rephrase": "What are the good and bad things about many tourists coming to a city?",
+          "followups": [
+            "Who benefits most from tourism, in your opinion?",
+            "How could the negative effects be reduced?"
+          ],
+          "help": [
+            {
+              "en": "On the positive side, it boosts the local economy.",
+              "es": "En el lado positivo, impulsa la economía local."
+            },
+            {
+              "en": "The downside is that...",
+              "es": "La desventaja es que..."
+            },
+            {
+              "en": "It can also push up the cost of living for residents.",
+              "es": "También puede elevar el costo de vida para los habitantes."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people travel to and explore cities change in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how could people's ways of travelling to and visiting cities be different?",
+          "followups": [
+            "Do you think technology will make travel better or worse?",
+            "Why do you say that?"
+          ],
+          "help": [
+            {
+              "en": "I'd imagine that in the future...",
+              "es": "Me imagino que en el futuro..."
+            },
+            {
+              "en": "It's likely that technology will play a bigger role in...",
+              "es": "Es probable que la tecnología tenga un papel más importante en..."
+            },
+            {
+              "en": "That said, I don't think people will ever stop wanting to...",
+              "es": "Dicho esto, no creo que la gente deje nunca de querer..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-someone-who-did-something-difficult-and",
+      "theme": "Challenges and success",
+      "questions": [
+        {
+          "q": "What kinds of achievements are most admired by people in your country?",
+          "kind": "concrete",
+          "rephrase": "What successes do people in your country respect the most?",
+          "followups": [
+            "Why do you think that is?",
+            "Has this changed in recent years?"
+          ],
+          "help": [
+            {
+              "en": "In Mexico, people tend to admire...",
+              "es": "En México, la gente suele admirar..."
+            },
+            {
+              "en": "A good example of this would be...",
+              "es": "Un buen ejemplo de esto sería..."
+            },
+            {
+              "en": "This is probably because...",
+              "es": "Esto probablemente se debe a que..."
+            }
+          ]
+        },
+        {
+          "q": "Do young people where you live usually get support from their families when facing difficulties?",
+          "kind": "concrete",
+          "rephrase": "When young people in your area have problems, does their family usually help them?",
+          "followups": [
+            "Can you give me an example?",
+            "Is this different in big cities and small towns?"
+          ],
+          "help": [
+            {
+              "en": "Generally speaking, families here are quite close, so...",
+              "es": "En general, las familias aquí son muy unidas, así que..."
+            },
+            {
+              "en": "That said, it depends a lot on...",
+              "es": "Dicho esto, depende mucho de..."
+            },
+            {
+              "en": "From what I've seen,...",
+              "es": "Por lo que he visto,..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people give up easily while others keep trying?",
+          "kind": "abstract",
+          "rephrase": "Why do some people stop quickly when things are hard, but others don't?",
+          "followups": [
+            "Do you think this can be learned?",
+            "Which kind of person are you?"
+          ],
+          "help": [
+            {
+              "en": "I think it largely comes down to...",
+              "es": "Creo que en gran parte depende de..."
+            },
+            {
+              "en": "Another factor could be the way they were brought up.",
+              "es": "Otro factor podría ser la manera en que los criaron."
+            },
+            {
+              "en": "People who have a clear goal are more likely to...",
+              "es": "Las personas que tienen una meta clara tienen más probabilidades de..."
+            }
+          ]
+        },
+        {
+          "q": "Is success today measured differently from how it was measured in your parents' generation?",
+          "kind": "abstract",
+          "rephrase": "Do people today have a different idea of success than people had in your parents' time?",
+          "followups": [
+            "Why do you think it has changed?",
+            "Which view do you agree with more?"
+          ],
+          "help": [
+            {
+              "en": "In my parents' day, success mainly meant...",
+              "es": "En la época de mis padres, el éxito significaba principalmente..."
+            },
+            {
+              "en": "Nowadays, by contrast,...",
+              "es": "Hoy en día, en cambio,..."
+            },
+            {
+              "en": "Social media has definitely played a part in this.",
+              "es": "Las redes sociales definitivamente han influido en esto."
+            }
+          ]
+        },
+        {
+          "q": "Should schools teach children how to cope with failure?",
+          "kind": "abstract",
+          "rephrase": "Should schools help children learn how to deal with not succeeding?",
+          "followups": [
+            "How could schools do this?",
+            "Is this the job of schools or of parents?"
+          ],
+          "help": [
+            {
+              "en": "I'm strongly in favour of this, because...",
+              "es": "Estoy totalmente a favor de esto, porque..."
+            },
+            {
+              "en": "One way schools could do this is by...",
+              "es": "Una forma en que las escuelas podrían hacerlo es..."
+            },
+            {
+              "en": "On the other hand, some people would argue that...",
+              "es": "Por otro lado, algunas personas dirían que..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-famous-person-in-your-area",
+      "theme": "Fame and public figures",
+      "questions": [
+        {
+          "q": "What kinds of people are famous in the town or city where you live?",
+          "kind": "concrete",
+          "rephrase": "Which types of people are well known where you live?",
+          "followups": [
+            "Why do you think these people became famous?",
+            "Is this different from famous people in the capital?"
+          ],
+          "help": [
+            {
+              "en": "Where I live, the most famous people tend to be...",
+              "es": "Donde vivo, las personas más famosas suelen ser..."
+            },
+            {
+              "en": "A good example would be...",
+              "es": "Un buen ejemplo sería..."
+            },
+            {
+              "en": "This is mainly because...",
+              "es": "Esto se debe principalmente a que..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country pay much attention to the private lives of celebrities?",
+          "kind": "concrete",
+          "rephrase": "Are people in your country interested in the personal lives of famous people?",
+          "followups": [
+            "Why do you think that is?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "I'd say quite a lot of people do, especially...",
+              "es": "Yo diría que mucha gente sí, sobre todo..."
+            },
+            {
+              "en": "You can see this in the way that...",
+              "es": "Esto se nota en la forma en que..."
+            },
+            {
+              "en": "On the other hand, some people aren't interested at all.",
+              "es": "Por otro lado, a algunas personas no les interesa en absoluto."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people want to become famous?",
+          "kind": "abstract",
+          "rephrase": "What are the reasons people want to be famous?",
+          "followups": [
+            "Do you think these reasons are good ones?",
+            "Has this changed compared with the past?"
+          ],
+          "help": [
+            {
+              "en": "I think there are several reasons for this.",
+              "es": "Creo que hay varias razones para esto."
+            },
+            {
+              "en": "One of the main motivations is probably...",
+              "es": "Una de las principales motivaciones probablemente es..."
+            },
+            {
+              "en": "Another factor could be that...",
+              "es": "Otro factor podría ser que..."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of being a famous person?",
+          "kind": "abstract",
+          "rephrase": "What is good and what is bad about being famous?",
+          "followups": [
+            "Which do you think is more important?",
+            "Can you think of a famous person who has experienced this?"
+          ],
+          "help": [
+            {
+              "en": "On the positive side,...",
+              "es": "Por el lado positivo,..."
+            },
+            {
+              "en": "However, the main drawback is that...",
+              "es": "Sin embargo, la principal desventaja es que..."
+            },
+            {
+              "en": "Overall, I'd say the disadvantages outweigh the advantages.",
+              "es": "En general, diría que las desventajas pesan más que las ventajas."
+            }
+          ]
+        },
+        {
+          "q": "How might social media change the way people become famous in the future?",
+          "kind": "abstract",
+          "rephrase": "How could social media affect how people become famous later on?",
+          "followups": [
+            "Do you think this is a positive change?",
+            "Why do you think that?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to say for sure, but I imagine that...",
+              "es": "Es difícil saberlo con certeza, pero me imagino que..."
+            },
+            {
+              "en": "We're already seeing a trend where...",
+              "es": "Ya estamos viendo una tendencia en la que..."
+            },
+            {
+              "en": "In the long run, this could lead to...",
+              "es": "A largo plazo, esto podría llevar a..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-time-you-changed-an-important-decision",
+      "theme": "Decision-making in life",
+      "questions": [
+        {
+          "q": "In your country, who do young people usually ask for advice when making important decisions?",
+          "kind": "concrete",
+          "rephrase": "When young people in your country have a big decision to make, who do they talk to?",
+          "followups": [
+            "Why do you think they trust those people?",
+            "Has this changed since your parents were young?"
+          ],
+          "help": [
+            {
+              "en": "In Mexico, family plays a huge role, so most young people turn to their parents first.",
+              "es": "En México la familia tiene un papel enorme, así que la mayoría de los jóvenes recurre primero a sus padres."
+            },
+            {
+              "en": "That said, more and more young people rely on their friends or even social media.",
+              "es": "Dicho esto, cada vez más jóvenes se apoyan en sus amigos o incluso en las redes sociales."
+            },
+            {
+              "en": "It really depends on the type of decision they're facing.",
+              "es": "Realmente depende del tipo de decisión que tengan que tomar."
+            }
+          ]
+        },
+        {
+          "q": "What kinds of decisions do people where you live find most difficult to make?",
+          "kind": "concrete",
+          "rephrase": "Where you live, which decisions are the hardest for people?",
+          "followups": [
+            "Why are those decisions so difficult?",
+            "Can you give me an example from your own experience?"
+          ],
+          "help": [
+            {
+              "en": "I'd say choosing a career is probably the toughest one for most people.",
+              "es": "Yo diría que elegir una carrera es probablemente la decisión más difícil para la mayoría."
+            },
+            {
+              "en": "Decisions about money, like buying a house, also cause a lot of stress.",
+              "es": "Las decisiones sobre dinero, como comprar una casa, también causan mucho estrés."
+            },
+            {
+              "en": "This is mainly because the consequences can last for many years.",
+              "es": "Esto se debe principalmente a que las consecuencias pueden durar muchos años."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people find it much harder to make decisions than others?",
+          "kind": "abstract",
+          "rephrase": "Why is deciding more difficult for some people than for others?",
+          "followups": [
+            "Do you think this can be learnt or improved?",
+            "Is it connected to a person's upbringing?"
+          ],
+          "help": [
+            {
+              "en": "I think a lot of it comes down to personality and confidence.",
+              "es": "Creo que en gran parte depende de la personalidad y la seguridad en uno mismo."
+            },
+            {
+              "en": "Some people are afraid of making mistakes, so they keep putting decisions off.",
+              "es": "Algunas personas tienen miedo de equivocarse, así que siguen posponiendo las decisiones."
+            },
+            {
+              "en": "On the other hand, people who have more experience tend to decide more quickly.",
+              "es": "Por otro lado, las personas con más experiencia suelen decidir más rápido."
+            }
+          ]
+        },
+        {
+          "q": "Is changing your mind a sign of weakness, or can it show strength?",
+          "kind": "abstract",
+          "rephrase": "Is it good or bad when someone changes their mind about something?",
+          "followups": [
+            "Why do you think some people see it as weakness?",
+            "What about politicians or leaders who change their minds?"
+          ],
+          "help": [
+            {
+              "en": "In my view, it takes courage to admit you were wrong.",
+              "es": "En mi opinión, se necesita valor para admitir que te equivocaste."
+            },
+            {
+              "en": "However, if someone changes their mind constantly, people may stop trusting them.",
+              "es": "Sin embargo, si alguien cambia de opinión constantemente, la gente puede dejar de confiar en esa persona."
+            },
+            {
+              "en": "For example, in healthcare we sometimes have to change a plan when new information appears.",
+              "es": "Por ejemplo, en el área de la salud a veces tenemos que cambiar un plan cuando surge nueva información."
+            }
+          ]
+        },
+        {
+          "q": "How might technology change the way people make important decisions in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how could technology help people decide important things?",
+          "followups": [
+            "Would you trust a computer to make a decision for you?",
+            "What are the risks of relying on technology in this way?"
+          ],
+          "help": [
+            {
+              "en": "I imagine artificial intelligence will play a much bigger role in giving advice.",
+              "es": "Me imagino que la inteligencia artificial tendrá un papel mucho más importante al dar consejos."
+            },
+            {
+              "en": "The main advantage is that people will have access to far more information.",
+              "es": "La principal ventaja es que la gente tendrá acceso a mucha más información."
+            },
+            {
+              "en": "Even so, I believe the final decision should always be made by a human.",
+              "es": "Aun así, creo que la decisión final siempre debería tomarla una persona."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-happy-person-you-know",
+      "theme": "Happiness and well-being",
+      "questions": [
+        {
+          "q": "What kinds of things make people in your country feel happy in their everyday lives?",
+          "kind": "concrete",
+          "rephrase": "What makes people in your country happy on a normal day?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different for younger and older people?"
+          ],
+          "help": [
+            {
+              "en": "For most people where I live, ...",
+              "es": "Para la mayoría de la gente donde vivo, ..."
+            },
+            {
+              "en": "One thing that really matters is...",
+              "es": "Algo que realmente importa es..."
+            },
+            {
+              "en": "It's quite common to see...",
+              "es": "Es bastante común ver..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country usually talk openly about their feelings, or do they keep them private?",
+          "kind": "concrete",
+          "rephrase": "In your country, do people talk about their feelings or keep them to themselves?",
+          "followups": [
+            "Can you give me an example?",
+            "Has this changed in recent years?"
+          ],
+          "help": [
+            {
+              "en": "It depends a lot on the person, but generally...",
+              "es": "Depende mucho de la persona, pero en general..."
+            },
+            {
+              "en": "In my experience as a nurse, ...",
+              "es": "En mi experiencia como enfermera, ..."
+            },
+            {
+              "en": "Culturally speaking, ...",
+              "es": "Hablando en términos culturales, ..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some people stay cheerful even when they face serious difficulties?",
+          "kind": "abstract",
+          "rephrase": "Why are some people still happy when they have big problems?",
+          "followups": [
+            "Is this something people are born with, or can it be learnt?",
+            "Can you think of an example?"
+          ],
+          "help": [
+            {
+              "en": "I'd say it mainly comes down to...",
+              "es": "Yo diría que depende principalmente de..."
+            },
+            {
+              "en": "Another factor could be...",
+              "es": "Otro factor podría ser..."
+            },
+            {
+              "en": "This is partly because...",
+              "es": "Esto se debe en parte a que..."
+            }
+          ]
+        },
+        {
+          "q": "Do you think people today are happier than people were in the past?",
+          "kind": "abstract",
+          "rephrase": "Are people happier now than they were many years ago?",
+          "followups": [
+            "Why do you think that is?",
+            "What has changed the most?"
+          ],
+          "help": [
+            {
+              "en": "On the one hand..., but on the other hand...",
+              "es": "Por un lado..., pero por otro lado..."
+            },
+            {
+              "en": "Compared with previous generations, ...",
+              "es": "En comparación con las generaciones anteriores, ..."
+            },
+            {
+              "en": "It's hard to say for certain, but...",
+              "es": "Es difícil decirlo con certeza, pero..."
+            }
+          ]
+        },
+        {
+          "q": "Should employers take responsibility for the happiness and well-being of their staff?",
+          "kind": "abstract",
+          "rephrase": "Should companies help their workers to be happy and healthy?",
+          "followups": [
+            "What could employers do in practice?",
+            "Are there any disadvantages to this?"
+          ],
+          "help": [
+            {
+              "en": "To a certain extent, yes, because...",
+              "es": "Hasta cierto punto, sí, porque..."
+            },
+            {
+              "en": "A good example of this would be...",
+              "es": "Un buen ejemplo de esto sería..."
+            },
+            {
+              "en": "That said, I don't think it's only up to employers.",
+              "es": "Dicho esto, no creo que dependa solo de los empleadores."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-very-organized-person-you-know",
+      "theme": "Organization and time management",
+      "questions": [
+        {
+          "q": "Do people in your country generally plan their days carefully, or do they prefer to be more spontaneous?",
+          "kind": "concrete",
+          "rephrase": "In your country, do people usually plan their day, or do they just do things as they come?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different for younger and older people?"
+          ],
+          "help": [
+            {
+              "en": "On the whole, I'd say people where I live tend to...",
+              "es": "En general, diría que la gente donde vivo tiende a..."
+            },
+            {
+              "en": "It depends a lot on the type of job someone has.",
+              "es": "Depende mucho del tipo de trabajo que tenga alguien."
+            },
+            {
+              "en": "That said, in big cities it's quite different because...",
+              "es": "Dicho esto, en las ciudades grandes es bastante diferente porque..."
+            }
+          ]
+        },
+        {
+          "q": "What tools or methods do people where you live commonly use to organize their work and daily lives?",
+          "kind": "concrete",
+          "rephrase": "What do people in your area use to help them stay organized?",
+          "followups": [
+            "Can you give me an example from your own workplace?",
+            "Do you think these tools really help?"
+          ],
+          "help": [
+            {
+              "en": "These days, most people rely heavily on their phones to...",
+              "es": "Hoy en día, la mayoría de la gente depende mucho de su celular para..."
+            },
+            {
+              "en": "A lot of people still prefer the traditional way, such as...",
+              "es": "Mucha gente todavía prefiere la forma tradicional, como..."
+            },
+            {
+              "en": "In my line of work, for instance, we use...",
+              "es": "En mi área de trabajo, por ejemplo, usamos..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some people find it much harder than others to stay organized?",
+          "kind": "abstract",
+          "rephrase": "Why is it more difficult for some people to be organized?",
+          "followups": [
+            "Is it mainly a matter of personality or upbringing?",
+            "Can you think of an example?"
+          ],
+          "help": [
+            {
+              "en": "I think one of the main reasons is that...",
+              "es": "Creo que una de las razones principales es que..."
+            },
+            {
+              "en": "It could also be linked to the way they were brought up.",
+              "es": "También podría estar relacionado con la forma en que los educaron."
+            },
+            {
+              "en": "Another factor that shouldn't be overlooked is stress.",
+              "es": "Otro factor que no se debe pasar por alto es el estrés."
+            }
+          ]
+        },
+        {
+          "q": "Are there any disadvantages to being extremely organized in both work and personal life?",
+          "kind": "abstract",
+          "rephrase": "Can being too organized be a bad thing?",
+          "followups": [
+            "Why do you say that?",
+            "How does this compare with being disorganized?"
+          ],
+          "help": [
+            {
+              "en": "While being organized is clearly an advantage, it can sometimes...",
+              "es": "Aunque ser organizado es claramente una ventaja, a veces puede..."
+            },
+            {
+              "en": "The downside is that very organized people may struggle when plans change.",
+              "es": "La desventaja es que las personas muy organizadas pueden batallar cuando cambian los planes."
+            },
+            {
+              "en": "Overall, I'd argue that the benefits outweigh the drawbacks.",
+              "es": "En general, yo diría que los beneficios superan las desventajas."
+            }
+          ]
+        },
+        {
+          "q": "How might technology change the way people manage their time in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how could technology help people use their time?",
+          "followups": [
+            "Do you think this would be a positive change?",
+            "Could people become too dependent on technology?"
+          ],
+          "help": [
+            {
+              "en": "It's quite likely that in the future we'll see...",
+              "es": "Es muy probable que en el futuro veamos..."
+            },
+            {
+              "en": "On the one hand, this could save time, but on the other hand...",
+              "es": "Por un lado, esto podría ahorrar tiempo, pero por otro lado..."
+            },
+            {
+              "en": "There's a risk that people might stop thinking for themselves.",
+              "es": "Existe el riesgo de que la gente deje de pensar por sí misma."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-natural-place-in-your-city",
+      "theme": "Nature and urban life",
+      "questions": [
+        {
+          "q": "What kinds of outdoor places are most popular with families where you live?",
+          "kind": "concrete",
+          "rephrase": "Where do families in your area like to go outside?",
+          "followups": [
+            "Why do you think those places are so popular?",
+            "Is that different from when you were a child?"
+          ],
+          "help": [
+            {
+              "en": "In my city, families tend to go to...",
+              "es": "En mi ciudad, las familias suelen ir a..."
+            },
+            {
+              "en": "Especially at weekends, you'll see a lot of people...",
+              "es": "Sobre todo los fines de semana, se ve a mucha gente..."
+            },
+            {
+              "en": "One reason for this is probably that...",
+              "es": "Una razón de esto probablemente es que..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country spend much of their free time in natural surroundings?",
+          "kind": "concrete",
+          "rephrase": "Do people in your country often go to nature in their free time?",
+          "followups": [
+            "Can you give me an example?",
+            "Do younger and older people differ in this?"
+          ],
+          "help": [
+            {
+              "en": "It depends quite a lot on where people live.",
+              "es": "Depende bastante de dónde vive la gente."
+            },
+            {
+              "en": "Generally speaking, people who live in big cities...",
+              "es": "En términos generales, la gente que vive en ciudades grandes..."
+            },
+            {
+              "en": "For instance, many people I know...",
+              "es": "Por ejemplo, mucha gente que conozco..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some people prefer indoor activities to spending time outdoors?",
+          "kind": "abstract",
+          "rephrase": "Why do some people like to stay inside more than go outside?",
+          "followups": [
+            "Do you think technology plays a part in this?",
+            "Is this a problem, in your opinion?"
+          ],
+          "help": [
+            {
+              "en": "I'd say one of the main reasons is...",
+              "es": "Yo diría que una de las principales razones es..."
+            },
+            {
+              "en": "Another factor could be that...",
+              "es": "Otro factor podría ser que..."
+            },
+            {
+              "en": "That said, I don't think it's always a bad thing.",
+              "es": "Dicho esto, no creo que siempre sea algo malo."
+            }
+          ]
+        },
+        {
+          "q": "What are the benefits of having green spaces in large cities?",
+          "kind": "abstract",
+          "rephrase": "Why is it good for big cities to have parks and trees?",
+          "followups": [
+            "Which benefit do you think is the most important?",
+            "Are there any disadvantages?"
+          ],
+          "help": [
+            {
+              "en": "First and foremost, green spaces are good for people's health.",
+              "es": "Ante todo, las áreas verdes son buenas para la salud de la gente."
+            },
+            {
+              "en": "Apart from that, they help to reduce pollution.",
+              "es": "Aparte de eso, ayudan a reducir la contaminación."
+            },
+            {
+              "en": "From my experience as a nurse, I've noticed that...",
+              "es": "Por mi experiencia como enfermera, he notado que..."
+            }
+          ]
+        },
+        {
+          "q": "Should governments spend more money protecting natural areas, even if cities need to grow?",
+          "kind": "abstract",
+          "rephrase": "Should the government pay more to protect nature, even when cities get bigger?",
+          "followups": [
+            "Why do you think that?",
+            "How might cities look in the future if nothing changes?"
+          ],
+          "help": [
+            {
+              "en": "I strongly believe that governments should...",
+              "es": "Creo firmemente que los gobiernos deberían..."
+            },
+            {
+              "en": "On the one hand..., but on the other hand...",
+              "es": "Por un lado..., pero por otro lado..."
+            },
+            {
+              "en": "In the long run, it would probably be better to...",
+              "es": "A largo plazo, probablemente sería mejor..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-skill-you-learned-as-a-child",
+      "theme": "Childhood learning and skills",
+      "questions": [
+        {
+          "q": "What kinds of skills do parents in your country usually teach their children at home?",
+          "kind": "concrete",
+          "rephrase": "What do parents in your country often teach their children at home?",
+          "followups": [
+            "Why do you think parents choose those skills?",
+            "Is this different from what your grandparents learned?"
+          ],
+          "help": [
+            {
+              "en": "In Mexico, it's quite common for parents to teach their children...",
+              "es": "En México, es bastante común que los padres les enseñen a sus hijos..."
+            },
+            {
+              "en": "A typical example would be...",
+              "es": "Un ejemplo típico sería..."
+            },
+            {
+              "en": "This tends to vary depending on whether families live in cities or in rural areas.",
+              "es": "Esto suele variar según si las familias viven en ciudades o en zonas rurales."
+            }
+          ]
+        },
+        {
+          "q": "Are after-school activities such as music or sports lessons popular among children where you live?",
+          "kind": "concrete",
+          "rephrase": "Do many children where you live take classes like music or sports after school?",
+          "followups": [
+            "Which activities are the most popular?",
+            "Can every family afford these activities?"
+          ],
+          "help": [
+            {
+              "en": "Yes, they're becoming more and more popular, especially...",
+              "es": "Sí, cada vez son más populares, sobre todo..."
+            },
+            {
+              "en": "From what I've seen in my city,...",
+              "es": "Por lo que he visto en mi ciudad,..."
+            },
+            {
+              "en": "That said, not all families can afford them.",
+              "es": "Dicho esto, no todas las familias pueden pagarlas."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think children often learn new skills more quickly than adults?",
+          "kind": "abstract",
+          "rephrase": "Why is it usually easier for children to learn new things than for adults?",
+          "followups": [
+            "Can you give me an example?",
+            "Are there any skills that adults learn better?"
+          ],
+          "help": [
+            {
+              "en": "I think one of the main reasons is that children aren't afraid of making mistakes.",
+              "es": "Creo que una de las razones principales es que los niños no tienen miedo de equivocarse."
+            },
+            {
+              "en": "Another factor could be that they simply have more free time.",
+              "es": "Otro factor podría ser que simplemente tienen más tiempo libre."
+            },
+            {
+              "en": "Adults, on the other hand, tend to...",
+              "es": "Los adultos, en cambio, suelen..."
+            }
+          ]
+        },
+        {
+          "q": "Should schools focus more on practical life skills rather than academic subjects?",
+          "kind": "abstract",
+          "rephrase": "Should schools teach more useful everyday skills and fewer traditional school subjects?",
+          "followups": [
+            "Which practical skills would be the most important?",
+            "What might be the disadvantages of this?"
+          ],
+          "help": [
+            {
+              "en": "I'd say schools should strike a balance between the two.",
+              "es": "Yo diría que las escuelas deberían encontrar un equilibrio entre las dos cosas."
+            },
+            {
+              "en": "Skills such as managing money or basic first aid are essential because...",
+              "es": "Habilidades como administrar el dinero o dar primeros auxilios básicos son esenciales porque..."
+            },
+            {
+              "en": "However, academic subjects are still important for...",
+              "es": "Sin embargo, las materias académicas siguen siendo importantes para..."
+            }
+          ]
+        },
+        {
+          "q": "How might the skills that children learn change in the future because of technology?",
+          "kind": "abstract",
+          "rephrase": "Because of technology, how could the skills that children learn be different in the future?",
+          "followups": [
+            "Do you think this is a positive change?",
+            "Which traditional skills might disappear?"
+          ],
+          "help": [
+            {
+              "en": "It's likely that children will need to learn more digital skills, such as...",
+              "es": "Es probable que los niños necesiten aprender más habilidades digitales, como..."
+            },
+            {
+              "en": "On the downside, some traditional skills might be lost, for instance...",
+              "es": "Como desventaja, se podrían perder algunas habilidades tradicionales, por ejemplo..."
+            },
+            {
+              "en": "It's hard to predict, but I imagine that...",
+              "es": "Es difícil predecirlo, pero me imagino que..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-risk-that-turned-out-well",
+      "theme": "Risk and decision-making",
+      "questions": [
+        {
+          "q": "Do people in your country tend to avoid risks when choosing a job or career?",
+          "kind": "concrete",
+          "rephrase": "In your country, do people usually choose safe jobs?",
+          "followups": [
+            "Why do you think that is?",
+            "Has this changed compared with your parents' generation?"
+          ],
+          "help": [
+            {
+              "en": "Generally speaking, most people I know...",
+              "es": "Por lo general, la mayoría de la gente que conozco..."
+            },
+            {
+              "en": "This is largely because...",
+              "es": "Esto se debe en gran parte a que..."
+            },
+            {
+              "en": "That said, younger people are becoming more...",
+              "es": "Dicho esto, los jóvenes se están volviendo más..."
+            }
+          ]
+        },
+        {
+          "q": "What kinds of risky activities are popular with young people where you live?",
+          "kind": "concrete",
+          "rephrase": "What dangerous things do young people like to do in your area?",
+          "followups": [
+            "Why do you think they enjoy these activities?",
+            "Can you give me an example from your city?"
+          ],
+          "help": [
+            {
+              "en": "One thing that comes to mind is...",
+              "es": "Algo que me viene a la mente es..."
+            },
+            {
+              "en": "It's become quite popular recently, especially among...",
+              "es": "Se ha vuelto bastante popular últimamente, sobre todo entre..."
+            },
+            {
+              "en": "I suppose the appeal is that...",
+              "es": "Supongo que lo atractivo es que..."
+            }
+          ]
+        },
+        {
+          "q": "Why are some people more willing to take risks than others?",
+          "kind": "abstract",
+          "rephrase": "Why do some people like taking risks more than other people?",
+          "followups": [
+            "Is this more to do with personality or upbringing?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "I think it depends to a large extent on...",
+              "es": "Creo que depende en gran medida de..."
+            },
+            {
+              "en": "Another factor could be the way people are brought up.",
+              "es": "Otro factor podría ser la forma en que las personas son criadas."
+            },
+            {
+              "en": "For instance, someone who has financial security...",
+              "es": "Por ejemplo, alguien que tiene seguridad económica..."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of taking risks in business?",
+          "kind": "abstract",
+          "rephrase": "What is good and bad about taking risks when you run a business?",
+          "followups": [
+            "Which do you think is greater, the advantages or the disadvantages?",
+            "Why do you think that is?"
+          ],
+          "help": [
+            {
+              "en": "On the one hand, taking risks can lead to...",
+              "es": "Por un lado, correr riesgos puede llevar a..."
+            },
+            {
+              "en": "On the other hand, there's always the danger of...",
+              "es": "Por otro lado, siempre existe el peligro de..."
+            },
+            {
+              "en": "On balance, I'd say that...",
+              "es": "En general, yo diría que..."
+            }
+          ]
+        },
+        {
+          "q": "Do you think society has become too cautious about risk in recent years?",
+          "kind": "abstract",
+          "rephrase": "Do you think people today worry too much about danger?",
+          "followups": [
+            "Why do you think that has happened?",
+            "How is this different from the past?"
+          ],
+          "help": [
+            {
+              "en": "To some extent, yes, because...",
+              "es": "Hasta cierto punto, sí, porque..."
+            },
+            {
+              "en": "It's partly due to the fact that...",
+              "es": "Se debe en parte a que..."
+            },
+            {
+              "en": "Having said that, being careful isn't always a bad thing.",
+              "es": "Dicho eso, ser precavido no siempre es algo malo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-place-where-you-have-taken-photos-more",
+      "theme": "Photography and memories",
+      "questions": [
+        {
+          "q": "What kinds of places do people in your country like to photograph most?",
+          "kind": "concrete",
+          "rephrase": "Where do people in your country usually like to take pictures?",
+          "followups": [
+            "Why do you think those places are so popular?",
+            "Can you give me an example from your city?"
+          ],
+          "help": [
+            {
+              "en": "In my country, a lot of people tend to photograph...",
+              "es": "En mi país, mucha gente suele fotografiar..."
+            },
+            {
+              "en": "This is especially common during...",
+              "es": "Esto es especialmente común durante..."
+            },
+            {
+              "en": "A good example would be...",
+              "es": "Un buen ejemplo sería..."
+            }
+          ]
+        },
+        {
+          "q": "Do people where you live usually print their photos, or do they keep them on their phones?",
+          "kind": "concrete",
+          "rephrase": "Do people where you live put their photos on paper, or just keep them on their phones?",
+          "followups": [
+            "Has this changed in recent years?",
+            "Why do some people still prefer printed photos?"
+          ],
+          "help": [
+            {
+              "en": "Most people nowadays just keep them on their phones, although...",
+              "es": "Hoy en día la mayoría de la gente solo los guarda en el celular, aunque..."
+            },
+            {
+              "en": "Older generations, on the other hand, still like to...",
+              "es": "Las generaciones mayores, en cambio, todavía prefieren..."
+            },
+            {
+              "en": "For instance, in my family...",
+              "es": "Por ejemplo, en mi familia..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some people take photos of the same place many times?",
+          "kind": "abstract",
+          "rephrase": "Why do some people take pictures of one place again and again?",
+          "followups": [
+            "Is this different from taking photos of new places?",
+            "Can you think of an example?"
+          ],
+          "help": [
+            {
+              "en": "I suppose one reason is that...",
+              "es": "Supongo que una razón es que..."
+            },
+            {
+              "en": "Another possible explanation is that places change over time, so...",
+              "es": "Otra posible explicación es que los lugares cambian con el tiempo, así que..."
+            },
+            {
+              "en": "It could also be a way of keeping memories alive.",
+              "es": "También podría ser una forma de mantener vivos los recuerdos."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of tourists taking photos at famous sites?",
+          "kind": "abstract",
+          "rephrase": "What is good and bad about tourists taking pictures at famous places?",
+          "followups": [
+            "Should some places ban photography?",
+            "Why do you think that is?"
+          ],
+          "help": [
+            {
+              "en": "On the positive side, it helps to promote...",
+              "es": "Por un lado, ayuda a promocionar..."
+            },
+            {
+              "en": "However, the downside is that...",
+              "es": "Sin embargo, la desventaja es que..."
+            },
+            {
+              "en": "On balance, I would say that...",
+              "es": "En general, yo diría que..."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people take and share photos change in the future?",
+          "kind": "abstract",
+          "rephrase": "How could taking and sharing pictures be different in the future?",
+          "followups": [
+            "Do you think this will be a positive change?",
+            "Why do you think that?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to predict, but I imagine that...",
+              "es": "Es difícil predecirlo, pero me imagino que..."
+            },
+            {
+              "en": "With advances in technology, it's likely that...",
+              "es": "Con los avances de la tecnología, es probable que..."
+            },
+            {
+              "en": "One concern, though, is privacy, because...",
+              "es": "Sin embargo, una preocupación es la privacidad, porque..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-way-that-helps-you-save-a-lot-of-time",
+      "theme": "Time management and technology",
+      "questions": [
+        {
+          "q": "Do people in your country generally feel that they have enough free time?",
+          "kind": "concrete",
+          "rephrase": "Do most people where you live think they have enough time to relax?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different for older and younger people?"
+          ],
+          "help": [
+            {
+              "en": "On the whole, I'd say most people feel quite short of time.",
+              "es": "En general, diría que la mayoría de la gente siente que le falta tiempo."
+            },
+            {
+              "en": "This is especially true in big cities, where commuting takes hours.",
+              "es": "Esto es especialmente cierto en las ciudades grandes, donde el traslado toma horas."
+            },
+            {
+              "en": "That said, people in smaller towns often have a slower pace of life.",
+              "es": "Dicho esto, la gente en los pueblos pequeños suele llevar un ritmo de vida más tranquilo."
+            }
+          ]
+        },
+        {
+          "q": "What kinds of technology do people where you live use to save time in daily life?",
+          "kind": "concrete",
+          "rephrase": "What machines or apps do people near you use to do things faster?",
+          "followups": [
+            "Can you give me an example from your city?",
+            "Do you think older people use these as much?"
+          ],
+          "help": [
+            {
+              "en": "One of the most common examples is using apps to pay bills online.",
+              "es": "Uno de los ejemplos más comunes es usar aplicaciones para pagar cuentas en línea."
+            },
+            {
+              "en": "A lot of people also rely on delivery services instead of going shopping.",
+              "es": "Mucha gente también depende de los servicios a domicilio en lugar de ir de compras."
+            },
+            {
+              "en": "It has become so normal that people hardly notice it any more.",
+              "es": "Se ha vuelto tan normal que la gente casi ni lo nota ya."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country tend to arrive on time for appointments and meetings?",
+          "kind": "concrete",
+          "rephrase": "Are people in your country usually punctual when they have to meet someone?",
+          "followups": [
+            "Why do you think that is?",
+            "Is it different for work and social situations?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on the situation, to be honest.",
+              "es": "La verdad, depende mucho de la situación."
+            },
+            {
+              "en": "For work, people are generally expected to be punctual.",
+              "es": "En el trabajo, en general se espera que la gente sea puntual."
+            },
+            {
+              "en": "For social events, however, arriving a little late is quite acceptable.",
+              "es": "Sin embargo, en eventos sociales, llegar un poco tarde es bastante aceptable."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people find it difficult to manage their time effectively?",
+          "kind": "abstract",
+          "rephrase": "Why is it hard for some people to organise their time well?",
+          "followups": [
+            "Can you give me an example?",
+            "Do you think this skill can be taught?"
+          ],
+          "help": [
+            {
+              "en": "I think one of the main reasons is that people take on too many commitments.",
+              "es": "Creo que una de las razones principales es que la gente asume demasiados compromisos."
+            },
+            {
+              "en": "Another factor is the constant distraction of mobile phones.",
+              "es": "Otro factor es la distracción constante de los celulares."
+            },
+            {
+              "en": "Some people simply have never been taught how to plan ahead.",
+              "es": "Algunas personas simplemente nunca aprendieron a planear con anticipación."
+            }
+          ]
+        },
+        {
+          "q": "Do you think new technology will give people more free time in the future?",
+          "kind": "abstract",
+          "rephrase": "Will new machines and computers help people have more time to relax later on?",
+          "followups": [
+            "Why do you think so?",
+            "How does this compare with the situation fifty years ago?"
+          ],
+          "help": [
+            {
+              "en": "In theory it should, but I'm not entirely convinced.",
+              "es": "En teoría debería, pero no estoy del todo convencida."
+            },
+            {
+              "en": "The problem is that saving time often leads to people working even more.",
+              "es": "El problema es que ahorrar tiempo muchas veces hace que la gente trabaje todavía más."
+            },
+            {
+              "en": "In the long run, it may depend on how society chooses to use it.",
+              "es": "A largo plazo, puede depender de cómo decida usarla la sociedad."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-occasion-when-you-lost-something-in",
+      "theme": "Honesty and personal belongings",
+      "questions": [
+        {
+          "q": "What kinds of things do people in your country most commonly lose?",
+          "kind": "concrete",
+          "rephrase": "What things do people in your country often lose?",
+          "followups": [
+            "Why do you think those things get lost so easily?",
+            "Is it different for younger and older people?"
+          ],
+          "help": [
+            {
+              "en": "I'd say the most common things are probably...",
+              "es": "Yo diría que las cosas más comunes probablemente son..."
+            },
+            {
+              "en": "This is mainly because people carry them around all day.",
+              "es": "Esto es principalmente porque la gente las trae consigo todo el día."
+            },
+            {
+              "en": "For instance, a lot of my colleagues are always losing...",
+              "es": "Por ejemplo, muchos de mis compañeros siempre andan perdiendo..."
+            }
+          ]
+        },
+        {
+          "q": "If someone finds a lost wallet in the street where you live, what do they usually do?",
+          "kind": "concrete",
+          "rephrase": "Where you live, what do people normally do when they find a wallet in the street?",
+          "followups": [
+            "Why do you think they behave that way?",
+            "Can you give me an example of something like this happening?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on the person, but generally speaking...",
+              "es": "Realmente depende de la persona, pero en términos generales..."
+            },
+            {
+              "en": "Some people would try to contact the owner, whereas others...",
+              "es": "Algunas personas intentarían contactar al dueño, mientras que otras..."
+            },
+            {
+              "en": "I remember hearing about a case where...",
+              "es": "Recuerdo haber oído de un caso en el que..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some people return lost items while others decide to keep them?",
+          "kind": "abstract",
+          "rephrase": "Why do some people give back things they find, but other people keep them?",
+          "followups": [
+            "Do you think upbringing plays a part in this?",
+            "Is it ever acceptable to keep something you have found?"
+          ],
+          "help": [
+            {
+              "en": "I think it largely comes down to a person's values.",
+              "es": "Creo que en gran medida depende de los valores de cada persona."
+            },
+            {
+              "en": "Another factor might be whether they think anyone is watching.",
+              "es": "Otro factor podría ser si creen que alguien los está viendo."
+            },
+            {
+              "en": "On the other hand, some people simply don't know how to find the owner.",
+              "es": "Por otro lado, algunas personas simplemente no saben cómo encontrar al dueño."
+            }
+          ]
+        },
+        {
+          "q": "Has modern technology made it easier for people to keep track of their belongings?",
+          "kind": "abstract",
+          "rephrase": "Does technology today help people to not lose their things?",
+          "followups": [
+            "What are the disadvantages of relying on technology for this?",
+            "How was it different for your parents' generation?"
+          ],
+          "help": [
+            {
+              "en": "Without a doubt, things like tracking apps have made a big difference.",
+              "es": "Sin duda, cosas como las aplicaciones de rastreo han hecho una gran diferencia."
+            },
+            {
+              "en": "Having said that, people may have become more careless as a result.",
+              "es": "Dicho esto, puede que la gente se haya vuelto más descuidada por eso."
+            },
+            {
+              "en": "Compared with the past, it's much easier nowadays to...",
+              "es": "En comparación con el pasado, hoy en día es mucho más fácil..."
+            }
+          ]
+        },
+        {
+          "q": "Should public places such as stations and airports be responsible for protecting people's belongings?",
+          "kind": "abstract",
+          "rephrase": "Should places like stations and airports have to keep people's things safe?",
+          "followups": [
+            "Why do you think so?",
+            "What could these places do to reduce the number of lost items?"
+          ],
+          "help": [
+            {
+              "en": "To some extent, yes, but I also believe individuals have a responsibility.",
+              "es": "Hasta cierto punto sí, pero también creo que cada persona tiene una responsabilidad."
+            },
+            {
+              "en": "One practical measure would be to have more security staff.",
+              "es": "Una medida práctica sería tener más personal de seguridad."
+            },
+            {
+              "en": "At the end of the day, it's a shared responsibility.",
+              "es": "Al final de cuentas, es una responsabilidad compartida."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-person-you-met-only-once-and-would-like",
+      "theme": "Meeting new people",
+      "questions": [
+        {
+          "q": "Where do people in your country usually meet new people these days?",
+          "kind": "concrete",
+          "rephrase": "In your country, where do people normally meet people they don't know?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different for older people?"
+          ],
+          "help": [
+            {
+              "en": "Generally speaking, most people in Mexico meet new people through...",
+              "es": "En general, la mayoría de la gente en México conoce gente nueva a través de..."
+            },
+            {
+              "en": "It depends a lot on how old you are.",
+              "es": "Depende mucho de la edad que tengas."
+            },
+            {
+              "en": "Apart from that, a lot of people meet at work or at university.",
+              "es": "Aparte de eso, mucha gente se conoce en el trabajo o en la universidad."
+            }
+          ]
+        },
+        {
+          "q": "Is it common in your country for strangers to chat with each other in public places?",
+          "kind": "concrete",
+          "rephrase": "In your country, do people often talk to people they don't know, for example on a bus?",
+          "followups": [
+            "Can you give me an example?",
+            "Why do you think people do this?"
+          ],
+          "help": [
+            {
+              "en": "Yes, it's quite common, especially in smaller towns.",
+              "es": "Sí, es bastante común, sobre todo en los pueblos pequeños."
+            },
+            {
+              "en": "For instance, when you're waiting in a queue, people often start chatting.",
+              "es": "Por ejemplo, cuando estás esperando en una fila, la gente muchas veces se pone a platicar."
+            },
+            {
+              "en": "That said, in big cities people tend to be more reserved.",
+              "es": "Dicho esto, en las ciudades grandes la gente suele ser más reservada."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people find it easier than others to talk to strangers?",
+          "kind": "abstract",
+          "rephrase": "Why are some people more comfortable talking to people they don't know?",
+          "followups": [
+            "Is this something people can learn?",
+            "Does a person's job make a difference?"
+          ],
+          "help": [
+            {
+              "en": "I think it largely comes down to personality.",
+              "es": "Creo que en gran medida depende de la personalidad."
+            },
+            {
+              "en": "Another factor could be the way people are brought up.",
+              "es": "Otro factor podría ser la forma en que se cría a las personas."
+            },
+            {
+              "en": "In my own experience as a nurse, I've noticed that...",
+              "es": "Según mi propia experiencia como enfermera, he notado que..."
+            }
+          ]
+        },
+        {
+          "q": "How reliable are first impressions when we are judging what another person is like?",
+          "kind": "abstract",
+          "rephrase": "Can we really know what someone is like the first time we meet them?",
+          "followups": [
+            "Can you give me an example?",
+            "Why do you think people judge others so quickly?"
+          ],
+          "help": [
+            {
+              "en": "First impressions can be quite misleading because...",
+              "es": "Las primeras impresiones pueden ser bastante engañosas porque..."
+            },
+            {
+              "en": "On the one hand, they can tell us something; on the other hand, people often hide their true personality.",
+              "es": "Por un lado, nos pueden decir algo; por otro lado, la gente muchas veces oculta su verdadera personalidad."
+            },
+            {
+              "en": "It's often said that first impressions count, but in my view...",
+              "es": "Se suele decir que las primeras impresiones cuentan, pero en mi opinión..."
+            }
+          ]
+        },
+        {
+          "q": "How might technology change the way people meet and get to know each other in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how will technology change the way people meet new people?",
+          "followups": [
+            "Do you think this is a positive change?",
+            "Will meeting face to face become less important?"
+          ],
+          "help": [
+            {
+              "en": "I imagine that in the future more people will...",
+              "es": "Me imagino que en el futuro más gente va a..."
+            },
+            {
+              "en": "There's a risk that people will become more isolated.",
+              "es": "Existe el riesgo de que la gente se aísle más."
+            },
+            {
+              "en": "Even so, I doubt technology will ever fully replace meeting in person.",
+              "es": "Aun así, dudo que la tecnología llegue a reemplazar por completo el contacto en persona."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-course-that-impressed-you-a-lot",
+      "theme": "Education and lifelong learning",
+      "questions": [
+        {
+          "q": "What kinds of courses do adults in your country usually take after they finish their education?",
+          "kind": "concrete",
+          "rephrase": "After people finish school or university, what courses do they often take in your country?",
+          "followups": [
+            "Why do you think those courses are so popular?",
+            "Can you give me an example from someone you know?"
+          ],
+          "help": [
+            {
+              "en": "From what I've seen, the most common ones are...",
+              "es": "Por lo que he visto, los más comunes son..."
+            },
+            {
+              "en": "A lot of people tend to go for courses that...",
+              "es": "Mucha gente suele optar por cursos que..."
+            },
+            {
+              "en": "This is especially true for people who work in...",
+              "es": "Esto es especialmente cierto para quienes trabajan en..."
+            }
+          ]
+        },
+        {
+          "q": "Do employers in your country usually pay for their staff to attend training courses?",
+          "kind": "concrete",
+          "rephrase": "In your country, do companies often pay for workers to do training?",
+          "followups": [
+            "Is this more common in some jobs than in others?",
+            "How do employees feel about this?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on the type of company.",
+              "es": "Realmente depende del tipo de empresa."
+            },
+            {
+              "en": "In larger organisations, it's fairly common to...",
+              "es": "En las organizaciones más grandes, es bastante común..."
+            },
+            {
+              "en": "In my own field, for instance,...",
+              "es": "En mi propio campo, por ejemplo,..."
+            }
+          ]
+        },
+        {
+          "q": "What makes a teacher or trainer effective, in your opinion?",
+          "kind": "abstract",
+          "rephrase": "What do you think makes someone a good teacher?",
+          "followups": [
+            "Is that more important than their knowledge of the subject?",
+            "Can you think of a teacher who had these qualities?"
+          ],
+          "help": [
+            {
+              "en": "I'd say the most important quality is...",
+              "es": "Yo diría que la cualidad más importante es..."
+            },
+            {
+              "en": "Apart from knowing the subject well, a good teacher needs to...",
+              "es": "Además de conocer bien la materia, un buen maestro necesita..."
+            },
+            {
+              "en": "That's because students learn much more when...",
+              "es": "Eso es porque los alumnos aprenden mucho más cuando..."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of taking courses online rather than in person?",
+          "kind": "abstract",
+          "rephrase": "What is good and bad about studying online compared with going to a class?",
+          "followups": [
+            "Which do you think works better for practical subjects?",
+            "Why do you think that is?"
+          ],
+          "help": [
+            {
+              "en": "On the one hand, online courses are far more flexible.",
+              "es": "Por un lado, los cursos en línea son mucho más flexibles."
+            },
+            {
+              "en": "On the other hand, you miss out on...",
+              "es": "Por otro lado, te pierdes de..."
+            },
+            {
+              "en": "Overall, I think it depends on what you're trying to learn.",
+              "es": "En general, creo que depende de lo que quieras aprender."
+            }
+          ]
+        },
+        {
+          "q": "How might the way adults learn new skills change in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how do you think adults will learn new things?",
+          "followups": [
+            "Do you think this change will be positive?",
+            "Could technology ever replace human teachers completely?"
+          ],
+          "help": [
+            {
+              "en": "I imagine that in the coming years...",
+              "es": "Me imagino que en los próximos años..."
+            },
+            {
+              "en": "It's quite likely that technology will play a bigger role in...",
+              "es": "Es bastante probable que la tecnología tenga un papel más importante en..."
+            },
+            {
+              "en": "Having said that, I don't think we'll ever lose...",
+              "es": "Dicho esto, no creo que lleguemos a perder..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-gift-you-would-like-to-buy-for-a-friend",
+      "theme": "Gifts and giving",
+      "questions": [
+        {
+          "q": "On what occasions do people in your country usually give each other gifts?",
+          "kind": "concrete",
+          "rephrase": "When do people in your country normally give presents?",
+          "followups": [
+            "Which of these occasions is the most important?",
+            "Has this changed since you were a child?"
+          ],
+          "help": [
+            {
+              "en": "The most common occasions are probably birthdays and Christmas, but...",
+              "es": "Las ocasiones más comunes probablemente son los cumpleaños y la Navidad, pero..."
+            },
+            {
+              "en": "In my country, it's also traditional to give something when...",
+              "es": "En mi país, también es tradicional regalar algo cuando..."
+            },
+            {
+              "en": "It depends a lot on the family, but generally speaking...",
+              "es": "Depende mucho de la familia, pero en general..."
+            }
+          ]
+        },
+        {
+          "q": "What kinds of gifts are popular among young people where you live?",
+          "kind": "concrete",
+          "rephrase": "What presents do young people in your area like to give or get?",
+          "followups": [
+            "Why do you think those gifts are so popular?",
+            "Are they different from the gifts older people prefer?"
+          ],
+          "help": [
+            {
+              "en": "These days, a lot of young people go for...",
+              "es": "Hoy en día, muchos jóvenes optan por..."
+            },
+            {
+              "en": "Something that has become really popular recently is...",
+              "es": "Algo que se ha vuelto muy popular últimamente es..."
+            },
+            {
+              "en": "I'd say that technology plays a big part, for example...",
+              "es": "Diría que la tecnología tiene un papel importante, por ejemplo..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people prefer to give money rather than choose a present?",
+          "kind": "abstract",
+          "rephrase": "Why do some people give cash instead of buying a gift?",
+          "followups": [
+            "Do you think giving money is less personal?",
+            "Can you give me an example of when money is a better gift?"
+          ],
+          "help": [
+            {
+              "en": "One reason might be that people simply don't have time to...",
+              "es": "Una razón podría ser que la gente simplemente no tiene tiempo para..."
+            },
+            {
+              "en": "From a practical point of view, it makes sense because...",
+              "es": "Desde un punto de vista práctico, tiene sentido porque..."
+            },
+            {
+              "en": "On the other hand, some people feel it shows less effort.",
+              "es": "Por otro lado, algunas personas sienten que demuestra menos esfuerzo."
+            }
+          ]
+        },
+        {
+          "q": "Do you think the price of a gift is more important than the thought behind it?",
+          "kind": "abstract",
+          "rephrase": "Is how much a gift costs more important than the idea behind it?",
+          "followups": [
+            "Why do you think some people care so much about price?",
+            "Is this view the same in every generation?"
+          ],
+          "help": [
+            {
+              "en": "Personally, I'm convinced that the thought matters far more, because...",
+              "es": "Personalmente, estoy convencida de que la intención importa mucho más, porque..."
+            },
+            {
+              "en": "Having said that, I can understand why some people...",
+              "es": "Dicho esto, entiendo por qué algunas personas..."
+            },
+            {
+              "en": "A cheap gift can mean a lot if...",
+              "es": "Un regalo barato puede significar mucho si..."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people give gifts change in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how could people's ways of giving presents be different?",
+          "followups": [
+            "Do you think that would be a good change?",
+            "What role might technology play in this?"
+          ],
+          "help": [
+            {
+              "en": "I imagine that more and more people will...",
+              "es": "Me imagino que cada vez más personas van a..."
+            },
+            {
+              "en": "It's quite likely that experiences will replace physical objects because...",
+              "es": "Es bastante probable que las experiencias reemplacen a los objetos físicos porque..."
+            },
+            {
+              "en": "That said, I doubt that traditional gifts will disappear completely.",
+              "es": "Aun así, dudo que los regalos tradicionales desaparezcan por completo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-book-you-read-that-made-you-happy",
+      "theme": "Reading and wellbeing",
+      "questions": [
+        {
+          "q": "What kinds of books are popular with people in your country?",
+          "kind": "concrete",
+          "rephrase": "What books do people in your country like to read?",
+          "followups": [
+            "Why do you think those books are so popular?",
+            "Is this different for younger and older people?"
+          ],
+          "help": [
+            {
+              "en": "From what I've seen, ...",
+              "es": "Por lo que he visto, ..."
+            },
+            {
+              "en": "It tends to depend on the age group.",
+              "es": "Suele depender del grupo de edad."
+            },
+            {
+              "en": "A good example of this would be...",
+              "es": "Un buen ejemplo de esto sería..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country read more on paper or on screens these days?",
+          "kind": "concrete",
+          "rephrase": "Do people where you live read printed books or read on phones and computers?",
+          "followups": [
+            "Why do you think that is?",
+            "Which do you prefer yourself, and why?"
+          ],
+          "help": [
+            {
+              "en": "I'd say most people nowadays...",
+              "es": "Yo diría que hoy en día la mayoría de la gente..."
+            },
+            {
+              "en": "That said, there are still quite a few people who...",
+              "es": "Dicho eso, todavía hay bastantes personas que..."
+            },
+            {
+              "en": "It's partly because...",
+              "es": "En parte es porque..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people prefer reading books to watching films or television?",
+          "kind": "abstract",
+          "rephrase": "Why do some people like books more than films or TV?",
+          "followups": [
+            "Can you give me an example?",
+            "Do you think films can ever be better than the book?"
+          ],
+          "help": [
+            {
+              "en": "One reason might be that...",
+              "es": "Una razón podría ser que..."
+            },
+            {
+              "en": "Books allow you to use your imagination far more.",
+              "es": "Los libros te permiten usar mucho más la imaginación."
+            },
+            {
+              "en": "Whereas with a film, ...",
+              "es": "Mientras que con una película, ..."
+            }
+          ]
+        },
+        {
+          "q": "In what ways can reading help people cope with stress or difficult times?",
+          "kind": "abstract",
+          "rephrase": "How can reading help people when they feel stressed or have problems?",
+          "followups": [
+            "Why do you think that works for some people?",
+            "Are there better ways to deal with stress than reading?"
+          ],
+          "help": [
+            {
+              "en": "I think reading can be a great way to switch off.",
+              "es": "Creo que leer puede ser una gran forma de desconectarse."
+            },
+            {
+              "en": "In my line of work, for instance, ...",
+              "es": "En mi trabajo, por ejemplo, ..."
+            },
+            {
+              "en": "It gives people a sense of comfort because...",
+              "es": "Les da a las personas una sensación de consuelo porque..."
+            }
+          ]
+        },
+        {
+          "q": "How might people's reading habits change in the future?",
+          "kind": "abstract",
+          "rephrase": "Do you think the way people read will be different in the future?",
+          "followups": [
+            "Why do you think so?",
+            "Do you think this change would be positive or negative?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to say for sure, but...",
+              "es": "Es difícil saberlo con certeza, pero..."
+            },
+            {
+              "en": "I suspect that more and more people will...",
+              "es": "Sospecho que cada vez más gente va a..."
+            },
+            {
+              "en": "On the other hand, printed books will probably never disappear completely.",
+              "es": "Por otro lado, los libros impresos probablemente nunca desaparecerán por completo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-party-for-a-special-event-that-impressed",
+      "theme": "Celebrations and social events",
+      "questions": [
+        {
+          "q": "What kinds of events do people in your country usually celebrate with a party?",
+          "kind": "concrete",
+          "rephrase": "When do people in your country usually have parties?",
+          "followups": [
+            "Which of these is the most important?",
+            "Has this changed since you were a child?"
+          ],
+          "help": [
+            {
+              "en": "In my country, the most common occasions are...",
+              "es": "En mi país, las ocasiones más comunes son..."
+            },
+            {
+              "en": "A good example would be...",
+              "es": "Un buen ejemplo sería..."
+            },
+            {
+              "en": "These celebrations tend to involve the whole family.",
+              "es": "Estas celebraciones suelen involucrar a toda la familia."
+            }
+          ]
+        },
+        {
+          "q": "Do people where you live prefer to hold parties at home or in rented venues?",
+          "kind": "concrete",
+          "rephrase": "Do people near you have parties at home or in places they pay for?",
+          "followups": [
+            "Why do you think that is?",
+            "Which do you personally prefer?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on the size of the event.",
+              "es": "Realmente depende del tamaño del evento."
+            },
+            {
+              "en": "For bigger celebrations, most people hire a hall.",
+              "es": "Para las celebraciones más grandes, la mayoría renta un salón."
+            },
+            {
+              "en": "Having it at home is usually more affordable.",
+              "es": "Hacerla en casa suele ser más económico."
+            }
+          ]
+        },
+        {
+          "q": "Why do some families spend a large amount of money on celebrations such as weddings?",
+          "kind": "abstract",
+          "rephrase": "Why do some families spend a lot of money on parties like weddings?",
+          "followups": [
+            "Do you think this is a good idea?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "One reason could be social pressure.",
+              "es": "Una razón podría ser la presión social."
+            },
+            {
+              "en": "For many people, it's a way of showing status.",
+              "es": "Para mucha gente, es una forma de mostrar su posición social."
+            },
+            {
+              "en": "On the other hand, some see it as a once-in-a-lifetime event.",
+              "es": "Por otro lado, algunos lo ven como algo que sucede una sola vez en la vida."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of large public celebrations organised by local governments?",
+          "kind": "abstract",
+          "rephrase": "What is good and bad about big public parties that cities organise?",
+          "followups": [
+            "Should governments spend public money on them?",
+            "How do they affect local businesses?"
+          ],
+          "help": [
+            {
+              "en": "On the plus side, they bring communities together.",
+              "es": "Por un lado, unen a las comunidades."
+            },
+            {
+              "en": "The main drawback is the cost to taxpayers.",
+              "es": "La principal desventaja es el costo para los contribuyentes."
+            },
+            {
+              "en": "There are also issues with safety and noise.",
+              "es": "También hay problemas de seguridad y ruido."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people celebrate special occasions change in the future?",
+          "kind": "abstract",
+          "rephrase": "How will people celebrate important events in the years to come?",
+          "followups": [
+            "What role will technology play?",
+            "Do you think these changes are positive?"
+          ],
+          "help": [
+            {
+              "en": "I suspect technology will play a bigger role.",
+              "es": "Sospecho que la tecnología tendrá un papel más importante."
+            },
+            {
+              "en": "It's likely that celebrations will become smaller and more personal.",
+              "es": "Es probable que las celebraciones se vuelvan más pequeñas y personales."
+            },
+            {
+              "en": "That said, I don't think traditions will disappear completely.",
+              "es": "Dicho esto, no creo que las tradiciones desaparezcan por completo."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-public-building-you-enjoy-visiting",
+      "theme": "Public buildings and spaces",
+      "questions": [
+        {
+          "q": "What kinds of public buildings do people in your country visit most often?",
+          "kind": "concrete",
+          "rephrase": "Which public buildings do people in your country go to most?",
+          "followups": [
+            "Why do you think that is?",
+            "Is this different for younger people?"
+          ],
+          "help": [
+            {
+              "en": "I'd say the most popular ones are probably...",
+              "es": "Yo diría que los más populares probablemente son..."
+            },
+            {
+              "en": "In my city, for example, ...",
+              "es": "En mi ciudad, por ejemplo, ..."
+            },
+            {
+              "en": "It depends a lot on where you live.",
+              "es": "Depende mucho de dónde vivas."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country tend to use public libraries as much as they did in the past?",
+          "kind": "concrete",
+          "rephrase": "Do people in your country go to libraries less now than before?",
+          "followups": [
+            "Why do you think that has changed?",
+            "What do people use libraries for nowadays?"
+          ],
+          "help": [
+            {
+              "en": "Not as much as before, mainly because...",
+              "es": "No tanto como antes, principalmente porque..."
+            },
+            {
+              "en": "These days most people prefer to...",
+              "es": "Hoy en día la mayoría de la gente prefiere..."
+            },
+            {
+              "en": "Having said that, ...",
+              "es": "Dicho esto, ..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think governments spend money on impressive public buildings such as museums and concert halls?",
+          "kind": "abstract",
+          "rephrase": "Why do governments pay for big, beautiful public buildings like museums?",
+          "followups": [
+            "Do you think this is a good use of public money?",
+            "Can you give me an example from your country?"
+          ],
+          "help": [
+            {
+              "en": "One reason might be that...",
+              "es": "Una razón podría ser que..."
+            },
+            {
+              "en": "It's partly about national pride.",
+              "es": "En parte tiene que ver con el orgullo nacional."
+            },
+            {
+              "en": "On the other hand, some people argue that...",
+              "es": "Por otro lado, algunas personas sostienen que..."
+            }
+          ]
+        },
+        {
+          "q": "What are the advantages and disadvantages of making entry to public museums free for everyone?",
+          "kind": "abstract",
+          "rephrase": "What are the good and bad points of letting everyone into museums for free?",
+          "followups": [
+            "Who would benefit most from this?",
+            "How would museums pay for their costs?"
+          ],
+          "help": [
+            {
+              "en": "The main benefit would be that...",
+              "es": "El principal beneficio sería que..."
+            },
+            {
+              "en": "The downside, however, is that...",
+              "es": "La desventaja, sin embargo, es que..."
+            },
+            {
+              "en": "On balance, I'd say...",
+              "es": "En general, yo diría que..."
+            }
+          ]
+        },
+        {
+          "q": "How might the design and use of public buildings change in the future?",
+          "kind": "abstract",
+          "rephrase": "In what ways could public buildings be different in the future?",
+          "followups": [
+            "Why do you think so?",
+            "Will technology play a big role in this?"
+          ],
+          "help": [
+            {
+              "en": "I imagine they'll become more...",
+              "es": "Me imagino que se volverán más..."
+            },
+            {
+              "en": "It's likely that more buildings will be designed to...",
+              "es": "Es probable que más edificios se diseñen para..."
+            },
+            {
+              "en": "It's hard to predict, but...",
+              "es": "Es difícil predecirlo, pero..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-film-you-did-not-like",
+      "theme": "Films and cinema",
+      "questions": [
+        {
+          "q": "What kinds of films are most popular with people in your country?",
+          "kind": "concrete",
+          "rephrase": "What types of films do people in your country like the most?",
+          "followups": [
+            "Why do you think those films are so popular?",
+            "Is this different for older and younger people?"
+          ],
+          "help": [
+            {
+              "en": "On the whole, I'd say that...",
+              "es": "Por lo general, diría que..."
+            },
+            {
+              "en": "Action films and comedies tend to be the most popular because...",
+              "es": "Las películas de acción y las comedias suelen ser las más populares porque..."
+            },
+            {
+              "en": "That said, younger audiences seem to prefer...",
+              "es": "Dicho esto, el público más joven parece preferir..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country prefer to watch films at the cinema or at home?",
+          "kind": "concrete",
+          "rephrase": "Where do people in your country like to watch films more, at the cinema or at home?",
+          "followups": [
+            "Why do you think that is?",
+            "Has this changed in recent years?"
+          ],
+          "help": [
+            {
+              "en": "These days, I think most people would rather...",
+              "es": "Hoy en día, creo que la mayoría de la gente prefiere..."
+            },
+            {
+              "en": "One of the main reasons is that...",
+              "es": "Una de las principales razones es que..."
+            },
+            {
+              "en": "Having said that, going to the cinema is still seen as...",
+              "es": "Aun así, ir al cine todavía se considera..."
+            }
+          ]
+        },
+        {
+          "q": "How do people where you live usually decide which film to watch?",
+          "kind": "concrete",
+          "rephrase": "How do people in your area choose a film to watch?",
+          "followups": [
+            "Can you give me an example?",
+            "Do you think this is a good way to choose?"
+          ],
+          "help": [
+            {
+              "en": "In my experience, a lot of people rely on...",
+              "es": "Según mi experiencia, mucha gente se basa en..."
+            },
+            {
+              "en": "Word of mouth plays a big role, for example...",
+              "es": "Las recomendaciones de boca en boca tienen mucho peso, por ejemplo..."
+            },
+            {
+              "en": "Others simply go for whatever the streaming platform suggests.",
+              "es": "Otros simplemente eligen lo que les sugiere la plataforma de streaming."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people trust film reviews while others ignore them completely?",
+          "kind": "abstract",
+          "rephrase": "Why do some people believe what critics say about films and others do not?",
+          "followups": [
+            "Which group are you closer to?",
+            "Are online reviews more reliable than professional ones?"
+          ],
+          "help": [
+            {
+              "en": "I suppose it depends largely on...",
+              "es": "Supongo que depende en gran medida de..."
+            },
+            {
+              "en": "Some people feel that critics are out of touch with ordinary viewers.",
+              "es": "Algunas personas sienten que los críticos están desconectados de los espectadores comunes."
+            },
+            {
+              "en": "On the other hand, a good review can save you time and money.",
+              "es": "Por otro lado, una buena reseña puede ahorrarte tiempo y dinero."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people watch films change in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how do you think people will watch films?",
+          "followups": [
+            "Do you think cinemas will disappear?",
+            "Would that be a good or a bad thing?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to predict, but I imagine that...",
+              "es": "Es difícil predecirlo, pero me imagino que..."
+            },
+            {
+              "en": "Technology is likely to make films more interactive.",
+              "es": "Es probable que la tecnología haga las películas más interactivas."
+            },
+            {
+              "en": "Even so, I doubt cinemas will ever disappear completely, because...",
+              "es": "Aun así, dudo que los cines lleguen a desaparecer por completo, porque..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-person-who-loves-history",
+      "theme": "History and the past",
+      "questions": [
+        {
+          "q": "Do people in your country enjoy visiting museums and historical sites?",
+          "kind": "concrete",
+          "rephrase": "Do people where you live like going to museums and old places?",
+          "followups": [
+            "Why do you think that is?",
+            "Which places are the most popular?"
+          ],
+          "help": [
+            {
+              "en": "On the whole, I'd say that...",
+              "es": "En general, diría que..."
+            },
+            {
+              "en": "It depends a lot on the age group.",
+              "es": "Depende mucho del grupo de edad."
+            },
+            {
+              "en": "A good example of this is...",
+              "es": "Un buen ejemplo de esto es..."
+            }
+          ]
+        },
+        {
+          "q": "How is history usually taught in schools in your country?",
+          "kind": "concrete",
+          "rephrase": "How do students learn history at school where you live?",
+          "followups": [
+            "Do you think this is an effective way to teach it?",
+            "How has this changed since you were at school?"
+          ],
+          "help": [
+            {
+              "en": "From my own experience at school...",
+              "es": "Por mi propia experiencia en la escuela..."
+            },
+            {
+              "en": "Traditionally, the focus has been on...",
+              "es": "Tradicionalmente, el enfoque ha estado en..."
+            },
+            {
+              "en": "These days, however, teachers tend to...",
+              "es": "Hoy en día, sin embargo, los maestros suelen..."
+            }
+          ]
+        },
+        {
+          "q": "What kinds of historical films or TV programmes are popular where you live?",
+          "kind": "concrete",
+          "rephrase": "What films or TV shows about the past do people like where you live?",
+          "followups": [
+            "Why do you think people enjoy them?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "One type that is very popular is...",
+              "es": "Un tipo que es muy popular es..."
+            },
+            {
+              "en": "People seem to be drawn to...",
+              "es": "A la gente parece atraerle..."
+            },
+            {
+              "en": "I suppose the appeal is that...",
+              "es": "Supongo que el atractivo es que..."
+            }
+          ]
+        },
+        {
+          "q": "Why do you think some young people are not very interested in history?",
+          "kind": "abstract",
+          "rephrase": "Why do some young people not care much about history?",
+          "followups": [
+            "Is this different from older generations?",
+            "What could be done to change this?"
+          ],
+          "help": [
+            {
+              "en": "I think one possible reason is that...",
+              "es": "Creo que una posible razón es que..."
+            },
+            {
+              "en": "Many young people feel that history has nothing to do with their lives.",
+              "es": "Muchos jóvenes sienten que la historia no tiene nada que ver con su vida."
+            },
+            {
+              "en": "On top of that...",
+              "es": "Además de eso..."
+            }
+          ]
+        },
+        {
+          "q": "How might technology change the way people learn about history in the future?",
+          "kind": "abstract",
+          "rephrase": "How could new technology change how people study history later on?",
+          "followups": [
+            "Do you think this would be a positive change?",
+            "Could anything be lost because of this?"
+          ],
+          "help": [
+            {
+              "en": "It's quite likely that in the future...",
+              "es": "Es bastante probable que en el futuro..."
+            },
+            {
+              "en": "On the one hand... but on the other hand...",
+              "es": "Por un lado... pero por otro lado..."
+            },
+            {
+              "en": "That said, I don't think it could ever fully replace...",
+              "es": "Dicho esto, no creo que pueda reemplazar por completo..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-person-who-is-good-at-making-things-by",
+      "theme": "Handicrafts and traditional skills",
+      "questions": [
+        {
+          "q": "What kinds of handmade products are popular in your country?",
+          "kind": "concrete",
+          "rephrase": "What things made by hand do people in your country like?",
+          "followups": [
+            "Why do you think those are so popular?",
+            "Are they bought mainly by local people or by tourists?"
+          ],
+          "help": [
+            {
+              "en": "In my country, one of the most popular examples is ...",
+              "es": "En mi país, uno de los ejemplos más populares es ..."
+            },
+            {
+              "en": "It really depends on the region, but ...",
+              "es": "Depende mucho de la región, pero ..."
+            },
+            {
+              "en": "You can find these almost everywhere, especially in ...",
+              "es": "Se pueden encontrar casi en todas partes, sobre todo en ..."
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country still learn practical skills such as sewing or woodwork at school?",
+          "kind": "concrete",
+          "rephrase": "Do children in your country learn things like sewing or working with wood at school?",
+          "followups": [
+            "Was that the case when you were at school?",
+            "Do you think schools should teach more of these skills?"
+          ],
+          "help": [
+            {
+              "en": "When I was at school, we used to ...",
+              "es": "Cuando yo iba a la escuela, solíamos ..."
+            },
+            {
+              "en": "These days, it seems to me that ...",
+              "es": "Hoy en día, me parece que ..."
+            },
+            {
+              "en": "Generally speaking, schools tend to focus more on ...",
+              "es": "En general, las escuelas suelen enfocarse más en ..."
+            }
+          ]
+        },
+        {
+          "q": "Where do people in your city usually go to buy handmade goods?",
+          "kind": "concrete",
+          "rephrase": "In your city, where do people normally buy things made by hand?",
+          "followups": [
+            "Is it easy to find good-quality handmade goods there?",
+            "Has this changed in recent years?"
+          ],
+          "help": [
+            {
+              "en": "The most common place would probably be ...",
+              "es": "El lugar más común probablemente sería ..."
+            },
+            {
+              "en": "More and more people are now buying them online, for example ...",
+              "es": "Cada vez más gente las compra por internet, por ejemplo ..."
+            },
+            {
+              "en": "There's a well-known market where ...",
+              "es": "Hay un mercado muy conocido donde ..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people prefer handmade items to mass-produced ones, even when they cost more?",
+          "kind": "abstract",
+          "rephrase": "Why do some people choose things made by hand instead of factory products, even if they are more expensive?",
+          "followups": [
+            "Do you think handmade items are really better quality?",
+            "Is this preference more common among older or younger people?"
+          ],
+          "help": [
+            {
+              "en": "I think the main reason is that ...",
+              "es": "Creo que la razón principal es que ..."
+            },
+            {
+              "en": "There's also a sense that each piece is unique, so ...",
+              "es": "También existe la idea de que cada pieza es única, así que ..."
+            },
+            {
+              "en": "On the other hand, not everyone can afford to ...",
+              "es": "Por otro lado, no todo el mundo puede darse el lujo de ..."
+            }
+          ]
+        },
+        {
+          "q": "How might traditional crafts change in the future as technology continues to develop?",
+          "kind": "abstract",
+          "rephrase": "How could old types of handwork change in the future because of new technology?",
+          "followups": [
+            "Do you think some crafts might disappear completely?",
+            "What could be done to protect these skills?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to say for sure, but I imagine that ...",
+              "es": "Es difícil saberlo con certeza, pero me imagino que ..."
+            },
+            {
+              "en": "One possibility is that technology could actually help by ...",
+              "es": "Una posibilidad es que la tecnología de hecho ayude al ..."
+            },
+            {
+              "en": "Unless young people take an interest, there's a risk that ...",
+              "es": "A menos que los jóvenes se interesen, existe el riesgo de que ..."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-person-who-taught-you-a-new-skill",
+      "theme": "Learning and teaching skills",
+      "questions": [
+        {
+          "q": "What kinds of practical skills do young people in your country usually learn from their parents?",
+          "kind": "concrete",
+          "rephrase": "What useful skills do young people in your country learn from their parents?",
+          "followups": [
+            "Why do you think parents teach these skills?",
+            "Is this different from when your parents were young?"
+          ],
+          "help": [
+            {
+              "en": "In my country, it's quite common for parents to teach their children...",
+              "es": "En mi país, es bastante común que los padres enseñen a sus hijos..."
+            },
+            {
+              "en": "A typical example would be cooking traditional dishes.",
+              "es": "Un ejemplo típico sería cocinar platillos tradicionales."
+            },
+            {
+              "en": "This tends to vary depending on the family.",
+              "es": "Esto suele variar dependiendo de la familia."
+            }
+          ]
+        },
+        {
+          "q": "Do people where you live prefer to learn new skills in classes or by watching videos online?",
+          "kind": "concrete",
+          "rephrase": "Where you live, do people like learning new things in a class or from online videos?",
+          "followups": [
+            "Which way do you prefer, and why?",
+            "Can you give me an example?"
+          ],
+          "help": [
+            {
+              "en": "These days, more and more people seem to rely on online videos.",
+              "es": "Hoy en día, cada vez más personas parecen depender de los videos en línea."
+            },
+            {
+              "en": "That said, some skills really need a teacher in person.",
+              "es": "Dicho esto, algunas habilidades realmente necesitan un maestro en persona."
+            },
+            {
+              "en": "It largely depends on the kind of skill.",
+              "es": "Depende en gran medida del tipo de habilidad."
+            }
+          ]
+        },
+        {
+          "q": "What qualities do you think make someone a good teacher of practical skills?",
+          "kind": "abstract",
+          "rephrase": "What makes a person good at teaching practical things?",
+          "followups": [
+            "Why is that quality so important?",
+            "Is being an expert enough to be a good teacher?"
+          ],
+          "help": [
+            {
+              "en": "In my opinion, the most important quality is patience.",
+              "es": "En mi opinión, la cualidad más importante es la paciencia."
+            },
+            {
+              "en": "Another key factor is the ability to explain things clearly.",
+              "es": "Otro factor clave es la capacidad de explicar las cosas con claridad."
+            },
+            {
+              "en": "Not everyone who is skilled is necessarily good at teaching.",
+              "es": "No todas las personas hábiles son necesariamente buenas para enseñar."
+            }
+          ]
+        },
+        {
+          "q": "Why do some adults find it harder to learn new skills than children do?",
+          "kind": "abstract",
+          "rephrase": "Why is learning new things sometimes more difficult for adults than for children?",
+          "followups": [
+            "Do you think this is always true?",
+            "What could help adults learn more easily?"
+          ],
+          "help": [
+            {
+              "en": "One possible reason is that adults have less free time.",
+              "es": "Una posible razón es que los adultos tienen menos tiempo libre."
+            },
+            {
+              "en": "Adults are often more afraid of making mistakes.",
+              "es": "Los adultos a menudo tienen más miedo de cometer errores."
+            },
+            {
+              "en": "On the other hand, adults are usually more motivated.",
+              "es": "Por otro lado, los adultos suelen estar más motivados."
+            }
+          ]
+        },
+        {
+          "q": "How might the way people learn practical skills change in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how could the way people learn useful skills be different?",
+          "followups": [
+            "Do you think this change would be positive?",
+            "Will people still need human teachers?"
+          ],
+          "help": [
+            {
+              "en": "I imagine technology will play an even bigger role.",
+              "es": "Me imagino que la tecnología tendrá un papel aún más importante."
+            },
+            {
+              "en": "For instance, virtual reality could be used for training.",
+              "es": "Por ejemplo, la realidad virtual podría usarse para la capacitación."
+            },
+            {
+              "en": "Even so, I doubt it will completely replace face-to-face teaching.",
+              "es": "Aun así, dudo que reemplace por completo la enseñanza presencial."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-enjoyable-evening-you-had-with-friends",
+      "theme": "Friendship and social life",
+      "questions": [
+        {
+          "q": "Where do young people in your country usually go when they meet their friends in the evening?",
+          "kind": "concrete",
+          "rephrase": "Where do young people in your country go to meet friends at night?",
+          "followups": [
+            "Why are those places so popular?",
+            "Is it different for older people?"
+          ],
+          "help": [
+            {
+              "en": "It really depends on the city, but generally speaking…",
+              "es": "Depende mucho de la ciudad, pero en términos generales…"
+            },
+            {
+              "en": "A lot of young people tend to…",
+              "es": "Muchos jóvenes suelen…"
+            },
+            {
+              "en": "For example, in my city it's quite common to…",
+              "es": "Por ejemplo, en mi ciudad es bastante común…"
+            }
+          ]
+        },
+        {
+          "q": "Do people in your country prefer to socialise at home or in public places such as restaurants?",
+          "kind": "concrete",
+          "rephrase": "Do people where you live like to meet friends at home or go out?",
+          "followups": [
+            "Why do you think that is?",
+            "Has this changed in recent years?"
+          ],
+          "help": [
+            {
+              "en": "On the whole, I'd say most people prefer…",
+              "es": "En general, diría que la mayoría de la gente prefiere…"
+            },
+            {
+              "en": "One reason for this is that…",
+              "es": "Una razón de esto es que…"
+            },
+            {
+              "en": "That said, it's becoming more common to…",
+              "es": "Dicho esto, cada vez es más común…"
+            }
+          ]
+        },
+        {
+          "q": "Why do some adults find it difficult to keep in touch with their friends?",
+          "kind": "abstract",
+          "rephrase": "Why is it hard for some adults to stay in contact with friends?",
+          "followups": [
+            "Can you give me an example?",
+            "Is this more of a problem for people with demanding jobs?"
+          ],
+          "help": [
+            {
+              "en": "I think the main reason is probably…",
+              "es": "Creo que la razón principal probablemente es…"
+            },
+            {
+              "en": "Once people start working full-time, they…",
+              "es": "Cuando la gente empieza a trabajar tiempo completo…"
+            },
+            {
+              "en": "Another factor that plays a role is…",
+              "es": "Otro factor que influye es…"
+            }
+          ]
+        },
+        {
+          "q": "Do you think social media has made friendships stronger or weaker?",
+          "kind": "abstract",
+          "rephrase": "Has social media made friendships better or worse?",
+          "followups": [
+            "Why do you think so?",
+            "How is online contact different from meeting in person?"
+          ],
+          "help": [
+            {
+              "en": "It's a double-edged sword, really.",
+              "es": "En realidad, es un arma de doble filo."
+            },
+            {
+              "en": "On the one hand…, but on the other hand…",
+              "es": "Por un lado…, pero por otro lado…"
+            },
+            {
+              "en": "Nothing can really replace face-to-face contact because…",
+              "es": "Nada puede reemplazar realmente el contacto en persona porque…"
+            }
+          ]
+        },
+        {
+          "q": "How might the way people spend their free time with friends change in the future?",
+          "kind": "abstract",
+          "rephrase": "In the future, how will people spend free time with friends differently?",
+          "followups": [
+            "Do you think this would be a positive change?",
+            "What might cause this change?"
+          ],
+          "help": [
+            {
+              "en": "It's hard to predict, but I imagine that…",
+              "es": "Es difícil predecirlo, pero me imagino que…"
+            },
+            {
+              "en": "With advances in technology, people will probably…",
+              "es": "Con los avances de la tecnología, la gente probablemente…"
+            },
+            {
+              "en": "Having said that, I doubt people will ever stop…",
+              "es": "Dicho esto, dudo que la gente deje alguna vez de…"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "p3-person-whose-health-and-fitness-you-have",
+      "theme": "Health and prevention",
+      "questions": [
+        {
+          "q": "What do people in your country usually do to stay healthy?",
+          "kind": "concrete",
+          "rephrase": "How do people where you live try to keep healthy?",
+          "followups": [
+            "Has this changed in recent years?",
+            "Is it different for younger and older people?"
+          ],
+          "help": [
+            {
+              "en": "Generally speaking, most people I know try to...",
+              "es": "En términos generales, la mayoría de la gente que conozco intenta..."
+            },
+            {
+              "en": "It depends a lot on where people live and how much free time they have.",
+              "es": "Depende mucho de dónde vive la gente y de cuánto tiempo libre tiene."
+            },
+            {
+              "en": "A good example of this would be...",
+              "es": "Un buen ejemplo de esto sería..."
+            }
+          ]
+        },
+        {
+          "q": "Where do people in your country usually get information about health and diet?",
+          "kind": "concrete",
+          "rephrase": "Where do people in your country learn about health and food?",
+          "followups": [
+            "Do you think these sources are reliable?",
+            "Why do you think that is?"
+          ],
+          "help": [
+            {
+              "en": "These days, a lot of people turn to social media for advice.",
+              "es": "Hoy en día, mucha gente recurre a las redes sociales para buscar consejos."
+            },
+            {
+              "en": "Older people, on the other hand, tend to trust their doctor more.",
+              "es": "La gente mayor, en cambio, suele confiar más en su médico."
+            },
+            {
+              "en": "The problem with that is that...",
+              "es": "El problema con eso es que..."
+            }
+          ]
+        },
+        {
+          "q": "Why do some people ignore health advice even when they know it is good for them?",
+          "kind": "abstract",
+          "rephrase": "Why do some people not follow good advice about their health?",
+          "followups": [
+            "Can you give me an example?",
+            "What could be done to change this?"
+          ],
+          "help": [
+            {
+              "en": "I think one of the main reasons is that the benefits are not immediate.",
+              "es": "Creo que una de las razones principales es que los beneficios no son inmediatos."
+            },
+            {
+              "en": "Habits are very hard to break, especially when...",
+              "es": "Los hábitos son muy difíciles de romper, sobre todo cuando..."
+            },
+            {
+              "en": "On top of that, some people simply can't afford a healthier lifestyle.",
+              "es": "Además, algunas personas simplemente no pueden permitirse un estilo de vida más saludable."
+            }
+          ]
+        },
+        {
+          "q": "Do you think governments should spend more money on preventing illness than on treating it?",
+          "kind": "abstract",
+          "rephrase": "Should governments pay more to stop people getting ill than to cure them?",
+          "followups": [
+            "Why do you think that?",
+            "Are there any disadvantages to that approach?"
+          ],
+          "help": [
+            {
+              "en": "In my view, prevention is far more cost-effective in the long run.",
+              "es": "En mi opinión, la prevención es mucho más rentable a largo plazo."
+            },
+            {
+              "en": "Having said that, we can't simply neglect people who are already sick.",
+              "es": "Dicho esto, no podemos simplemente descuidar a quienes ya están enfermos."
+            },
+            {
+              "en": "Ideally, there should be a balance between the two.",
+              "es": "Lo ideal sería que hubiera un equilibrio entre ambas cosas."
+            }
+          ]
+        },
+        {
+          "q": "How might technology change the way people look after their health in the future?",
+          "kind": "abstract",
+          "rephrase": "How could technology change how people take care of their health later on?",
+          "followups": [
+            "Do you think this will be a positive change?",
+            "Could it create any problems?"
+          ],
+          "help": [
+            {
+              "en": "I imagine that wearable devices will become much more common.",
+              "es": "Me imagino que los dispositivos portátiles serán mucho más comunes."
+            },
+            {
+              "en": "One possible drawback is that people might rely too much on technology.",
+              "es": "Una posible desventaja es que la gente podría depender demasiado de la tecnología."
+            },
+            {
+              "en": "It's hard to predict, but I suspect that...",
+              "es": "Es difícil predecirlo, pero sospecho que..."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
