@@ -1,9 +1,15 @@
 // POST /api/examiner (SPEC 8): Part 3 examiner decisions, streamed as plain
 // text. Thin: check the token, validate input, call EXAMINER_MODEL, stream.
-// "Reintentar" comparisons join this function in step 5.
+// Also the "Reintentar" comparison on the results screen (kind "compare").
 
 import Anthropic from "@anthropic-ai/sdk";
-import { buildExaminerMessage, examinerSystemPrompt, parseExaminerRequest } from "./_lib/examiner-prompt.js";
+import {
+  buildCompareMessage,
+  buildExaminerMessage,
+  compareSystemPrompt,
+  examinerSystemPrompt,
+  parseExaminerRequest,
+} from "./_lib/examiner-prompt.js";
 import { error, readJson } from "./_lib/http.js";
 import { bearer, verifyToken } from "./_lib/token.js";
 
@@ -13,6 +19,8 @@ const client = new Anthropic({ maxRetries: 0, timeout: 10_000 });
 
 /** SPEC 4: the fastest model, no thinking, max_tokens 80. */
 const MAX_TOKENS = 80;
+/** Two lines of Spanish. */
+const COMPARE_MAX_TOKENS = 300;
 
 export async function POST(request: Request): Promise<Response> {
   const secret = process.env.SESSION_SECRET;
@@ -24,12 +32,13 @@ export async function POST(request: Request): Promise<Response> {
   if (!body) return error("bad-request", 400);
   if (body.kind === "ping") return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
 
+  const compare = body.kind === "compare";
   const stream = client.messages.stream(
     {
       model,
-      max_tokens: MAX_TOKENS,
-      system: examinerSystemPrompt(),
-      messages: [{ role: "user", content: buildExaminerMessage(body) }],
+      max_tokens: compare ? COMPARE_MAX_TOKENS : MAX_TOKENS,
+      system: compare ? compareSystemPrompt() : examinerSystemPrompt(),
+      messages: [{ role: "user", content: compare ? buildCompareMessage(body) : buildExaminerMessage(body) }],
     },
     // The browser aborts speculative requests when Julio keeps talking; stop
     // the model call too, so aborted requests don't cost tokens.

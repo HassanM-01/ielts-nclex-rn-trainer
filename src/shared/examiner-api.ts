@@ -32,7 +32,22 @@ export interface ExaminerPingRequest {
   kind: "ping";
 }
 
-export type ExaminerRequest = ExaminerTurnRequest | ExaminerPingRequest;
+/**
+ * "Reintentar" on the results screen (SPEC 13): compares his two attempts at
+ * one question in two lines of Spanish, streamed as plain text.
+ */
+export interface ExaminerCompareRequest {
+  kind: "compare";
+  question: string;
+  /** His answer during the test. */
+  first: string;
+  /** His answer on "Reintentar". */
+  second: string;
+  /** The upgraded answer he was shown. */
+  better: string;
+}
+
+export type ExaminerRequest = ExaminerTurnRequest | ExaminerPingRequest | ExaminerCompareRequest;
 
 /** The model's reply is streamed as plain text: "[NEXT]", "[END]" or one follow-up question. */
 export const REPLY_NEXT = "[NEXT]";

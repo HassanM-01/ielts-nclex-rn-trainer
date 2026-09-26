@@ -105,3 +105,31 @@ describe("POST /api/examiner", () => {
     expect(await res.json()).toEqual({ error: "not-configured" });
   });
 });
+
+describe("POST /api/examiner, kind compare (Reintentar)", () => {
+  const COMPARE = {
+    kind: "compare",
+    question: "Describe a noisy place you have been to.",
+    first: "the hospital is noisy",
+    second: "the emergency room is noisy because ambulances arrive all night",
+    better: "The emergency room where I work is incredibly noisy...",
+  };
+
+  it("streams two lines from EXAMINER_MODEL with its own prompt", async () => {
+    streamMock.mockReturnValue(fakeStream(["Mejoraste...\n", "Ahora..."]));
+    const res = await POST(req(COMPARE));
+    expect(await res.text()).toBe("Mejoraste...\nAhora...");
+    const [params] = streamMock.mock.calls[0] as [Record<string, unknown>];
+    expect(params.model).toBe("claude-haiku-4-5-20251001");
+    expect(params).not.toHaveProperty("thinking");
+    expect(params.system).toContain("two short lines in Spanish");
+    const messages = params.messages as { content: string }[];
+    expect(messages[0]?.content).toContain("Second attempt (just now): the emergency room is noisy because");
+  });
+
+  it("rejects a compare without the question or the upgraded answer", async () => {
+    expect((await POST(req({ ...COMPARE, question: "" }))).status).toBe(400);
+    expect((await POST(req({ ...COMPARE, better: undefined }))).status).toBe(400);
+    expect(streamMock).not.toHaveBeenCalled();
+  });
+});

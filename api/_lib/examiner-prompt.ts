@@ -3,17 +3,29 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ExaminerRequest, ExaminerTurnRequest, FollowupAllowance } from "../../src/shared/examiner-api";
+import type { ExaminerCompareRequest, ExaminerRequest, ExaminerTurnRequest, FollowupAllowance } from "../../src/shared/examiner-api";
 
-const LIMITS = { questions: 12, questionChars: 400, exchange: 40, entryChars: 4_000, promptChars: 400 };
+const LIMITS = { questions: 12, questionChars: 400, exchange: 40, entryChars: 4_000, promptChars: 400, compareChars: 6_000 };
 const ALLOWANCES: FollowupAllowance[] = ["1-per-part", "1-per-2-questions", "1-per-question"];
 
-let systemPrompt: string | null = null;
+const prompts = new Map<string, string>();
+
+function prompt(file: string): string {
+  let p = prompts.get(file);
+  if (p === undefined) {
+    p = readFileSync(join(process.cwd(), "api", "prompts", file), "utf8").trim();
+    prompts.set(file, p);
+  }
+  return p;
+}
 
 /** Loaded once per function instance (vercel.json includes api/prompts). */
 export function examinerSystemPrompt(): string {
-  systemPrompt ??= readFileSync(join(process.cwd(), "api", "prompts", "examiner.md"), "utf8").trim();
-  return systemPrompt;
+  return prompt("examiner.md");
+}
+
+export function compareSystemPrompt(): string {
+  return prompt("compare.md");
 }
 
 function isString(x: unknown, max: number): x is string {
@@ -24,6 +36,7 @@ export function parseExaminerRequest(body: unknown): ExaminerRequest | null {
   if (!body || typeof body !== "object") return null;
   const b = body as Record<string, unknown>;
   if (b.kind === "ping") return { kind: "ping" };
+  if (b.kind === "compare") return parseCompare(b);
   if (b.kind !== "turn") return null;
   const { part2Prompt, questions, index, exchange, secondsLeft, followupsUsed, allowance } = b;
   if (!isString(part2Prompt, LIMITS.promptChars)) return null;
@@ -49,6 +62,27 @@ export function parseExaminerRequest(body: unknown): ExaminerRequest | null {
     followupsUsed,
     allowance: allowance as FollowupAllowance,
   };
+}
+
+function parseCompare(b: Record<string, unknown>): ExaminerCompareRequest | null {
+  const { question, first, second, better } = b;
+  if (!isString(question, LIMITS.questionChars) || !isString(better, LIMITS.compareChars)) return null;
+  if (typeof first !== "string" || first.length > LIMITS.compareChars) return null;
+  if (typeof second !== "string" || second.length > LIMITS.compareChars) return null;
+  return { kind: "compare", question, first, second, better };
+}
+
+/** The user message for a "Reintentar" comparison. */
+export function buildCompareMessage(r: ExaminerCompareRequest): string {
+  return [
+    `Question: ${r.question}`,
+    "",
+    `First attempt (during the test): ${r.first.trim() || "(no answer)"}`,
+    "",
+    `Improved answer he was shown: ${r.better}`,
+    "",
+    `Second attempt (just now): ${r.second.trim() || "(no answer)"}`,
+  ].join("\n");
 }
 
 const ALLOWANCE_TEXT: Record<FollowupAllowance, string> = {

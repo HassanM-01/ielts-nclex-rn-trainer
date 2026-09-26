@@ -6,6 +6,10 @@
     "api/examiner.ts": {
       "includeFiles": "api/prompts/**"
     },
+    "api/grade.ts": {
+      "includeFiles": "api/prompts/**",
+      "maxDuration": 300
+    },
     "api/session-start.ts": {
       "includeFiles": "data/bank/ielts/*.json"
     }
