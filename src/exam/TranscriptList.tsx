@@ -1,33 +1,13 @@
-// After the exam (step 2 stand-in for the results screen of step 5): the
-// transcript by part and question, from the saved checkpoint.
+// The transcript by part and question, with notes such as "interrupted for
+// time". Shown on the results screen (it replaced the step 2 transcript page).
 
-import { navigate } from "../app/router";
 import { t } from "../i18n";
-import { loadCheckpoint } from "../session/checkpoint";
+import type { ExamCheckpoint } from "../session/checkpoint";
 
-export function TranscriptScreen() {
-  const cp = loadCheckpoint();
-
-  if (!cp) {
-    return (
-      <main className="mx-auto max-w-2xl space-y-4 p-6" lang="es">
-        <p>{t.transcript.none}</p>
-        <button type="button" className="underline" onClick={() => navigate("/")}>
-          {t.transcript.backHome}
-        </button>
-      </main>
-    );
-  }
-
+export function TranscriptList({ cp }: { cp: ExamCheckpoint }) {
   const answers = cp.answers.filter((a) => a.outcome !== null);
-
   return (
-    <main className="mx-auto max-w-2xl space-y-4 p-6" lang="es">
-      <h1 className="text-2xl font-semibold">{t.transcript.title}</h1>
-      <p className="text-sm text-slate-500">{new Date(cp.startedAt).toLocaleString("es-MX")}</p>
-      {(cp.endedEarly || !cp.finished) && <p className="text-amber-800">{t.transcript.unfinished}</p>}
-      <p className="text-slate-600">{t.transcript.gradingSoon}</p>
-
+    <div className="space-y-3">
       <ol className="space-y-3">
         {answers.map((a) => (
           <li key={a.stepId} className="rounded-lg border border-slate-200 bg-white p-3">
@@ -55,14 +35,10 @@ export function TranscriptScreen() {
 
       {cp.notes && (
         <section>
-          <h2 className="mb-1 font-medium">{t.transcript.notes}</h2>
+          <h3 className="mb-1 font-medium">{t.transcript.notes}</h3>
           <p className="rounded-lg bg-white p-3 whitespace-pre-wrap">{cp.notes}</p>
         </section>
       )}
-
-      <button type="button" className="rounded-lg bg-slate-800 px-4 py-2 text-white" onClick={() => navigate("/")}>
-        {t.transcript.backHome}
-      </button>
-    </main>
+    </div>
   );
 }

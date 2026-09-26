@@ -1,6 +1,6 @@
 // Home (SPEC 13, step 4 version): mode selector, "Empezar examen", the mic
-// check, resume after a reload. Level, last score and quick practice come in
-// steps 5 to 7.
+// check, resume after a reload, and a link to the last results. Level, last
+// score and quick practice come in steps 6 and 7.
 //
 // Prewarm (SPEC 3.5): load the voice list, ask for mic permission, and fetch
 // a token plus this session's questions as soon as Home loads, so the
@@ -131,7 +131,7 @@ export function Home() {
             <button type="button" className="rounded-lg bg-slate-800 px-4 py-2 text-white" onClick={resume}>
               {t.home.resume}
             </button>
-            <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2" onClick={() => navigate("/transcripcion")}>
+            <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2" onClick={() => navigate("/resultados")}>
               {t.home.viewSoFar}
             </button>
             <button type="button" className="rounded-lg px-4 py-2 text-slate-600 underline" onClick={discard}>
@@ -171,7 +171,7 @@ export function Home() {
         </button>
         <p className="mt-2 text-sm text-slate-600">{t.home.headphonesTip}</p>
         {cp?.finished && (
-          <button type="button" className="mt-3 text-sm text-slate-600 underline" onClick={() => navigate("/transcripcion")}>
+          <button type="button" className="mt-3 text-sm text-slate-600 underline" onClick={() => navigate("/resultados")}>
             {t.home.lastExam}
           </button>
         )}

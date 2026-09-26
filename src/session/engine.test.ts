@@ -4,7 +4,7 @@ import { buildIeltsScript, IELTS_ENDPOINTING, LINES } from "../exams/ielts";
 import { Metrics } from "../metrics/latency";
 import type { SayOptions, SayResult, Turn, TurnKind } from "../speech/controller";
 import type { ExamCheckpoint } from "./checkpoint";
-import { ExamEngine, type SpeechPort } from "./engine";
+import { ExamEngine, type EngineOptions, type SpeechPort } from "./engine";
 import type { ExaminerOutcome, ExaminerPort } from "./examiner-client";
 import type { ExaminerTurnRequest } from "../shared/examiner-api";
 
@@ -139,7 +139,7 @@ function checkpoint(over: Partial<ExamCheckpoint> = {}): ExamCheckpoint {
   };
 }
 
-function setup(cpOver: Partial<ExamCheckpoint> = {}, examiner: ExaminerPort | null = null) {
+function setup(cpOver: Partial<ExamCheckpoint> = {}, examiner: ExaminerPort | null = null, hooks: Partial<EngineOptions> = {}) {
   const speech = new FakeSpeech();
   const cp = checkpoint(cpOver);
   const steps = buildIeltsScript(cp.items, { examinerName: "Sonia", level: 3, hour: 15 });
@@ -150,8 +150,9 @@ function setup(cpOver: Partial<ExamCheckpoint> = {}, examiner: ExaminerPort | nu
     save: (c) => saves.push(c.nextStep),
     wallClock: () => 1_000_000 + clock,
     examiner,
+    ...hooks,
   });
-  return { speech, engine, cp, saves };
+  return { speech, engine, cp, saves, steps };
 }
 
 /** Julio answers the current question, then goes quiet long enough to commit. */
@@ -395,6 +396,89 @@ describe("ExamEngine", () => {
     engine.start();
     await flush();
     expect(speech.lastSaid).toBe("Let's continue. How often do you buy new shoes?");
+  });
+});
+
+describe("ExamEngine grading hooks and metrics (step 5)", () => {
+  it("records fluency metrics for each answer", async () => {
+    const { speech, engine, cp } = setup({ nextStep: 2 });
+    engine.start();
+    await flush();
+    const turn = speech.currentTurn.id;
+    clock += 800;
+    speech.reply("I work");
+    speech.tick(clock);
+    clock += 4_200;
+    speech.reply(LONG);
+    speech.tick(clock);
+    speech.pauses.push({ turnId: turn, ms: 1_500 }, { turnId: turn, ms: 2_500 }, { turnId: 999, ms: 3_000 });
+    clock += 4_500;
+    speech.silence = 4_000;
+    speech.tick(clock);
+    await flush();
+    expect(cp.answers.find((a) => a.stepId === "p1-work-q1")?.metrics).toEqual({
+      speakingMs: 4_200,
+      words: 13,
+      pausesOver1s: 2,
+      pausesOver2s: 1,
+      firstWordMs: 800,
+    });
+  });
+
+  it("times the first word from the repeated question after 'Sorry?'", async () => {
+    const { speech, engine, cp } = setup({ nextStep: 2 });
+    engine.start();
+    await flush();
+    await answer(speech, "Sorry?", 2_500);
+    clock += 600;
+    speech.reply(LONG);
+    speech.tick(clock);
+    clock += 4_500;
+    speech.silence = 4_000;
+    speech.tick(clock);
+    await flush();
+    expect(cp.answers.find((a) => a.stepId === "p1-work-q1")?.metrics?.firstWordMs).toBe(600);
+  });
+
+  it("calls onClosing once as the closing line begins, then onFinish", async () => {
+    const events: string[] = [];
+    const steps = buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 3, hour: 15 });
+    const { speech, engine } = setup({ nextStep: steps.length - 1 }, null, {
+      onClosing: () => events.push(`closing:${speech.said.length}`),
+      onFinish: () => events.push("finish"),
+    });
+    engine.start();
+    await flush();
+    // onClosing fired before the line was spoken.
+    expect(events).toEqual(["closing:0", "finish"]);
+    expect(speech.lastSaid).toBe(LINES.closing);
+    expect(engine.endedAt).not.toBeNull();
+  });
+
+  it("calls onFinish on 'Terminar' too", async () => {
+    let finished = 0;
+    const { speech, engine } = setup({ nextStep: 2 }, null, { onFinish: () => finished++ });
+    engine.start();
+    await flush();
+    speech.reply("I work in");
+    engine.end();
+    expect(finished).toBe(1);
+  });
+
+  it("turns Part 2 recording on for the long turn and off when it ends", async () => {
+    const calls: boolean[] = [];
+    const steps = buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 3, hour: 15 });
+    const mono = steps.findIndex((s) => s.kind === "monologue");
+    const { speech, engine } = setup({ nextStep: mono }, null, { onMonologue: (on) => calls.push(on) });
+    engine.start();
+    await flush();
+    expect(calls).toEqual([true]);
+    speech.reply(LONG);
+    engine.commitNow();
+    await flush();
+    expect(calls).toEqual([true, false]);
+    engine.end();
+    expect(calls).toEqual([true, false]);
   });
 });
 

@@ -14,6 +14,7 @@ import { LEVELS, type LevelId } from "../levels/levels";
 import type { ExaminerTurnRequest, ExchangeEntry } from "../shared/examiner-api";
 import type { SayOptions, SayResult, SpeechController } from "../speech/controller";
 import { countWords } from "../speech/text";
+import { countPauses } from "../grading/fluency";
 import type { AnswerOutcome, AnswerRecord, ExamCheckpoint } from "./checkpoint";
 import {
   decideAnswer,
@@ -103,6 +104,17 @@ interface Part3State {
   spec: Speculative | null;
 }
 
+/** Per-answer fluency tracking (this page load), for AnswerRecord.metrics. */
+interface Tracker {
+  /** When his first words were recognized (performance.now). */
+  firstWordAt: number | null;
+  /** From the end of the question to his first words. */
+  firstWordMs: number | null;
+  /** When the answer's words last changed. */
+  lastChangeAt: number;
+  words: number;
+}
+
 export interface EngineOptions {
   level: LevelId;
   defaults: EndpointingDefaults;
@@ -111,6 +123,12 @@ export interface EngineOptions {
   examiner?: ExaminerPort | null;
   /** Epoch clock for records (tests override). */
   wallClock?: () => number;
+  /** The closing line is starting: the moment to start grading (SPEC 11). */
+  onClosing?: () => void;
+  /** The exam is over (finished or ended with "Terminar"). */
+  onFinish?: () => void;
+  /** The Part 2 long turn starts (true) or ends (false): record it for replay. */
+  onMonologue?: (on: boolean) => void;
 }
 
 export class ExamEngine {
@@ -121,8 +139,13 @@ export class ExamEngine {
   stateStartedAt = 0;
   /** The last examiner line, for "Repetir pregunta". */
   lastLine = "";
+  /** When the exam ended (performance.now), for the results-screen latency rows. */
+  endedAt: number | null = null;
 
   private run = 0;
+  private trackers = new Map<string, Tracker>();
+  private closingNotified = false;
+  private monologueOn = false;
   private prefix: Prefix | null = null;
   private p3: Part3State | null = null;
   private listeners = new Set<() => void>();
@@ -210,8 +233,10 @@ export class ExamEngine {
     if ("stepIndex" in p) {
       const rec = this.record(p.stepIndex);
       if (rec && rec.outcome === null) {
+        rec.text = this.answerText(rec);
         rec.outcome = "ended";
         rec.committedAt = this.wall();
+        this.saveMetrics(rec);
       }
     }
     this.finish(true);
@@ -272,6 +297,7 @@ export class ExamEngine {
       return;
     }
 
+    if (step.state === "closing") this.notifyClosing();
     const text = withPrefix(prefix, step.text);
     // An examiner interruption ("Thank you." at a time limit) can't be talked over.
     const interruptible = (prefix?.interruptible ?? true) && (step.kind !== "say" || step.interruptible !== false);
@@ -291,6 +317,7 @@ export class ExamEngine {
     const now = performance.now();
     if (step.kind === "monologue") {
       this.speech.setMonologue(true);
+      this.setMonologueRecording(true);
       this.phase = {
         kind: "monologue",
         stepIndex: i,
@@ -347,6 +374,7 @@ export class ExamEngine {
     const turnId = rec.turnIds[rec.turnIds.length - 1];
     const text = turnId !== undefined ? this.speech.turnText(turnId) : "";
     if (p.turn.speechStartedAt === null && countWords(text) > 0) p.turn.speechStartedAt = now;
+    this.track(rec, p.turn.listenStartedAt, now);
 
     const action = decideAnswer(p.turn, {
       now,
@@ -376,6 +404,7 @@ export class ExamEngine {
         m.log("repeat-request", `"${text}"`);
         // The request isn't part of the answer.
         rec.turnIds = rec.turnIds.filter((id) => id !== turnId);
+        this.untrackIfEmpty(rec);
         if (p.turn.repeated) {
           this.complete(p.stepIndex, "no-answer", now);
         } else {
@@ -403,6 +432,7 @@ export class ExamEngine {
     if (!step || step.kind !== "monologue" || !rec) return;
     const text = this.answerText(rec);
     if (p.m.speechStartedAt === null && countWords(text) > 0) p.m.speechStartedAt = now;
+    this.track(rec, p.m.listenStartedAt, now);
 
     const action = decideMonologue(p.m, {
       now,
@@ -526,6 +556,7 @@ export class ExamEngine {
     const turnId = rec.turnIds[rec.turnIds.length - 1];
     const text = turnId !== undefined ? this.speech.turnText(turnId) : "";
     if (p.turn.speechStartedAt === null && countWords(text) > 0) p.turn.speechStartedAt = now;
+    this.track(rec, p.turn.listenStartedAt, now);
     const silenceMs = this.speech.silenceMs(now);
     this.speculate(p, this.answerText(rec), Math.min(silenceMs, now - p.turn.listenStartedAt));
 
@@ -556,6 +587,7 @@ export class ExamEngine {
         m.count("repeat_requests");
         m.log("repeat-request", `"${text}"`);
         rec.turnIds = rec.turnIds.filter((id) => id !== turnId);
+        this.untrackIfEmpty(rec);
         this.abortSpeculative();
         if (p.turn.repeated) {
           this.commitDiscussion(p.stepIndex, "no-answer", now);
@@ -639,6 +671,7 @@ export class ExamEngine {
       rec.text = answer;
       rec.outcome = outcome;
       rec.committedAt = this.wall();
+      this.saveMetrics(rec);
     }
     this.logCommit(rec, outcome);
     p3.exchange.push({ role: "candidate", text: answer });
@@ -776,7 +809,9 @@ export class ExamEngine {
       rec.text = this.answerText(rec);
       rec.outcome = outcome;
       rec.committedAt = this.wall();
+      this.saveMetrics(rec);
     }
+    if (this.steps[stepIndex]?.kind === "monologue") this.setMonologueRecording(false);
     this.logCommit(rec, outcome);
     this.prefix = prefix;
     this.cp.nextStep = stepIndex + 1;
@@ -791,8 +826,8 @@ export class ExamEngine {
     this.abortSpeculative();
     this.unTick?.();
     this.unTick = null;
-    // Late final results may have arrived after each commit.
-    for (const a of this.cp.answers) if (a.turnIds.length) a.text = this.answerText(a);
+    this.setMonologueRecording(false);
+    this.refreshTexts();
     this.cp.finished = true;
     this.cp.endedEarly = endedEarly;
     const p90 = pauseP90(this.speech.pauses.map((p) => p.ms));
@@ -800,7 +835,65 @@ export class ExamEngine {
     this.opts.save(this.cp);
     this.speech.stop();
     this.phase = { kind: "done" };
-    this.setState("results", performance.now());
+    this.endedAt = performance.now();
+    this.setState("results", this.endedAt);
+    this.opts.onFinish?.();
+  }
+
+  /** Late final results may have arrived after each commit. */
+  private refreshTexts(): void {
+    for (const a of this.cp.answers) {
+      if (!a.turnIds.length) continue;
+      a.text = this.answerText(a);
+      if (a.metrics) a.metrics.words = countWords(a.text);
+    }
+  }
+
+  private notifyClosing(): void {
+    if (this.closingNotified) return;
+    this.closingNotified = true;
+    this.refreshTexts();
+    this.opts.onClosing?.();
+  }
+
+  private setMonologueRecording(on: boolean): void {
+    if (this.monologueOn === on) return;
+    this.monologueOn = on;
+    this.opts.onMonologue?.(on);
+  }
+
+  // ---- fluency metrics ------------------------------------------------------
+
+  /** Called on every tick while he answers: when his words start and last change. */
+  private track(rec: AnswerRecord, listenStartedAt: number, now: number): void {
+    const words = countWords(this.answerText(rec));
+    if (words === 0) return;
+    let t = this.trackers.get(rec.stepId);
+    if (!t) {
+      t = { firstWordAt: now, firstWordMs: Math.max(0, now - listenStartedAt), lastChangeAt: now, words };
+      this.trackers.set(rec.stepId, t);
+    } else if (words !== t.words) {
+      t.words = words;
+      t.lastChangeAt = now;
+    }
+  }
+
+  /** A repeat request removed the only text: start timing afresh. */
+  private untrackIfEmpty(rec: AnswerRecord): void {
+    if (countWords(this.answerText(rec)) === 0) this.trackers.delete(rec.stepId);
+  }
+
+  private saveMetrics(rec: AnswerRecord): void {
+    const t = this.trackers.get(rec.stepId);
+    const turns = new Set(rec.turnIds);
+    const pauses = countPauses(this.speech.pauses.filter((p) => turns.has(p.turnId)).map((p) => p.ms));
+    rec.metrics = {
+      speakingMs: t?.firstWordAt != null ? Math.round(t.lastChangeAt - t.firstWordAt) : 0,
+      words: countWords(rec.text),
+      pausesOver1s: pauses.over1s,
+      pausesOver2s: pauses.over2s,
+      firstWordMs: t?.firstWordMs != null ? Math.round(t.firstWordMs) : null,
+    };
   }
 
   private setState(s: ExamState, at: number): void {

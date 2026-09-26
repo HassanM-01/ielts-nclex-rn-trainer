@@ -6,6 +6,7 @@
 import type { IeltsItems } from "../exams/ielts";
 import type { ExamId } from "../exams/types";
 import type { ExamMode, LevelId } from "../levels/levels";
+import type { AnswerMetrics } from "../shared/grade";
 
 export type AnswerOutcome = "answered" | "no-answer" | "time-limit" | "hard-stop" | "ended";
 
@@ -24,6 +25,8 @@ export interface AnswerRecord {
   backupPrompt: boolean;
   /** Recognizer turns that make up this answer (this page load only). */
   turnIds: number[];
+  /** Fluency numbers for grading, set when the answer is committed. */
+  metrics?: AnswerMetrics;
 }
 
 export interface ExamCheckpoint {
@@ -31,7 +34,10 @@ export interface ExamCheckpoint {
   id: string;
   exam: ExamId;
   mode: ExamMode;
+  /** The level whose conditions the session runs under (a full test: always 3). */
   level: LevelId;
+  /** His own level, which feedback aims at (SPEC 7); missing in older checkpoints. */
+  feedbackLevel?: LevelId;
   startedAt: string;
   updatedAt: string;
   items: IeltsItems;

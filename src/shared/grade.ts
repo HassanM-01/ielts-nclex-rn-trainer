@@ -163,13 +163,15 @@ function str(x: unknown): string | null {
   return typeof x === "string" ? x.trim() : null;
 }
 
-function strings(x: unknown): string[] | null {
+/** A list of strings (empty ones dropped), or null. */
+export function strings(x: unknown): string[] | null {
   if (!Array.isArray(x)) return null;
   const out = x.map(str);
   return out.every((s): s is string => s !== null) ? out.filter(Boolean) : null;
 }
 
-function criterion(x: unknown): Criterion | null {
+/** One criterion object (also used on a closed criterion while the stream is still arriving). */
+export function normalizeCriterion(x: unknown): Criterion | null {
   const o = obj(x);
   if (!o) return null;
   const evidence = strings(o.evidence);
@@ -196,9 +198,9 @@ function pick<T extends string>(x: unknown, allowed: readonly T[]): T | null {
 export function normalizeGrade(x: unknown): Grade | null {
   const o = obj(x);
   if (!o) return null;
-  const fc = criterion(o.fluency_coherence);
-  const lr = criterion(o.lexical_resource);
-  const gr = criterion(o.grammatical_range);
+  const fc = normalizeCriterion(o.fluency_coherence);
+  const lr = normalizeCriterion(o.lexical_resource);
+  const gr = normalizeCriterion(o.grammatical_range);
   const pp = obj(o.pronunciation_proxy);
   const fixes = strings(o.top_fixes_es);
   const focus = str(o.next_focus_es);

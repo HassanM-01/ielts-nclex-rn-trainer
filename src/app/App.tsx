@@ -1,11 +1,12 @@
 import { lazy, Suspense } from "react";
 import { DebugOverlay } from "../components/DebugOverlay";
 import { ExamScreen } from "../exam/ExamScreen";
-import { TranscriptScreen } from "../exam/TranscriptScreen";
+import { loadResultsScreen } from "../results/load";
 import { Home } from "./Home";
 import { usePath } from "./router";
 
 const LabPage = lazy(() => import("../lab/LabPage"));
+const ResultsScreen = lazy(loadResultsScreen);
 
 function Route({ path }: { path: string }) {
   switch (path) {
@@ -17,8 +18,14 @@ function Route({ path }: { path: string }) {
       );
     case "/examen":
       return <ExamScreen />;
+    case "/resultados":
+    // The step 2 transcript page's old address.
     case "/transcripcion":
-      return <TranscriptScreen />;
+      return (
+        <Suspense fallback={null}>
+          <ResultsScreen />
+        </Suspense>
+      );
     default:
       return <Home />;
   }

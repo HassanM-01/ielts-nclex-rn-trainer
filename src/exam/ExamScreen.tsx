@@ -8,6 +8,7 @@ import { useSpeech } from "../app/speech";
 import { MicMeter } from "../components/MicMeter";
 import { RecognitionBanner } from "../components/RecognitionBanner";
 import { t } from "../i18n";
+import { loadResultsScreen } from "../results/load";
 import { getActiveExam, useExam } from "../session/exam-session";
 import type { ExamEngine } from "../session/engine";
 import { CueCardView } from "./CueCardView";
@@ -32,8 +33,13 @@ export function ExamScreen() {
   const done = !engine || engine.phase.kind === "done";
   useEffect(() => {
     if (!engine) navigate("/");
-    else if (engine.phase.kind === "done") navigate("/transcripcion");
+    else if (engine.phase.kind === "done") navigate("/resultados");
   }, [engine, done]);
+
+  // Fetch the results screen now, so it opens instantly at the end.
+  useEffect(() => {
+    void loadResultsScreen().catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!engine) return;

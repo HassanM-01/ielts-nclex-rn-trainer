@@ -13,13 +13,18 @@ export type LatencyName =
   | "rec_restart_gap"
   | "rec_first_interim"
   | "rec_final_lag"
-  | "examiner_reply";
+  | "examiner_reply"
+  | "stats_on_screen"
+  | "grade_first_band";
 
 /** SPEC 3 performance budget (ms). */
 export const BUDGET: Partial<Record<LatencyName, { target: number; limit: number }>> = {
   commit_to_audio_scripted: { target: 400, limit: 800 },
   commit_to_audio_ai: { target: 700, limit: 1_200 },
   click_to_speaking: { target: 500, limit: 1_000 },
+  // SPEC 3 says "instant" / 200 ms; 100 ms stands in for "instant".
+  stats_on_screen: { target: 100, limit: 200 },
+  grade_first_band: { target: 30_000, limit: 90_000 },
 };
 
 export const LATENCY_LABELS: Record<LatencyName, string> = {
@@ -32,6 +37,8 @@ export const LATENCY_LABELS: Record<LatencyName, string> = {
   rec_first_interim: "Voice onset → first interim text",
   rec_final_lag: "Voice end → final text",
   examiner_reply: "Examiner request → reply (model)",
+  stats_on_screen: "Exam end → local stats on screen",
+  grade_first_band: "Exam end → first band on screen",
 };
 
 export interface LogEvent {
@@ -66,6 +73,7 @@ const NOTABLE_EVENTS = new Set([
   "stall", "rec-error", "rec-failure", "mic-change", "tts-fallback", "tts-watchdog", "tts-stuck", "vad",
   "barge-in", "carry", "echo-trim", "commit", "repeat-request", "no-speech-repeat", "no-answer", "time-limit",
   "backup-prompt", "hard-stop", "ai-reply", "ai-fallback", "part3-end", "rec-retry", "rec-recovered",
+  "grade-start", "grade-done", "grade-error",
 ]);
 const REPORT_EVENTS = 80;
 const MAX_SAMPLES = 500;
