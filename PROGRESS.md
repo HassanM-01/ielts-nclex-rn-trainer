@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 5 (grading, streamed and structured, and the results screen)
-- **State:** plan APPROVED by Hassan (2026-09-25), not started. The next session should start building straight away (it counts as mid-step; no need to re-ask). The plan is under "Step 5 plan (approved)" below.
-- **Waiting on:** nothing. `api/prompts/ielts-descriptors.md` is in place.
+- **State:** built (2026-09-26), awaiting Hassan's checkpoint (HUMAN_GUIDE Stage 5). See "Checkpoint for Hassan" below.
+- **Waiting on:** Hassan's Stage 5 result (two graded full tests).
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
 ## Step 5 plan (approved 2026-09-25)
@@ -44,7 +44,8 @@ Step 6 (Supabase, History, Vocab, deploy):
 - [ ] Vocab: move words saved in localStorage (step 5 "Guardar") into the `vocab` table, then read and write through `/api/vocab`.
 - [ ] Profile: store `pause_p90` after each session and apply `personalBaseMs()` (already written and tested in `src/session/endpointing.ts`) to the next session's endpointing.
 - [ ] Save sessions (upsert by client uuid) with transcript, metrics snapshot and grade; keep the finished checkpoint in localStorage until the save succeeds.
-- [ ] Deploy: SPA rewrite to `index.html` for `/lab`, `/examen`, `/transcripcion` (and the results route); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
+- [ ] Deploy: SPA rewrite to `index.html` for `/lab`, `/examen`, `/resultados` and `/transcripcion` (now an alias of `/resultados`); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
+- [ ] Grading: save the grade with the session (today it's in localStorage `exam.grade.v1`, last session only); send up to 30 saved words due for review in `savedWords` (the field and prompt line exist, always empty now); count `saved_words_used` toward mastery (3 correct uses).
 
 Step 7 (levels, Ayuda, quick practice):
 - [ ] Level from `profile` (placement from the first full test) instead of `DEFAULT_LEVEL`; the move-up / move-down suggestions.
@@ -60,7 +61,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
-| 5 | Grading (streamed, structured) and results screen | pending | |
+| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
@@ -82,6 +83,57 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-26: step 5 built.** `npm run typecheck` (app, `/api`, scripts), `npm test` (338 tests, up from 282) and `npm run build` all pass. The browser bundle contains no SDK, zod or secret names (checked). No model was called: every test mocks the SDK, and the browser checks used a stubbed stream.
+
+Built:
+- **Server:**
+  - `api/grade.ts` checks the token and streams `GRADE_MODEL` with structured outputs (`zodOutputFormat`, SPEC 11 schema in stream order, `effort: "medium"`, `max_tokens` 32k). The browser receives newline-delimited JSON events: `delta`, `reset`, `done` and `error`.
+  - One retry, only on `max_tokens`, a refusal, a network error or JSON that fails the schema; the browser is told to `reset`. Each attempt is capped at 140 s. `vercel.json` gives the function `maxDuration: 300` and the prompts.
+  - `api/_lib/grade-prompt.ts` holds the input validation, the zod schema and the user message: session facts, then the transcript by part and question, each answer with its metrics line and outcome note.
+  - `api/prompts/grade-ielts.md` holds the grading rules, and the verbatim descriptors are appended after it.
+  - `/api/examiner` has a new `kind: "compare"` (Haiku, `max_tokens` 300, prompt `api/prompts/compare.md`): two lines of Spanish comparing the two attempts.
+- **Shared contract:** `src/shared/grade.ts` has the types, `normalizeGrade` (whole bands 0 to 9, rounded down; enums case-insensitive; at most 3 fixes and 2 upgraded answers) and `overallBand` (mean of 3, rounded DOWN to 0.5).
+- **Engine:**
+  - Each committed answer now has `metrics`: speaking time (first to last recognised word), words, pauses over 1 s and over 2 s (VAD pauses in its turns), and time to first word (reset after a "Sorry?").
+  - New hooks: `onClosing` (grading starts as the closing line begins), `onFinish` (grading starts at the end if "Terminar" skipped the closing) and `onMonologue` (Part 2 recording).
+  - The checkpoint gains `feedbackLevel` (Nivel 2 until placement).
+- **Browser:**
+  - `src/grading/` holds:
+    - `grade-client.ts`: one job per session; a finished grade is kept in localStorage so a reload doesn't pay again.
+    - `partial-json.ts`: the forgiving stream parser.
+    - `grade-view.ts`: which sections can show.
+    - `fluency.ts`: local stats.
+    - `part2-audio.ts`: MediaRecorder on the VAD stream, in memory only.
+    - `retry.ts`: "Reintentar" and the comparison call.
+    - `vocab-store.ts`: "Guardar" to localStorage.
+  - The results screen (`/resultados`, lazy, prefetched during the exam) replaces the transcript page, and `/transcripcion` is an alias. It shows, in order:
+    - local stats;
+    - the overall ("Banda estimada, sin pronunciación", distance to 7.0);
+    - the three criteria as each closes in the stream;
+    - fixes and focus;
+    - the pronunciation flags;
+    - two upgraded answers side by side with "Reintentar";
+    - vocabulary with "Guardar";
+    - Part 2 replay;
+    - the transcript.
+  - Failures show a Spanish message with "Intentar de nuevo". Too little speech (under 30 words) makes no model call and explains why.
+  - New latency rows in the overlay and "Copy report": `Exam end → local stats on screen` (100 / 200 ms) and `Exam end → first band on screen` (30 / 90 s). There are also report events `grade-start`, `grade-done` and `grade-error`.
+
+Checked in Claude's browser pane with the grade stream stubbed (no model):
+- Stats matched the seeded metrics.
+- Criteria rendered one by one while the others showed "Calificando…"; the overall was 5.5 from 6/6/5.
+- "Guardar" persisted.
+- A reload showed the saved grade and words with no new request.
+- The no-passphrase error showed its Spanish message and retry.
+- "Reintentar" with a fake recognizer endpointed the answer, released the mic and showed the comparison.
+- No console errors.
+
+Untested (Hassan's checkpoint):
+- a real grade from `claude-opus-5-5` (calibration, time to first band);
+- the real `claude-haiku-4-5` comparison;
+- Part 2 replay with a real mic on Edge;
+- the examiner's voice on "Reintentar" (the pane has no voices).
 
 **2026-09-25 (fifth part): step 5 prep and handoff.** Hassan approved the step 5 plan (defaults for Guardar, level and cap; see "Step 5 plan"). He supplied the official IELTS Speaking band descriptors PDF; its text was extracted verbatim into `api/prompts/ielts-descriptors.md` (bands 9 to 0, four criteria each, plus the two notes), and the PDF was moved to the Windows Recycle Bin as he asked. The session ended here because the chat context was nearly full. The next session starts building step 5.
 
@@ -336,7 +388,31 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Step 4 is done. The step 5 checkpoint will be written when step 5 is built (HUMAN_GUIDE.md Stage 5).
+**Step 5: calibrate the grading (HUMAN_GUIDE.md Stage 5, about 40 minutes).** Each graded test costs about US$0.10 to 0.20; each "Reintentar" comparison is under a cent.
+
+Setup: `npm run dev`, then http://localhost:3000 in Edge, with headphones. Choose "Examen completo". Press Shift+D any time to see the numbers.
+
+**Test A, as yourself.** Answer naturally and fully. Expected overall: about 8 or higher. Below 7.5 means the grading is off.
+
+**Test B, as a B1 speaker.** Give short answers, use the simple present, basic words and a few mistakes ("I go to hospital yesterday"), and pause for a long time. Expected overall: 4.5 to 5.5. Above 6 means the grading is off.
+
+For both, check:
+1. When the closing line ends, the results page opens and "Tu fluidez" (speaking time, words per minute, long pauses, time to start) is there at once.
+2. The criteria appear one by one ("Calificando…" until each arrives). The first should come in about 30 s, and the limit is 90 s. The overall ("Banda estimada, sin pronunciación") appears once all three are in.
+3. The evidence quotes are things you actually said.
+4. The advice, fixes and focus are in Spanish and specific (not "practica más").
+5. The two upgraded answers are one step above what you said (written at band 7, since feedback targets Nivel 2), not wildly fancier.
+6. "Reintentar" on one of them: the examiner asks the question again, you answer, and within a few seconds you get 2 lines of Spanish comparing the attempts.
+7. "Guardar" on a vocabulary word turns into "Guardada", and stays that way after reloading the page.
+8. "Escucha tu Parte 2" plays back your long turn.
+9. Optional: start a "Solo Parte 1" practice and press "Terminar" early. The results say "Muestra parcial" and still grade (if you said at least ~30 words).
+
+Report back:
+- Both tests' bands per criterion and the overall.
+- From Shift+D: "Exam end → first band on screen" and "Exam end → local stats on screen".
+- If a score looks off, paste one criterion's evidence and band so the prompt can be adjusted.
+- Anything odd (Reintentar, replay, messages). "Copy report" on `/lab` includes the `grade-start` / `grade-done` / `grade-error` events.
+- If the first band takes longer than 90 s, say so. The first lever is `effort: "low"` (SPEC 4), before any model change.
 
 ## Decisions
 
@@ -399,6 +475,22 @@ New decisions during the build go below with a date.
   - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
   - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
 
+- 2026-09-26 (step 5 implementation choices within the spec and the approved plan):
+  - The grader doesn't receive the opening (name, identification): IELTS doesn't assess it, and it keeps Julio's name out of the request.
+  - Under 30 words in all answers, no model call; the results screen explains in Spanish.
+  - Grading starts at the closing line. If "Terminar" skips it, grading starts at the end. A results page opened after a reload doesn't grade on its own: it offers "Calificar mi examen", so a reload during grading can't silently pay twice. A finished grade is reused from localStorage.
+  - Stream order on screen: each criterion as soon as its object closes; the fixes and focus as they close; the pronunciation flags, upgraded answers and vocabulary with the final grade (they come last in the stream anyway).
+  - Speaking time is measured from the first to the last recognised word. The recogniser's lag at both ends roughly cancels out.
+  - "Reintentar" endpointing:
+    - Part 1 uses the exam's rules (2.5 s, 40 s limit).
+    - Part 2 ends on 6 s of silence or at 2:00.
+    - Part 3 uses 3.5 s, capped at 2:00.
+    - All at his level's extra patience, with one repeat on "Sorry?".
+  - Comparisons have a 20 s timeout and a cap of 10 per page.
+  - The latency row "Exam end → local stats on screen" uses 100 ms as the target, standing in for SPEC 3's "instant" (limit 200 ms).
+  - Retries follow SPEC 11 (once, on max_tokens, a refusal, a network error or invalid JSON). The API's server-side refusal-fallback option isn't used.
+  - `/transcripcion` stays as an alias of the new `/resultados`.
+
 ## Open questions
 
 - **Part 3 AI latency** (2026-09-25: within budget on the retest, 214 / 823 ms with n = 2, because the speculative replies were ready at commit; re-measure once deployed in step 6). Earlier notes:
@@ -416,6 +508,9 @@ New decisions during the build go below with a date.
 - Stall restarts: the retest passed, but its counts weren't captured. Recheck the stall counter at the step 2 checkpoint.
 
 ## Known issues
+
+- Part 2 replay records from the mic-level (VAD) stream. If that stream can't open, or is reopened mid-turn by a mic change, the replay is missing or ends early. Nothing else depends on it.
+- The "Exam end → …" latency rows are measured only when the results page follows an exam on the same page load (not after a reload).
 
 - The bank:build cost estimate is conservative: it assumed 6k output tokens per card, while Opus 5.5 at medium effort used about 2k. The real cost was a third of the estimate.
 
@@ -436,3 +531,4 @@ New decisions during the build go below with a date.
 | 2026-09-25 | Bank build, remaining 106 items (145k input, 128k output tokens) | US$3.14 |
 | 2026-09-25 | Rebuild of the 15 health cards' Part 3 sets (estimated ~$0.50; more because of the avoid list) | US$1.06 |
 | 2026-09-23 to 25 | Part 3 examiner testing (Haiku 4.5, a few dozen calls) | under US$0.10 (estimate) |
+| 2026-09-26 | Step 5 build: no model calls (all mocked or stubbed) | US$0 |
