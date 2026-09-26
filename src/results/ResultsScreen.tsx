@@ -234,16 +234,16 @@ function Grading({ cp, job, level }: { cp: ExamCheckpoint; job: GradeJob; level:
 }
 
 export default function ResultsScreen() {
-  const [cp] = useState(loadCheckpoint);
+  const [cp] = useState(() => {
+    const c = loadCheckpoint();
+    // A grade saved earlier shows at once, without paying for grading again.
+    if (c && !currentGradeJob(c.id) && loadSavedGrade(c.id)) startGrading(c, null);
+    return c;
+  });
   useFrameSubscription(subscribeGrade);
   const engine = getActiveExam();
   // Only an exam that just ended on this page has an end time to measure from.
   const endedAt = cp && engine?.cp.id === cp.id ? engine.endedAt : null;
-
-  // A grade saved earlier shows at once, without paying for grading again.
-  useEffect(() => {
-    if (cp && !currentGradeJob(cp.id) && loadSavedGrade(cp.id)) startGrading(cp, null);
-  }, [cp]);
 
   const job = cp ? currentGradeJob(cp.id) : null;
 
@@ -257,7 +257,8 @@ export default function ResultsScreen() {
   }, [cp, firstBand, endedAt, job?.status]);
   useEffect(() => {
     if (!cp || !job || recorded.has(`${cp.id}:log:${job.status}`)) return;
-    if (job.status !== "done" && job.status !== "error") return;
+    // A grade loaded from storage wasn't graded now.
+    if ((job.status !== "done" && job.status !== "error") || (job.status === "done" && job.text === "")) return;
     recorded.add(`${cp.id}:log:${job.status}`);
     const m = getSpeech().metrics;
     if (job.status === "done") m.log("grade-done", `${Math.round((performance.now() - job.startedAt) / 1000)} s`);
