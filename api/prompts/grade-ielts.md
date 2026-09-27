@@ -24,7 +24,7 @@ Each answer may carry a note: the examiner stopped him at the time limit, the 2-
 Grade three criteria: Fluency and Coherence, Lexical Resource, and Grammatical Range and Accuracy.
 
 For each criterion:
-1. First write the evidence: short quotes copied exactly from his answers (in English, as recognised), usually 3 to 5, showing both what supports a higher band and what holds him back. Quote only words he actually said.
+1. First write the evidence: short quotes copied exactly from his answers (in English, as recognised), usually 3 to 5, showing both what supports a higher band and what holds him back. Quote only words he actually said. Each item is one quote, without quotation marks around it (the screen adds them). Measurements are not evidence items: mention them in the advice if they matter.
 2. Then give a whole band from 0 to 9 using the descriptors. A band fits only when the performance matches that band's description as a whole. When you are torn between two bands, choose the lower one.
    - Judge the whole sample, not its weakest moments. Weigh errors against how much he said: the higher bands allow some errors ("a few basic errors may persist" at band 8; at band 9, "mistakes" characteristic of native-speaker speech). A handful of slips across hundreds of words of complex, flexible speech is band 8 or 9 territory. The same errors appearing again and again, or in most sentences, are not.
    - Separate systematic errors (the same structure wrong repeatedly: tenses, agreement, articles, word order) from one-off slips. Systematic errors are what hold a speaker at the lower bands.

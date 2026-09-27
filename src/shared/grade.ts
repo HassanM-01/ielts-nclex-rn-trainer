@@ -176,6 +176,15 @@ export function strings(x: unknown): string[] | null {
   return out.every((s): s is string => s !== null) ? out.filter(Boolean) : null;
 }
 
+const QUOTES = `"'“”‘’«»`;
+
+/** The screen adds quotation marks to evidence, so drop the model's own. */
+export function unquote(s: string): string {
+  let out = s.trim();
+  while (out.length >= 2 && QUOTES.includes(out[0]!) && QUOTES.includes(out[out.length - 1]!)) out = out.slice(1, -1).trim();
+  return out;
+}
+
 /** One criterion object (also used on a closed criterion while the stream is still arriving). */
 export function normalizeCriterion(x: unknown): Criterion | null {
   const o = obj(x);
@@ -185,7 +194,7 @@ export function normalizeCriterion(x: unknown): Criterion | null {
   const band = typeof o.band === "number" && Number.isFinite(o.band) ? o.band : null;
   if (!evidence || advice === null || band === null) return null;
   // Whole bands 0 to 9 (SPEC 11); a stray half band rounds down, never up.
-  return { evidence, band: Math.min(9, Math.max(0, Math.floor(band))), advice_es: advice };
+  return { evidence: evidence.map(unquote).filter(Boolean), band: Math.min(9, Math.max(0, Math.floor(band))), advice_es: advice };
 }
 
 const EXAMS: VocabExam[] = ["ielts", "nclex", "both"];

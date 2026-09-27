@@ -56,6 +56,14 @@ describe("normalizeGrade", () => {
     ]);
   });
 
+  it("drops the model's own quotation marks around evidence (the screen adds them)", () => {
+    const g = normalizeGrade({
+      ...SAMPLE_GRADE,
+      fluency_coherence: { ...SAMPLE_GRADE.fluency_coherence, evidence: ['"So. We were brought up."', "“it depends”", "don't \"stop\" here", '""'] },
+    });
+    expect(g?.fluency_coherence.evidence).toEqual(["So. We were brought up.", "it depends", 'don\'t "stop" here']);
+  });
+
   it("keeps at most 3 fixes and 2 upgraded answers", () => {
     const u = SAMPLE_GRADE.upgraded_answers[0]!;
     const g = normalizeGrade({ ...SAMPLE_GRADE, top_fixes_es: ["1", "2", "3", "4"], upgraded_answers: [u, u, u] });

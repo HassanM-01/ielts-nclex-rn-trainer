@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 5 (grading, streamed and structured, and the results screen)
-- **State:** built (2026-09-26). Test A (2026-09-27) scored 7.0 (below the 7.5 bar), so the grading prompt was recalibrated. Waiting for Hassan to regrade Test A and then run Test B. See "Checkpoint for Hassan" below.
-- **Waiting on:** Hassan's Test A regrade and Test B result, plus a decision on the examiner-voice start latency (open questions).
+- **State:** built (2026-09-26). Test A first scored 7.0; after recalibration the regrade scored 8.0 (passes). Waiting for Test B. See "Checkpoint for Hassan" below.
+- **Waiting on:** Hassan's Test B result, plus a decision on the examiner-voice start latency (open questions).
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
 ## Step 5 plan (approved 2026-09-25)
@@ -61,7 +61,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
-| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade and Test B pending. |
+| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. Test B pending. |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
@@ -83,6 +83,14 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-27 (second part): Test A regrade passes.**
+- With the recalibrated prompt, Test A's regrade scored FC 8, LR 8, GR 8, overall 8.0.
+- The evidence no longer counts the recogniser's errors, and the advice is specific and in Spanish.
+- Timing: first band 18.8 s after the request, all 40.1 s. The first run's "exam end → first band" was 16.0 s. That number was already recorded before the fix; the earlier report showing n = 0 was copied before grading had finished.
+- Cost: 10,515 input and 3,849 output tokens, about US$0.12 per grade.
+- Fix: the model put its own quotation marks inside evidence items (shown as “"…"”), once used a measurement as an evidence item, and joined quotes with "/". The prompt now asks for one quote per item without quotation marks, and `normalizeGrade` strips any wrapping quotes (tested).
+- Not an issue, but worth knowing: the upgraded answers are written at band 7 because feedback targets Nivel 2 (SPEC 7). For a band 8 speaker like Hassan that is below his level; for Julio it's the intended "one step up".
 
 **2026-09-27: step 5 Test A result and calibration fixes.**
 
@@ -410,9 +418,7 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Next (2026-09-27): regrade Test A, then Test B.**
-1. `npm run dev`, open http://localhost:3000/resultados in Edge. Test A is still the saved exam, as long as no other exam was started since. Press "Volver a calificar (solo en desarrollo…)" (about US$0.10 to 0.20). Expected: about 8 or higher. Report the three bands, and the `grade-done` line from "Copy report" on `/lab` (time to first band, tokens).
-2. Then run Test B (below) as a B1 speaker. Starting it replaces Test A as the saved exam.
+**Next (2026-09-27): Test B.** Test A passed on regrade (8.0). Run Test B below as a B1 speaker and report the bands, the `grade-done` line from "Copy report" on `/lab`, and checks 6 to 9 if not done yet (Reintentar, Guardar, Part 2 replay, a partial practice). If Test B scores above 6, press "Volver a calificar" after the next prompt change instead of repeating the test.
 
 **Step 5: calibrate the grading (HUMAN_GUIDE.md Stage 5, about 40 minutes).** Each graded test costs about US$0.10 to 0.20; each "Reintentar" comparison is under a cent.
 
@@ -567,3 +573,4 @@ New decisions during the build go below with a date.
 | 2026-09-23 to 25 | Part 3 examiner testing (Haiku 4.5, a few dozen calls) | under US$0.10 (estimate) |
 | 2026-09-26 | Step 5 build: no model calls (all mocked or stubbed) | US$0 |
 | 2026-09-27 | Hassan's Test A: 1 grade (claude-opus-5-5) + Part 3 examiner calls | about US$0.15 (estimate; tokens weren't logged yet) |
+| 2026-09-27 | Test A regrade (10,515 input / 3,849 output tokens at $4 / $20 per million) | US$0.12 |
