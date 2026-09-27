@@ -9,7 +9,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
-import type { GradeErrorCode, GradeEvent } from "../src/shared/grade";
+import type { GradeErrorCode, GradeEvent, GradeUsage } from "../src/shared/grade";
 import { buildGradeMessage, GradeOutput, gradeSystemPrompt, parseGradeRequest, type GradeOutputType } from "./_lib/grade-prompt.js";
 import { error, readJson } from "./_lib/http.js";
 import { bearer, verifyToken } from "./_lib/token.js";
@@ -30,6 +30,7 @@ async function attempt(
   params: Parameters<typeof client.messages.stream>[0],
   signal: AbortSignal,
   onText: (text: string) => void,
+  usage: GradeUsage,
 ): Promise<Attempt> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ATTEMPT_MS);
@@ -45,6 +46,8 @@ async function attempt(
       }
     }
     const msg = await stream.finalMessage();
+    usage.input += msg.usage.input_tokens + (msg.usage.cache_read_input_tokens ?? 0) + (msg.usage.cache_creation_input_tokens ?? 0);
+    usage.output += msg.usage.output_tokens;
     if (msg.stop_reason === "refusal") return { ok: false, code: "refusal" };
     if (msg.stop_reason === "max_tokens") return { ok: false, code: "incomplete" };
     let parsed: unknown;
@@ -86,12 +89,13 @@ export async function POST(request: Request): Promise<Response> {
   const out = new ReadableStream<Uint8Array>({
     async start(controller) {
       const send = (e: GradeEvent) => controller.enqueue(encoder.encode(`${JSON.stringify(e)}\n`));
+      const usage: GradeUsage = { input: 0, output: 0 };
       try {
         for (let n = 1; n <= MAX_ATTEMPTS; n++) {
           if (n > 1) send({ t: "reset" });
-          const r = await attempt(params, request.signal, (v) => send({ t: "delta", v }));
+          const r = await attempt(params, request.signal, (v) => send({ t: "delta", v }), usage);
           if (r.ok) {
-            send({ t: "done", grade: r.grade });
+            send({ t: "done", grade: r.grade, usage });
             break;
           }
           if (request.signal.aborted) break;

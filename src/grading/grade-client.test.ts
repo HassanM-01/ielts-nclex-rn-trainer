@@ -116,7 +116,7 @@ describe("startGrading", () => {
   it("streams sections as they close, then keeps the final grade", async () => {
     const json = JSON.stringify(SAMPLE_GRADE);
     const cut = json.indexOf(',"lexical_resource"') + 5;
-    const fetchImpl = streamingFetch([{ t: "delta", v: json.slice(0, cut) }, { t: "delta", v: json.slice(cut) }, { t: "done", grade: SAMPLE_GRADE }]);
+    const fetchImpl = streamingFetch([{ t: "delta", v: json.slice(0, cut) }, { t: "delta", v: json.slice(cut) }, { t: "done", grade: SAMPLE_GRADE, usage: { input: 7_000, output: 2_500 } }]);
     const seen: string[][] = [];
     const unsub = subscribeGrade(() => seen.push([...(currentGradeJob("s1")?.partial.closedKeys ?? [])]));
     const job = startGrading(checkpoint(), 1, { fetchImpl });
@@ -126,6 +126,9 @@ describe("startGrading", () => {
     expect(currentGradeJob("s1")?.status).toBe("done");
     expect(currentGradeJob("s1")?.grade).toEqual(SAMPLE_GRADE);
     expect(currentGradeJob("s1")?.firstBandAt).not.toBeNull();
+    expect(currentGradeJob("s1")?.endedAt).not.toBeNull();
+    expect(currentGradeJob("s1")?.usage).toEqual({ input: 7_000, output: 2_500 });
+    expect(currentGradeJob("s1")?.fromStorage).toBe(false);
     expect(seen.some((k) => k.length === 1 && k[0] === "fluency_coherence")).toBe(true);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("/api/grade");
@@ -185,7 +188,9 @@ describe("startGrading", () => {
 
     resetGradeJob();
     const fetchImpl = streamingFetch([]);
-    expect(startGrading(checkpoint(), 1, { fetchImpl }).status).toBe("done");
+    const reloaded = startGrading(checkpoint(), 1, { fetchImpl });
+    expect(reloaded.status).toBe("done");
+    expect(reloaded.fromStorage).toBe(true);
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 });

@@ -15,7 +15,7 @@ import { isSaved, saveWord } from "../grading/vocab-store";
 import { fill, t } from "../i18n";
 import { DEFAULT_LEVEL, LEVELS, type LevelId } from "../levels/levels";
 import { loadCheckpoint, type ExamCheckpoint } from "../session/checkpoint";
-import { getActiveExam } from "../session/exam-session";
+import { getActiveExam, watchGradeJob } from "../session/exam-session";
 import { CRITERIA, type Criterion, type VocabItem } from "../shared/grade";
 import { RetryPanel } from "./RetryPanel";
 
@@ -28,12 +28,20 @@ function clock(ms: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
+/** Grades (again) from the results screen, logging how it goes. */
+function regrade(cp: ExamCheckpoint): void {
+  const speech = getSpeech();
+  const job = startGrading(cp, speech.recognizer.avgConfidence, { force: true });
+  speech.metrics.log("grade-start", `${cp.mode} (from results): ${job.status}`);
+  watchGradeJob(speech, cp.id);
+}
+
 function band(n: number): string {
   return n.toFixed(1);
 }
 
-/** Records an "exam end → X on screen" latency once per session, after the frame paints. */
-function recordOnce(key: string, name: "stats_on_screen" | "grade_first_band", endedAt: number | null): void {
+/** Records "exam end → local stats on screen" once per session, after the frame paints. */
+function recordOnce(key: string, name: "stats_on_screen", endedAt: number | null): void {
   if (endedAt === null || recorded.has(key)) return;
   recorded.add(key);
   requestAnimationFrame(() => getSpeech().metrics.record(name, Math.max(0, performance.now() - endedAt)));
@@ -135,7 +143,7 @@ function Grading({ cp, job, level }: { cp: ExamCheckpoint; job: GradeJob; level:
           <button
             type="button"
             className="rounded-lg bg-slate-800 px-4 py-2 text-white"
-            onClick={() => startGrading(cp, getSpeech().recognizer.avgConfidence, { force: true })}
+            onClick={() => regrade(cp)}
           >
             {t.results.tryAgain}
           </button>
@@ -250,21 +258,6 @@ export default function ResultsScreen() {
   useEffect(() => {
     if (cp) recordOnce(`${cp.id}:stats`, "stats_on_screen", endedAt);
   }, [cp, endedAt]);
-  const firstBand = !!job && (job.grade !== null || job.partial.closedKeys.includes("fluency_coherence"));
-  useEffect(() => {
-    if (cp && firstBand && job?.status !== "done") recordOnce(`${cp.id}:band`, "grade_first_band", endedAt);
-    else if (cp && firstBand) recorded.add(`${cp.id}:band`); // a saved grade isn't a measurement
-  }, [cp, firstBand, endedAt, job?.status]);
-  useEffect(() => {
-    if (!cp || !job || recorded.has(`${cp.id}:log:${job.status}`)) return;
-    // A grade loaded from storage wasn't graded now.
-    if ((job.status !== "done" && job.status !== "error") || (job.status === "done" && job.text === "")) return;
-    recorded.add(`${cp.id}:log:${job.status}`);
-    const m = getSpeech().metrics;
-    if (job.status === "done") m.log("grade-done", `${Math.round((performance.now() - job.startedAt) / 1000)} s`);
-    else m.log("grade-error", job.failure ?? "?");
-  }, [cp, job, job?.status]);
-
   if (!cp) {
     return (
       <main className="mx-auto max-w-3xl space-y-4 p-6" lang="es">
@@ -293,6 +286,16 @@ export default function ResultsScreen() {
 
       <Stats cp={cp} />
 
+      {job && import.meta.env.DEV && job.status === "done" && (
+        <button
+          type="button"
+          className="text-sm text-slate-500 underline"
+          onClick={() => regrade(cp)}
+        >
+          {t.results.devRegrade}
+        </button>
+      )}
+
       {job ? (
         <Grading cp={cp} job={job} level={level} />
       ) : (
@@ -300,7 +303,7 @@ export default function ResultsScreen() {
           <button
             type="button"
             className="rounded-lg bg-emerald-700 px-5 py-3 font-semibold text-white"
-            onClick={() => startGrading(cp, getSpeech().recognizer.avgConfidence)}
+            onClick={() => regrade(cp)}
           >
             {t.results.gradeNow}
           </button>

@@ -30,7 +30,7 @@ function fakeStream(text: string, stop = "end_turn", opts: { throwAfter?: number
         yield { type: "content_block_delta", index: 0, delta: { type: "text_delta", text: c } };
       }
     },
-    finalMessage: async () => ({ stop_reason: stop, content: [] }),
+    finalMessage: async () => ({ stop_reason: stop, content: [], usage: { input_tokens: 6_000, output_tokens: 3_000, cache_read_input_tokens: null } }),
   };
 }
 
@@ -97,7 +97,7 @@ describe("POST /api/grade", () => {
     const deltas = ev.filter((e) => e.t === "delta").map((e) => (e as { v: string }).v);
     expect(deltas.length).toBeGreaterThan(1);
     expect(deltas.join("")).toBe(GOOD);
-    expect(ev[ev.length - 1]).toEqual({ t: "done", grade: SAMPLE_GRADE });
+    expect(ev[ev.length - 1]).toEqual({ t: "done", grade: SAMPLE_GRADE, usage: { input: 6_000, output: 3_000 } });
   });
 
   it("calls GRADE_MODEL with structured outputs, medium effort, the descriptors and the request's signal", async () => {
@@ -128,6 +128,8 @@ describe("POST /api/grade", () => {
     const afterReset = ev.slice(ev.findIndex((e) => e.t === "reset") + 1);
     expect(afterReset.filter((e) => e.t === "delta").map((e) => (e as { v: string }).v).join("")).toBe(GOOD);
     expect(ev[ev.length - 1]?.t).toBe("done");
+    // Both attempts are billed.
+    expect((ev[ev.length - 1] as { usage: unknown }).usage).toEqual({ input: 12_000, output: 6_000 });
   });
 
   it("retries once after a refusal or a network error, then reports the error", async () => {

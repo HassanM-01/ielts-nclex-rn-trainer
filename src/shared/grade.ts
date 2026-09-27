@@ -133,10 +133,16 @@ export type GradeKey = (typeof GRADE_KEYS)[number];
 export type GradeEvent =
   | { t: "delta"; v: string }
   | { t: "reset" }
-  | { t: "done"; grade: Grade }
+  | { t: "done"; grade: Grade; usage: GradeUsage }
   | { t: "error"; code: GradeErrorCode };
 
 export type GradeErrorCode = "upstream" | "refusal" | "incomplete";
+
+/** Tokens billed for the grade, all attempts included (for the cost log). */
+export interface GradeUsage {
+  input: number;
+  output: number;
+}
 
 // ---- pure helpers ----------------------------------------------------------------
 

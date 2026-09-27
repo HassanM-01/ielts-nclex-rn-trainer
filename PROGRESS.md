@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 5 (grading, streamed and structured, and the results screen)
-- **State:** built (2026-09-26), awaiting Hassan's checkpoint (HUMAN_GUIDE Stage 5). See "Checkpoint for Hassan" below.
-- **Waiting on:** Hassan's Stage 5 result (two graded full tests).
+- **State:** built (2026-09-26). Test A (2026-09-27) scored 7.0 (below the 7.5 bar), so the grading prompt was recalibrated. Waiting for Hassan to regrade Test A and then run Test B. See "Checkpoint for Hassan" below.
+- **Waiting on:** Hassan's Test A regrade and Test B result, plus a decision on the examiner-voice start latency (open questions).
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
 ## Step 5 plan (approved 2026-09-25)
@@ -61,7 +61,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
-| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | |
+| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade and Test B pending. |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
@@ -83,6 +83,28 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-27: step 5 Test A result and calibration fixes.**
+
+Hassan's Test A (himself, Edge 154, Yeti, Ava Multilingual Online Natural): FC 7, LR 8, GR 7, overall 7.0. A native speaker should score about 8+, so the grading is off by the Stage 5 rule. The evidence shows why:
+1. **It counted recogniser errors as grammar errors.** "This facial expressions" was quoted under grammar even though the grader itself flagged it as "His facial expressions" under pronunciation. It also quoted "you you" and a stray full stop ("So. We were brought up."). Edge adds punctuation; the prompt said there was none.
+2. **It treated a few one-off slips as systematic.** "costed" and "remember of" appeared in roughly 1,100 words of complex speech. Band 8 allows "a few basic errors may persist"; band 9 allows native-speaker "mistakes".
+3. **It penalised "you know" / "right?" as filler and called short Part 1 answers underdeveloped.** Band 7 lists discourse markers as a strength, and Part 1 expects 1 to 3 sentences.
+
+Prompt changes (`api/prompts/grade-ielts.md`; SPEC rules unchanged, including "when torn, choose the lower band"):
+- Punctuation is the recogniser's.
+- Check whether the recogniser could have produced an error before quoting it; anything flagged under pronunciation can't also count against grammar or vocabulary.
+- Weigh errors against the amount of speech, and separate systematic errors from one-off slips (per the band 8 and 9 descriptors).
+- Discourse markers only count against him when they replace content or fill silence.
+- Complete Part 1 answers of 1 to 3 sentences are not a weakness.
+- Julio's real problems (the same tense, agreement or article errors again and again) still count fully, so Test B should stay low. That's what Test B checks.
+
+Measurement fixes:
+- **"Exam end → first band" had n = 0 in his report**, and there was no `grade-done` event. Both were recorded by the results screen's render effects, which don't run while the tab is in the background (or they missed their moment). They're now recorded by the grading job itself (`watchGradeJob` in `exam-session.ts`). The row is renamed "Exam end → first band ready". `grade-done` now logs the time to first band, the total time, and the tokens billed (the server sends `usage` in the `done` event).
+- **"Exam end → local stats on screen" was 334 ms** (limit 200). React holds a lazy route's content for about 300 ms after its fallback shows, even when the chunk is already loaded. Once prefetched, the results screen now renders directly: 5 ms from navigation in Claude's browser.
+- **New dev-only "Volver a calificar" button** (only under `npm run dev`) rescores the last exam's saved transcript with the current prompt, so calibration doesn't need a new 13-minute test each time.
+
+Typecheck, 338 tests and the build pass; the bundle is clean.
 
 **2026-09-26: step 5 built.** `npm run typecheck` (app, `/api`, scripts), `npm test` (338 tests, up from 282) and `npm run build` all pass. The browser bundle contains no SDK, zod or secret names (checked). No model was called: every test mocks the SDK, and the browser checks used a stubbed stream.
 
@@ -388,6 +410,10 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
+**Next (2026-09-27): regrade Test A, then Test B.**
+1. `npm run dev`, open http://localhost:3000/resultados in Edge. Test A is still the saved exam, as long as no other exam was started since. Press "Volver a calificar (solo en desarrollo…)" (about US$0.10 to 0.20). Expected: about 8 or higher. Report the three bands, and the `grade-done` line from "Copy report" on `/lab` (time to first band, tokens).
+2. Then run Test B (below) as a B1 speaker. Starting it replaces Test A as the saved exam.
+
 **Step 5: calibrate the grading (HUMAN_GUIDE.md Stage 5, about 40 minutes).** Each graded test costs about US$0.10 to 0.20; each "Reintentar" comparison is under a cent.
 
 Setup: `npm run dev`, then http://localhost:3000 in Edge, with headphones. Choose "Examen completo". Press Shift+D any time to see the numbers.
@@ -409,7 +435,7 @@ For both, check:
 
 Report back:
 - Both tests' bands per criterion and the overall.
-- From Shift+D: "Exam end → first band on screen" and "Exam end → local stats on screen".
+- From Shift+D: "Exam end → first band ready" and "Exam end → local stats on screen".
 - If a score looks off, paste one criterion's evidence and band so the prompt can be adjusted.
 - Anything odd (Reintentar, replay, messages). "Copy report" on `/lab` includes the `grade-start` / `grade-done` / `grade-error` events.
 - If the first band takes longer than 90 s, say so. The first lever is `effort: "low"` (SPEC 4), before any model change.
@@ -475,6 +501,8 @@ New decisions during the build go below with a date.
   - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
   - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
 
+- 2026-09-27 (step 5 calibration, following HUMAN_GUIDE Stage 5 "Claude Code can adjust the prompt"): the grading prompt's recogniser, error-weighting, discourse-marker and Part 1-length rules, as described under "Last session". SPEC 11's rules are unchanged.
+
 - 2026-09-26 (step 5 implementation choices within the spec and the approved plan):
   - The grader doesn't receive the opening (name, identification): IELTS doesn't assess it, and it keeps Julio's name out of the request.
   - Under 30 words in all answers, no model call; the results screen explains in Spanish.
@@ -492,6 +520,12 @@ New decisions during the build go below with a date.
   - `/transcripcion` stays as an alias of the new `/resultados`.
 
 ## Open questions
+
+- **Examiner voice start latency (decision for Hassan, 2026-09-27).** "Commit → examiner audio (scripted)" was 378 / 1,000 ms (p50 / p95, n = 20) against 400 / 800, and "click → examiner speaking" was 1,045 ms (n = 1, limit 1,000). Both are Edge's online Natural voice starting slowly ("speak() → voice start" p95 1,043 ms), not our code. This is the second run over the p95 limit (the first was 822 ms). The options:
+  - (a) Accept it for the online Natural voice.
+  - (b) Lower the no-start fallback from 1.5 s to about 0.6 s, so a slow sentence switches to a local voice. The p95 would be met, but the voice would sometimes change mid-line and sound robotic.
+  - (c) Keep watching it on Julio's connection after deploy.
+  - Recommendation: (c) with (a) as the default. The natural voice matters more to Julio than 200 ms on 1 line in 20; revisit if his numbers are worse.
 
 - **Part 3 AI latency** (2026-09-25: within budget on the retest, 214 / 823 ms with n = 2, because the speculative replies were ready at commit; re-measure once deployed in step 6). Earlier notes:
   - **The numbers:** commit → examiner audio (AI) was 1,060 / 1,814 ms (p50 / p95, n = 3) against 700 / 1,200. The model's reply took 1.6 to 2.1 s end to end. That was under `vercel dev` on Hassan's PC, where the function runs locally and compiles on first use, so the deployed iad1 function may well be faster.
@@ -532,3 +566,4 @@ New decisions during the build go below with a date.
 | 2026-09-25 | Rebuild of the 15 health cards' Part 3 sets (estimated ~$0.50; more because of the avoid list) | US$1.06 |
 | 2026-09-23 to 25 | Part 3 examiner testing (Haiku 4.5, a few dozen calls) | under US$0.10 (estimate) |
 | 2026-09-26 | Step 5 build: no model calls (all mocked or stubbed) | US$0 |
+| 2026-09-27 | Hassan's Test A: 1 grade (claude-opus-5-5) + Part 3 examiner calls | about US$0.15 (estimate; tokens weren't logged yet) |

@@ -38,7 +38,7 @@ export const LATENCY_LABELS: Record<LatencyName, string> = {
   rec_final_lag: "Voice end → final text",
   examiner_reply: "Examiner request → reply (model)",
   stats_on_screen: "Exam end → local stats on screen",
-  grade_first_band: "Exam end → first band on screen",
+  grade_first_band: "Exam end → first band ready",
 };
 
 export interface LogEvent {

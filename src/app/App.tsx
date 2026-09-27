@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { DebugOverlay } from "../components/DebugOverlay";
 import { ExamScreen } from "../exam/ExamScreen";
-import { loadResultsScreen } from "../results/load";
+import { loadedResultsScreen, loadResultsScreen } from "../results/load";
 import { Home } from "./Home";
 import { usePath } from "./router";
 
@@ -20,12 +20,16 @@ function Route({ path }: { path: string }) {
       return <ExamScreen />;
     case "/resultados":
     // The step 2 transcript page's old address.
-    case "/transcripcion":
-      return (
+    case "/transcripcion": {
+      const Loaded = loadedResultsScreen();
+      return Loaded ? (
+        <Loaded />
+      ) : (
         <Suspense fallback={null}>
           <ResultsScreen />
         </Suspense>
       );
+    }
     default:
       return <Home />;
   }

@@ -14,6 +14,7 @@ import {
   type GradeEvent,
   type GradeMode,
   type GradeRequest,
+  type GradeUsage,
 } from "../shared/grade";
 import type { ExamCheckpoint } from "../session/checkpoint";
 import { getToken } from "../session/token-client";
@@ -77,9 +78,14 @@ export interface GradeJob {
   text: string;
   partial: PartialResult;
   grade: Grade | null;
-  /** performance.now() when the request went out, and when the first criterion closed. */
+  /** performance.now() when the request went out, when the first criterion closed, and when it ended. */
   startedAt: number;
   firstBandAt: number | null;
+  endedAt: number | null;
+  /** Tokens billed (from the server), once done. */
+  usage: GradeUsage | null;
+  /** Loaded from localStorage rather than graded now. */
+  fromStorage: boolean;
 }
 
 let job: GradeJob | null = null;
@@ -144,9 +150,21 @@ export function startGrading(
   if (existing && !opts.force && existing.status !== "error") return existing;
   const saved = opts.force ? null : loadSavedGrade(cp.id);
   const now = performance.now();
-  const base: GradeJob = { sessionId: cp.id, status: "streaming", failure: null, text: "", partial: EMPTY, grade: null, startedAt: now, firstBandAt: null };
+  const base: GradeJob = {
+    sessionId: cp.id,
+    status: "streaming",
+    failure: null,
+    text: "",
+    partial: EMPTY,
+    grade: null,
+    startedAt: now,
+    firstBandAt: null,
+    endedAt: null,
+    usage: null,
+    fromStorage: false,
+  };
   if (saved) {
-    job = { ...base, status: "done", grade: saved, firstBandAt: now };
+    job = { ...base, status: "done", grade: saved, firstBandAt: now, endedAt: now, fromStorage: true };
     changed();
     return job;
   }
@@ -168,6 +186,7 @@ async function run(j: GradeJob, body: GradeRequest, signal: AbortSignal, fetchIm
   const fail = (failure: GradeFailure) => {
     j.status = "error";
     j.failure = failure;
+    j.endedAt = performance.now();
     changed();
   };
   const token = await getToken();
@@ -223,13 +242,15 @@ function applyEvent(j: GradeJob, e: GradeEvent): boolean {
       return true;
     case "done": {
       const grade = normalizeGrade(e.grade);
+      j.endedAt = performance.now();
       if (!grade) {
         j.status = "error";
         j.failure = "server";
       } else {
         j.grade = grade;
+        j.usage = e.usage ?? null;
         j.status = "done";
-        j.firstBandAt ??= performance.now();
+        j.firstBandAt ??= j.endedAt;
         saveGrade(j.sessionId, grade);
       }
       changed();
@@ -238,6 +259,7 @@ function applyEvent(j: GradeJob, e: GradeEvent): boolean {
     case "error":
       j.status = "error";
       j.failure = "server";
+      j.endedAt = performance.now();
       changed();
       return false;
   }

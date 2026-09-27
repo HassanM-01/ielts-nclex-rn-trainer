@@ -197,6 +197,7 @@ export const es = {
       server: "El servidor no pudo calificar tu examen esta vez. Tus respuestas están guardadas.",
     },
     tryAgain: "Intentar de nuevo",
+    devRegrade: "Volver a calificar (solo en desarrollo; cuesta otra calificación)",
     backHome: "Volver al inicio",
   },
 

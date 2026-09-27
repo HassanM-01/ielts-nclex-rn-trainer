@@ -6,7 +6,7 @@
 import { useFrameSubscription } from "../app/speech";
 import { FIXED_SET } from "../exams/ielts-fixed-set";
 import { buildIeltsScript, IELTS_ENDPOINTING, type ScriptMode } from "../exams/ielts";
-import { currentGradeJob, startGrading } from "../grading/grade-client";
+import { currentGradeJob, startGrading, subscribeGrade } from "../grading/grade-client";
 import { startPart2Recording, stopPart2Recording } from "../grading/part2-audio";
 import { conditionsLevel, DEFAULT_LEVEL } from "../levels/levels";
 import type { SpeechController } from "../speech/controller";
@@ -76,9 +76,9 @@ function launch(speech: SpeechController, cp: ExamCheckpoint, clickAt: number): 
     save: (c) => void saveCheckpoint(c),
     // One client per exam: its guard counts the 40-request session cap.
     examiner: new ExaminerClient(() => getToken()),
-    onClosing: () => beginGrading(speech, cp, true),
+    onClosing: () => beginGrading(speech, cp, true, () => engine.endedAt),
     // "Terminar" skips the closing line: grade what exists.
-    onFinish: () => beginGrading(speech, cp, false),
+    onFinish: () => beginGrading(speech, cp, false, () => engine.endedAt),
     onMonologue: (on) => (on ? startPart2Recording(cp.id, speech.vad?.stream) : stopPart2Recording()),
   });
   active = engine;
@@ -92,10 +92,43 @@ function launch(speech: SpeechController, cp: ExamCheckpoint, clickAt: number): 
  * "Terminar" skipped it. A second call is a no-op, even after a failure
  * (the results screen offers "Intentar de nuevo").
  */
-function beginGrading(speech: SpeechController, cp: ExamCheckpoint, reachedClosing: boolean): void {
+function beginGrading(speech: SpeechController, cp: ExamCheckpoint, reachedClosing: boolean, examEndedAt: () => number | null): void {
   if (currentGradeJob(cp.id)) return;
   const job = startGrading(cp, speech.recognizer.avgConfidence, { reachedClosing });
   speech.metrics.log("grade-start", `${cp.mode}: ${job.status}`);
+  watchGradeJob(speech, cp.id, examEndedAt);
+}
+
+/**
+ * Logs how the current grading job went ("grade-done" with timings and
+ * tokens, or "grade-error") and, for an exam that just ended, records
+ * "exam end → first band". Done here rather than by the results screen, so
+ * a background tab (which doesn't render) still gets its numbers.
+ */
+export function watchGradeJob(speech: SpeechController, sessionId: string, examEndedAt: () => number | null = () => null): void {
+  const job = currentGradeJob(sessionId);
+  if (!job || job.status !== "streaming") return;
+  const m = speech.metrics;
+  let bandRecorded = false;
+  const secs = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
+  const check = () => {
+    const j = currentGradeJob(sessionId);
+    if (j !== job) return unsub();
+    const ended = examEndedAt();
+    if (!bandRecorded && j.firstBandAt !== null && ended !== null) {
+      bandRecorded = true;
+      m.record("grade_first_band", Math.max(0, j.firstBandAt - ended));
+    }
+    if (j.status === "streaming") return;
+    if (j.status === "done") {
+      const u = j.usage ? `, ${j.usage.input} input / ${j.usage.output} output tokens` : "";
+      m.log("grade-done", `first band ${secs((j.firstBandAt ?? j.startedAt) - j.startedAt)} after the request, all ${secs((j.endedAt ?? j.startedAt) - j.startedAt)}${u}`);
+    } else {
+      m.log("grade-error", j.failure ?? "?");
+    }
+    unsub();
+  };
+  const unsub = subscribeGrade(check);
 }
 
 /** Re-render on engine changes, at most once per frame. */
