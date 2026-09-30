@@ -4,6 +4,7 @@
 // at runtime and nothing server-side reaches the browser.
 
 import type { IeltsItems } from "../exams/ielts";
+import type { LevelId } from "../levels/levels";
 
 export interface ExchangeEntry {
   role: "examiner" | "candidate";
@@ -62,9 +63,31 @@ export interface SessionStartResponse {
   items: IeltsItems | null;
   /** The season file the questions came from, if any. */
   season: string | null;
+  /**
+   * From the database (step 6); null / empty when it's unavailable, in
+   * which case there is no cap and no repeat filter (SPEC 4).
+   */
+  profile: {
+    level: LevelId;
+    /** 90th percentile of his mid-answer pauses in the last session (ms). */
+    pauseP90Ms: number | null;
+    testDate: string | null;
+  } | null;
+  /** Saved words due for review (up to 30), for the grader and Home. */
+  dueWords: { word: string; es: string }[];
+  /** The last graded full test, for Home ("distance to 7.0"). */
+  lastFull: { overall: number; startedAt: string } | null;
 }
 
-export type ApiErrorCode = "unauthorized" | "bad-request" | "not-configured" | "upstream" | "wrong-passphrase";
+export type ApiErrorCode =
+  | "unauthorized"
+  | "bad-request"
+  | "not-configured"
+  | "upstream"
+  | "wrong-passphrase"
+  /** DAILY_SESSION_CAP reached (session-start and grade). */
+  | "daily-cap"
+  | "not-found";
 
 export interface ApiError {
   error: ApiErrorCode;

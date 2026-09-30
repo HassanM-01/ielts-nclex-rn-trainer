@@ -160,6 +160,49 @@ describe("POST /api/grade", () => {
   });
 });
 
+describe("POST /api/grade daily cap (step 6)", () => {
+  const fetchMock = vi.fn();
+  beforeEach(() => {
+    vi.stubEnv("SUPABASE_URL", "https://db.example.supabase.co");
+    vi.stubEnv("SUPABASE_SECRET_KEY", "sb_secret_test");
+    vi.stubEnv("DAILY_SESSION_CAP", "3");
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("counts the grade with one atomic RPC before calling the model", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ allowed: true, count: 2 })));
+    streamMock.mockReturnValue(fakeStream(GOOD));
+    const ev = await events(await POST(req(REQ)));
+    expect(ev[ev.length - 1]?.t).toBe("done");
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe("https://db.example.supabase.co/rest/v1/rpc/grade_admit");
+    expect(JSON.parse(init.body as string)).toEqual({ cap: 3 });
+  });
+
+  it("refuses past the cap without calling the model", async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ allowed: false, count: 3 })));
+    const res = await POST(req(REQ));
+    expect(res.status).toBe(429);
+    expect(await res.json()).toEqual({ error: "daily-cap" });
+    expect(streamMock).not.toHaveBeenCalled();
+  });
+
+  it("grades anyway when the database can't answer", async () => {
+    fetchMock.mockRejectedValue(new TypeError("fetch failed"));
+    streamMock.mockReturnValue(fakeStream(GOOD));
+    const ev = await events(await POST(req(REQ)));
+    expect(ev[ev.length - 1]?.t).toBe("done");
+  });
+
+  it("doesn't count a request with a bad token or body", async () => {
+    await POST(req(REQ, null));
+    await POST(req({ ...REQ, level: 9 }));
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
 describe("grade input and prompt", () => {
   it("accepts a well-formed request and rejects malformed answers", () => {
     expect(parseGradeRequest(REQ)).toEqual(REQ);

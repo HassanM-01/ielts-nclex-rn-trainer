@@ -4,12 +4,15 @@
 // validate input, call the model, stream.
 //
 // One retry, only on max_tokens, a refusal or a network error; the browser
-// is told to drop the first attempt's text ("reset"). The daily cap check
-// arrives with Supabase in step 6.
+// is told to drop the first attempt's text ("reset"). Before the model call,
+// one atomic increment-and-check against DAILY_SESSION_CAP (SPEC 4); if the
+// database can't answer, grading goes ahead (SPEC 4 "Resilience").
 
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { GradeErrorCode, GradeEvent, GradeUsage } from "../src/shared/grade";
+import { dailyCap } from "./_lib/auth.js";
+import { dbConfigured, rpc } from "./_lib/db.js";
 import { buildGradeMessage, GradeOutput, gradeSystemPrompt, parseGradeRequest, type GradeOutputType } from "./_lib/grade-prompt.js";
 import { error, readJson } from "./_lib/http.js";
 import { bearer, verifyToken } from "./_lib/token.js";
@@ -66,6 +69,19 @@ async function attempt(
   }
 }
 
+/** grade_admit(): counts this grade and says whether it is within the cap. */
+async function admitted(): Promise<boolean> {
+  if (!dbConfigured()) return true;
+  try {
+    const r = await rpc<{ allowed: boolean }>("grade_admit", { cap: dailyCap() }, 2_000);
+    return r?.allowed !== false;
+  } catch {
+    // A 50 ms read is invisible next to grading, but a database outage must
+    // not block it: the client guard (one grade per session) still applies.
+    return true;
+  }
+}
+
 export async function POST(request: Request): Promise<Response> {
   const secret = process.env.SESSION_SECRET;
   const model = process.env.GRADE_MODEL;
@@ -74,6 +90,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const body = parseGradeRequest(await readJson(request, 200_000));
   if (!body) return error("bad-request", 400);
+  if (!(await admitted())) return error("daily-cap", 429);
 
   const params = {
     model,
