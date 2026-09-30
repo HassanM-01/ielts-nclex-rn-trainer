@@ -5,17 +5,18 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 6 (Supabase persistence, History, Vocab, keepalive cron, deploy)
-- **State:** step 5 done (2026-09-30). The step 6 plan below is PROPOSED, waiting for Hassan's go-ahead.
-- **Waiting on:** Hassan's go-ahead on the step 6 plan, and HUMAN_GUIDE Stage 6a (Supabase project, keys, CRON_SECRET) before the database parts can be tested.
+- **State:** built locally (2026-09-30). Everything that doesn't need the live database is done and tested. The database parts are tested against a mocked Supabase only, because the schema hasn't been created yet.
+- **Waiting on:** Hassan running `supabase/migrations/0001_init.sql` (HUMAN_GUIDE Stage 6b). Then Claude verifies the schema read-only, and then Hassan says whether to push (Stage 6c).
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
-## Step 6 plan (proposed 2026-09-30, not approved yet)
+## Step 6 plan (approved by Hassan 2026-09-30; built, see "Last session" and Decisions for how)
 
 - **Migrations** (`supabase/migrations/0001_init.sql`), per SPEC 12:
   - The tables `profile`, `sessions`, `vocab`, `case_flags`, `usage` and `heartbeat`, with explicit GRANTs for `service_role` (SPEC 4). RLS is on, with no public policies.
   - Two RPCs:
     - `session_start_info()`: today's count, the last 5 sessions' Part 1 topic ids, the last 10 sessions' card ids, the profile row, and up to 30 saved words due for review.
-    - `grade_admit(day, cap)`: an atomic increment-and-check.
+    - `grade_admit(cap)`: an atomic increment-and-check.
+    - Also built: `save_session(s)` (the upsert plus profile and vocab updates, one round trip) and `keepalive()`.
   - Hassan runs the SQL (Stage 6b).
 - **Server** (`api/_lib/db.ts`): plain `fetch` to Supabase's REST/RPC endpoints with `SUPABASE_SECRET_KEY`, and a short timeout. No `supabase-js`, so cold starts stay light and nothing can leak into the browser bundle.
   - `/api/session-start`: the one RPC. It refuses at `DAILY_SESSION_CAP`, applies the repeat filter, and returns the level and saved words. If Supabase fails, it keeps today's behaviour.
@@ -41,16 +42,17 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Deferred to later steps (don't forget)
 
 Step 6 (Supabase, History, Vocab, deploy):
-- [ ] `/api/session-start`: the one RPC (today's count, recent topic ids, profile row); refuse a token at `DAILY_SESSION_CAP`; pass `recent` (last 5 sessions' Part 1 ids, last 10 sessions' card ids) to `selectItems`; return the level and up to 30 saved words due. On Supabase failure keep today's behaviour (token plus questions, no cap, no filter).
-- [ ] `/api/grade`: one atomic increment-and-check against the daily cap before calling the model.
-- [ ] Vocab: move words saved in localStorage (step 5 "Guardar") into the `vocab` table, then read and write through `/api/vocab`.
-- [ ] Profile: store `pause_p90` after each session and apply `personalBaseMs()` (already written and tested in `src/session/endpointing.ts`) to the next session's endpointing.
-- [ ] Save sessions (upsert by client uuid) with transcript, metrics snapshot and grade; keep the finished checkpoint in localStorage until the save succeeds.
-- [ ] Deploy: SPA rewrite to `index.html` for `/lab`, `/examen`, `/resultados` and `/transcripcion` (now an alias of `/resultados`); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
-- [ ] Grading: save the grade with the session (today it's in localStorage `exam.grade.v1`, last session only); send up to 30 saved words due for review in `savedWords` (the field and prompt line exist, always empty now); count `saved_words_used` toward mastery (3 correct uses).
+- [x] `/api/session-start`: the one RPC (today's count, recent topic ids, profile row); refuse a token at `DAILY_SESSION_CAP`; pass `recent` (last 5 sessions' Part 1 ids, last 10 sessions' card ids) to `selectItems`; return the level and up to 30 saved words due. On Supabase failure keep today's behaviour (token plus questions, no cap, no filter).
+- [x] `/api/grade`: one atomic increment-and-check against the daily cap before calling the model.
+- [x] Vocab: move words saved in localStorage (step 5 "Guardar") into the `vocab` table, then read and write through `/api/vocab`.
+- [x] Profile: store `pause_p90` after each session and apply `personalBaseMs()` (already written and tested in `src/session/endpointing.ts`) to the next session's endpointing.
+- [x] Save sessions (upsert by client uuid) with transcript, metrics snapshot and grade; keep the finished checkpoint in localStorage until the save succeeds.
+- [ ] Deploy (rewrites, gate and cron built; the push and the re-measure wait for Stage 6c): SPA rewrite to `index.html` for `/lab`, `/examen`, `/resultados` and `/transcripcion` (now an alias of `/resultados`); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
+- [x] Grading: save the grade with the session (today it's in localStorage `exam.grade.v1`, last session only); send up to 30 saved words due for review in `savedWords` (the field and prompt line exist, always empty now); count `saved_words_used` toward mastery (3 correct uses).
 
 Step 7 (levels, Ayuda, quick practice):
-- [ ] Level from `profile` (placement from the first full test) instead of `DEFAULT_LEVEL`; the move-up / move-down suggestions.
+- [ ] Level from `profile` (placement from the first full test) instead of `DEFAULT_LEVEL`; the move-up / move-down suggestions. `/api/session-start` already returns `profile.level` (`sessionInfo()` in the browser), and nothing uses it yet. Placement needs a way to write `profile.level` / `placement_done` (no route for that yet).
+- [ ] Settings: the optional IELTS test date (`profile.ielts_test_date`; session-start already uses it for the season), voice and accent, the manual level override.
 - [ ] Send the card's `useful_words` and `help` (already in the bank, not yet in `IeltsItems`) to the browser for the cue card and the Ayuda panel; log Ayuda use per question and pass it to the grader.
 - [ ] "Práctica rápida" mode (one card plus the first 2 questions of its Part 3 set) in the mode selector and `buildIeltsScript`.
 
@@ -64,7 +66,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
 | 5 | Grading (streamed, structured) and results screen | done | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. 2026-09-30 Test B (Hassan as a B1 speaker): FC 4, LR 4, GR 4, overall 4.0 (expected 4.5 to 5.5; the "off" line is above 6). 2026-09-30: Hassan confirmed the other checks (Reintentar, Guardar, Part 2 replay, partial practice) and called step 5 a pass. Test B first band 27.1 s after the request (exam end → first band 22.1 s), 45.6 s total. |
-| 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
+| 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | in progress (built locally; waiting for Stage 6b, then 6c) | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
 
@@ -85,6 +87,50 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-30 (third part): step 6 built locally.**
+- `npm run typecheck`, `npm test` (378 tests, up from 339) and `npm run build` pass. The bundle contains no SDK, zod, Supabase or secret names (checked).
+- Hassan approved the plan and asked that every change be written down for future sessions; they're all under Decisions (2026-09-30, step 6).
+
+Built:
+- **Database:** `supabase/migrations/0001_init.sql` (not run yet; Stage 6b).
+  - The six SPEC 12 tables, with RLS on, no policies, and explicit grants to `service_role`.
+  - Functions: `julio_today()`, `session_start_info()`, `grade_admit(cap)`, `save_session(s jsonb)` and `keepalive()`, executable only by `service_role`.
+  - It can be run again safely ("if not exists" / "or replace").
+- **Server:**
+  - `api/_lib/db.ts`: plain `fetch` to Supabase REST, secret key on the `apikey` header only (per Supabase's API-keys docs), with timeouts.
+  - `api/_lib/auth.ts`: the passphrase header `x-app-passphrase`, and `dailyCap()`.
+  - `api/_lib/persistence.ts`: validation and row mapping.
+  - `/api/session-start`: one RPC (1.5 s timeout), refuses at the cap (429 `daily-cap`), applies the repeat filter, and returns `profile`, `dueWords` and `lastFull`. If Supabase fails, it returns a token and questions with no cap and no filter (tested).
+  - `/api/grade`: `grade_admit` before the model call (429 past the cap). If the database fails, it grades anyway.
+  - New routes: `/api/sessions` (POST, upsert), `/api/history` (GET the list, or one session with `?id=`), `/api/vocab` (GET; POST `save` or `mastered`) and `/api/keepalive` (GET, `Authorization: Bearer CRON_SECRET`).
+- **Browser:**
+  - `src/persistence/api.ts`: the passphrase-header client.
+  - `src/persistence/save-client.ts`: the save queue in localStorage `sessions.pending.v1`, with backoff and retries.
+  - Vocab "Guardar": saved locally, then synced to `/api/vocab`; step 5's localStorage words are sent on the next sync.
+  - The exam session saves at the end, and again with the grade. Saved words due for review go to the grader and are counted toward mastery.
+  - The personal pause calibration is applied from the profile.
+  - The metrics store resets at each new exam.
+  - Home: the passphrase gate, the daily-cap message (Start disabled), the last full-test band and distance to 7.0, up to 10 due words, and links to History and Vocab.
+  - History (`/historial`, `/historial/<id>`): a hand-drawn SVG chart, the session list, and a detail view with the full grade and transcript (`GradeReport` is shared with the results screen).
+  - Vocab (`/vocabulario`): tags, "Usada bien n de 3 veces", and the mastered toggle.
+- **Deploy config:** `vercel.json` has explicit SPA rewrites and a daily cron (`/api/keepalive`, 12:00 UTC).
+
+Checked:
+- **Supabase credentials** (read-only probe, no values printed): the URL and `sb_secret_` key are accepted. The RPC and tables don't exist yet (PGRST202/205), as expected before Stage 6b.
+- **`vercel dev`:** all new functions load and route. A wrong passphrase gets 401 on history, vocab, sessions and keepalive (and grade without a token). `/historial`, `/historial/<uuid>` and `/vocabulario` serve the app. No server errors.
+- **Claude's browser, with stubbed APIs:**
+  - With no passphrase, Home shows only the passphrase card.
+  - After sign-in: the last band 6.5 ("Te faltan 0.5"), the due words and the links.
+  - At the cap: the Spanish message, with Start disabled.
+  - History: the chart (full tests as lines, a practice session as an "N2" dot, the dashed 7.0 line), the list, and the detail view.
+  - Vocab: the list and the mastered toggle (POST).
+  - No console errors.
+
+Not tested yet:
+- Anything against the real database (it needs Stage 6b).
+- The deployed site: rewrites, cron and production env vars (Stage 6c, after Hassan says to push).
+- `CRON_SECRET` is not in `.env.local`, but `vercel dev` does see it: keepalive answered 401, not "not configured". So it is set in Vercel.
 
 **2026-09-30 (second part): step 5 done.**
 - Hassan confirmed all remaining Stage 5 checks: "Reintentar", "Guardar" after a reload, the Part 2 replay, and a partial practice labelled "Muestra parcial".
@@ -437,7 +483,12 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Step 5 is done (2026-09-30). The step 6 checkpoint (HUMAN_GUIDE Stage 6c) will be written when step 6 is built. Before then, Stage 6a (Supabase project, keys, CRON_SECRET) is needed to test the database parts.
+**Now: Stage 6b, run the database setup (about 5 minutes).**
+1. Open `supabase/migrations/0001_init.sql` in the repo and copy all of it. It is the only migration, so there's no order to follow.
+2. In Supabase: SQL Editor, New query, paste, Run. Expected: "Success. No rows returned".
+3. Tell Claude it ran, or paste the error. Claude then checks the schema with a read-only call (`session_start_info`), writing nothing.
+
+**Then: Stage 6c, deploy (after Hassan says "push").** The first push deploys the app publicly (behind the passphrase gate). Checklist: HUMAN_GUIDE 6c. Before sending the link to Julio, Hassan may want to delete his own test sessions in Supabase (Table Editor, `sessions`), so Julio's History, repeat filter and pause calibration start clean. The profile's `pause_p90` will hold Hassan's value until Julio's first session overwrites it.
 
 ## Decisions
 
@@ -499,6 +550,39 @@ New decisions during the build go below with a date.
   - Claude compiles the reported Sep–Dec 2026 Part 2 titles from 2–3 prep sites (titles only, sources noted here) to complete the season file; Hassan reviews them in 4c.
   - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
   - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
+
+- 2026-09-30 (step 6 implementation choices within SPEC 4, 9 and 12; Hassan: "make sure if you make any changes, you note it down"):
+  - **Supabase access:** plain `fetch` to its REST API from the server functions, with no `supabase-js`. The `sb_secret_` key goes on the `apikey` header only; Supabase's docs say secret keys aren't JWTs and must not be sent as `Authorization: Bearer`.
+  - **Schema additions beyond SPEC 12:**
+    - `profile.id` (always 1, a single row);
+    - `sessions.saved_at`;
+    - `vocab.created_at` (for "due" ordering);
+    - `case_flags.id`;
+    - `heartbeat.id` and `beat_at`.
+    - Words are the `vocab` primary key, checked to be lowercase.
+  - **Daily cap:**
+    - "Today" is Julio's day (America/Mexico_City), so the count resets at his midnight.
+    - `usage.sessions` counts graded sessions: `grade_admit` adds one and refuses (undoing it) past `DAILY_SESSION_CAP`. Regrades and "Intentar de nuevo" count too, since they cost the same.
+    - `/api/session-start` refuses a token when today's count is at or over the cap. Home then shows a Spanish message and disables "Empezar examen"; the mic check still works.
+    - If the database can't answer, both routes go ahead (SPEC 4 "Resilience"). The client guard of one grade per session still applies.
+  - **Repeat filter:** `sessions.topic_ids` holds the Part 1 topic ids plus the Part 2 card id the mode used. It covers the last 5 IELTS sessions for Part 1 and the last 10 for Part 2, in any mode.
+  - **Saving:**
+    - Each session is saved twice, both upserts by its uuid: when the exam ends (no grade) and when the grade arrives.
+    - `save_session` never lets a save without a grade erase one. It counts saved-word reviews only the first time a graded save arrives: `times_seen` +1 for each due word sent to the grader; `times_used_correctly` +1 for each word in `saved_words_used`; mastered at 3. It also stores `pause_p90` on the profile.
+    - Pending saves wait in localStorage `sessions.pending.v1` (at most 5), with retries after 2, 5, 15 and 60 s, on `online`, and on each Home visit. A 400 (malformed) is dropped rather than retried forever.
+  - **Session fields:** `sessions.level` is the conditions level (a full test is 3); the level feedback aimed at is in `transcript.feedbackLevel`. `metrics` is the metrics snapshot plus `fluency` (the local stats); the browser, voice, mic and recogniser are in its `info`.
+  - **Per-exam metrics:** starting a new exam (not a resume) resets the metrics store, so the Shift+D overlay, "Copy report" and `sessions.metrics` cover that exam only. This is also the fix for the unreset numbers in Test B's report.
+  - **"Due for review":** words not yet mastered, ordered by fewest correct uses, then fewest times seen, then oldest. Up to 30 go to the grader and up to 10 show on Home.
+  - **Personal pause calibration (SPEC 8):** applied to the opening, Part 1 and round-off questions (default 2.5 s) and to Part 3 answers (3.5 s), via `personalBaseMs()`. The Part 2 long turn keeps its own rules. The value is stored on the checkpoint, so a resumed exam uses the same one.
+  - **The level from the profile** is returned but not applied yet. That's step 7 (placement); feedback still aims at Nivel 2.
+  - **Test date:** session-start uses the test date the browser sends, else `profile.ielts_test_date`. The settings screen to set it is step 7.
+  - **Passphrase routes:** `/api/sessions`, `/api/history` and `/api/vocab` take the header `x-app-passphrase` (SPEC 4). The passphrase is never put in a URL.
+  - **The passphrase gate:** Home shows only the passphrase card until a passphrase has worked on this computer, or when the server says it's wrong. An unreachable server doesn't lock out a passphrase that worked before. `/lab` isn't gated: it makes no paid calls, and every API route checks the token or passphrase itself.
+  - **"Guardar":** the word is saved in localStorage at once (so it works offline), then sent to `/api/vocab`. Unsent words, including step 5's, are sent on each Home or Vocab visit. The server ignores duplicates.
+  - **History chart:** a hand-drawn SVG on a 0 to 9 scale. It draws the overall (thick) and the three criteria as lines for graded full tests, a dashed 7.0 line, and graded practice sessions as hollow dots labelled "N<level>" (the conditions level). Ungraded sessions appear in the list only.
+  - **Vocab's "Términos NCLEX" tab** (SPEC 10) waits for Clinical mode (step 8), which builds `vocab-seed.json`.
+  - **SPEC 9 says session-start returns the examiner voice and accent pick.** That stays in the browser (step 1's rotation) because the voice list only exists there.
+  - **Deploy:** explicit SPA rewrites (`/lab`, `/examen`, `/resultados`, `/transcripcion`, `/historial`, `/historial/:id`, `/vocabulario`) and a daily cron at 12:00 UTC (Hobby allows daily).
 
 - 2026-09-30: **Step 5 passed** (Hassan). **Examiner voice start latency:** keep the online Natural voice (option a) and re-measure on Julio's connection after deploy (option c). The scripted p95 over 800 ms comes from the voice service, not the app.
 
