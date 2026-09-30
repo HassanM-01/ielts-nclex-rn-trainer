@@ -6,7 +6,7 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 
 - **Current step:** 6 (Supabase persistence, History, Vocab, keepalive cron, deploy)
 - **State:** built locally (2026-09-30). Everything that doesn't need the live database is done and tested. The database parts are tested against a mocked Supabase only, because the schema hasn't been created yet.
-- **Waiting on:** Hassan running `supabase/migrations/0001_init.sql` (HUMAN_GUIDE Stage 6b). Then Claude verifies the schema read-only, and then Hassan says whether to push (Stage 6c).
+- **Waiting on:** Hassan's go-ahead to push to GitHub (Stage 6c). Stage 6b is done and verified (2026-09-30, see "Last session").
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
 ## Step 6 plan (approved by Hassan 2026-09-30; built, see "Last session" and Decisions for how)
@@ -66,7 +66,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
 | 5 | Grading (streamed, structured) and results screen | done | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. 2026-09-30 Test B (Hassan as a B1 speaker): FC 4, LR 4, GR 4, overall 4.0 (expected 4.5 to 5.5; the "off" line is above 6). 2026-09-30: Hassan confirmed the other checks (Reintentar, Guardar, Part 2 replay, partial practice) and called step 5 a pass. Test B first band 27.1 s after the request (exam end → first band 22.1 s), 45.6 s total. |
-| 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | in progress (built locally; waiting for Stage 6b, then 6c) | |
+| 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | in progress (built; database set up and verified; waiting for the go-ahead to push, Stage 6c) | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
 
@@ -87,6 +87,16 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-30 (fourth part): Stage 6b done and verified.**
+- Hassan ran `0001_init.sql` in the Supabase SQL Editor ("Success. No rows returned").
+- Read-only check with the secret key (nothing written, no values printed):
+  - `session_start_info()` returns `{today: 0, profile: {id 1, level 2, pause_p90 null, placement_done false}, due_words: [], last_full: null, recent_part1/2: []}`.
+  - The `profile` and `heartbeat` seed rows exist; `usage`, `sessions`, `vocab` and `case_flags` are empty.
+  - The API exposes exactly the 6 tables and the 5 functions (`grade_admit`, `julio_today`, `keepalive`, `save_session`, `session_start_info`).
+- `vercel env ls` (names only): all 9 variables the functions use are set for Production: `ANTHROPIC_API_KEY`, `EXAMINER_MODEL`, `GRADE_MODEL`, `APP_PASSPHRASE`, `SESSION_SECRET`, `DAILY_SESSION_CAP`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY` and `CRON_SECRET`.
+  - The Vercel MCP connector in this session can't see this project (it's likely scoped to others), so the CLI was used.
+- Pre-push check: only `.env.example` is tracked, there are no key patterns in the tracked files, and `.gitignore` covers `.env*` and `.vercel`. There are 43 local commits not yet pushed.
 
 **2026-09-30 (third part): step 6 built locally.**
 - `npm run typecheck`, `npm test` (378 tests, up from 339) and `npm run build` pass. The bundle contains no SDK, zod, Supabase or secret names (checked).
@@ -483,12 +493,9 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Now: Stage 6b, run the database setup (about 5 minutes).**
-1. Open `supabase/migrations/0001_init.sql` in the repo and copy all of it. It is the only migration, so there's no order to follow.
-2. In Supabase: SQL Editor, New query, paste, Run. Expected: "Success. No rows returned".
-3. Tell Claude it ran, or paste the error. Claude then checks the schema with a read-only call (`session_start_info`), writing nothing.
+Stage 6b is done (2026-09-30).
 
-**Then: Stage 6c, deploy (after Hassan says "push").** The first push deploys the app publicly (behind the passphrase gate). Checklist: HUMAN_GUIDE 6c. Before sending the link to Julio, Hassan may want to delete his own test sessions in Supabase (Table Editor, `sessions`), so Julio's History, repeat filter and pause calibration start clean. The profile's `pause_p90` will hold Hassan's value until Julio's first session overwrites it.
+**Next: Stage 6c, deploy (after Hassan says "push").** The first push deploys the app publicly (behind the passphrase gate). Checklist: HUMAN_GUIDE 6c. Before sending the link to Julio, Hassan may want to delete his own test sessions in Supabase (Table Editor, `sessions`), so Julio's History, repeat filter and pause calibration start clean. The profile's `pause_p90` will hold Hassan's value until Julio's first session overwrites it.
 
 ## Decisions
 
