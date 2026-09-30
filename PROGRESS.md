@@ -5,9 +5,9 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 6 (Supabase persistence, History, Vocab, keepalive cron, deploy)
-- **State:** built locally (2026-09-30). Everything that doesn't need the live database is done and tested. The database parts are tested against a mocked Supabase only, because the schema hasn't been created yet.
-- **Waiting on:** Hassan's go-ahead to push to GitHub (Stage 6c). Stage 6b is done and verified (2026-09-30, see "Last session").
-- **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
+- **State:** deployed to production (2026-09-30), at https://ielts-nclex-rn-trainer.vercel.app. Claude's smoke tests passed; waiting for Hassan's Stage 6c checks.
+- **Waiting on:** Hassan's HUMAN_GUIDE 6c checks on the production URL (see "Checkpoint for Hassan").
+- **Pushing:** Hassan approved pushing to main on 2026-09-30. Every push to GitHub `main` deploys to production. Keep running typecheck, tests, build and the bundle scan before each push.
 
 ## Step 6 plan (approved by Hassan 2026-09-30; built, see "Last session" and Decisions for how)
 
@@ -47,7 +47,7 @@ Step 6 (Supabase, History, Vocab, deploy):
 - [x] Vocab: move words saved in localStorage (step 5 "Guardar") into the `vocab` table, then read and write through `/api/vocab`.
 - [x] Profile: store `pause_p90` after each session and apply `personalBaseMs()` (already written and tested in `src/session/endpointing.ts`) to the next session's endpointing.
 - [x] Save sessions (upsert by client uuid) with transcript, metrics snapshot and grade; keep the finished checkpoint in localStorage until the save succeeds.
-- [ ] Deploy (rewrites, gate and cron built; the push and the re-measure wait for Stage 6c): SPA rewrite to `index.html` for `/lab`, `/examen`, `/resultados` and `/transcripcion` (now an alias of `/resultados`); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
+- [x] Deploy (pushed 2026-09-30; production smoke-tested; the latency re-measure waits for Hassan's 6c report): SPA rewrite to `index.html` for `/lab`, `/examen`, `/resultados` and `/transcripcion` (now an alias of `/resultados`); the passphrase gate; keepalive cron; `.vercelignore` already excludes `/api` tests. Then re-measure Part 3 AI latency on the deployed iad1 function (open question below).
 - [x] Grading: save the grade with the session (today it's in localStorage `exam.grade.v1`, last session only); send up to 30 saved words due for review in `savedWords` (the field and prompt line exist, always empty now); count `saved_words_used` toward mastery (3 correct uses).
 
 Step 7 (levels, Ayuda, quick practice):
@@ -66,7 +66,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
 | 5 | Grading (streamed, structured) and results screen | done | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. 2026-09-30 Test B (Hassan as a B1 speaker): FC 4, LR 4, GR 4, overall 4.0 (expected 4.5 to 5.5; the "off" line is above 6). 2026-09-30: Hassan confirmed the other checks (Reintentar, Guardar, Part 2 replay, partial practice) and called step 5 a pass. Test B first band 27.1 s after the request (exam end → first band 22.1 s), 45.6 s total. |
-| 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | in progress (built; database set up and verified; waiting for the go-ahead to push, Stage 6c) | |
+| 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | built (deployed 2026-09-30; awaiting Hassan's 6c checks) | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
 
@@ -87,6 +87,41 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-30 (fifth part): first deploy (Stage 6c, Claude's side).** Hassan said to push.
+
+Before the push (all passed):
+- typecheck, 378 tests, build;
+- the bundle scan;
+- `bank:validate`;
+- 7 functions (the Hobby limit is 12);
+- only `.env.example` tracked;
+- `main` 44 commits ahead of `origin/main` and 0 behind (a fast-forward).
+
+What went right:
+- **Push and build:** pushed `fca2ba5..7d8fcf7`. Vercel built it in 20 s and aliased it to https://ielts-nclex-rn-trainer.vercel.app. All functions run in iad1.
+- **Pages:** all SPA routes return the app (200): `/`, `/examen`, `/resultados`, `/transcripcion`, `/lab`, `/historial`, `/historial/<uuid>`, `/vocabulario`. Unknown paths return 404.
+- **Auth:** every API refuses without credentials (401).
+  - `session-start` with a wrong passphrase;
+  - `examiner` and `grade` without a token;
+  - `history`, `vocab` and `sessions` with a wrong passphrase;
+  - `keepalive` with a wrong bearer.
+- **Nothing extra deployed:** test files and `api/_lib` aren't routed (404).
+- **Bundle:** both production JS bundles have 0 hits for keys, secret names, `@anthropic-ai` or `supabase-js`.
+- **Cron:** registered (`vercel crons ls`: `/api/keepalive`, `0 12 * * *`). Triggered once with `vercel crons run`: the heartbeat moved from 19:16:23 to 19:23:30 UTC. That proves production has the right `CRON_SECRET`, `SUPABASE_URL` and `SUPABASE_SECRET_KEY`, and that the grants work from iad1.
+- **Logs:** no errors in the production runtime logs (only the smoke tests and the cron run).
+
+What went wrong or needed a workaround (none of it affects the app):
+- The Vercel MCP connector in these sessions can't see this project (`Project not found`, and an empty project search), so everything was done with the logged-in Vercel CLI: `vercel env ls`, `inspect`, `crons ls` / `run`, and `logs`.
+- Git Bash turned `/api/keepalive` into `C:/Program Files/Git/api/keepalive` for `vercel crons run`. Prefixing the command with `MSYS_NO_PATHCONV=1` fixed it.
+- `tsx -e` with top-level await fails (CommonJS); a `.mts` scratch file works (already a known gotcha).
+
+Not verified by Claude (it needs the passphrase and a real mic; these are Hassan's 6c checks):
+- a real graded session saved from production;
+- History and Vocab against real rows;
+- the phone view;
+- the next day's automatic cron run;
+- deployed latency (the Part 3 AI and voice-start open questions).
 
 **2026-09-30 (fourth part): Stage 6b done and verified.**
 - Hassan ran `0001_init.sql` in the Supabase SQL Editor ("Success. No rows returned").
@@ -493,9 +528,21 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-Stage 6b is done (2026-09-30).
+**Now: HUMAN_GUIDE Stage 6c checks on production (about 15 minutes).** URL: https://ielts-nclex-rn-trainer.vercel.app (the production domain; preview URLs may ask for a Vercel login).
 
-**Next: Stage 6c, deploy (after Hassan says "push").** The first push deploys the app publicly (behind the passphrase gate). Checklist: HUMAN_GUIDE 6c. Before sending the link to Julio, Hassan may want to delete his own test sessions in Supabase (Table Editor, `sessions`), so Julio's History, repeat filter and pause calibration start clean. The profile's `pause_p90` will hold Hassan's value until Julio's first session overwrites it.
+1. Open it in Edge. It's a new address, so the browser asks for the passphrase once. Do the mic check if asked, then a full test ("Examen completo"). It costs about US$0.13, like the local tests.
+2. On the results page, press "Guardar" on one or two words.
+3. Check:
+   - [ ] Supabase, Table Editor, `sessions`: the session is there with `grade` and `overall` filled in (it's saved when the exam ends and again when the grade arrives).
+   - [ ] `vocab`: the saved words are there. `usage`: today's row shows 1.
+   - [ ] In the app, "Mi historial" shows the session with its band and a chart point, and tapping it shows the feedback and transcript. "Mi vocabulario" shows the words.
+   - [ ] On your phone, open the same URL and enter the passphrase: "Mi historial" shows the same session.
+   - [ ] Vercel, Settings, Cron Jobs shows `/api/keepalive`. Tomorrow after 12:00 UTC (7:00 Houston time), the `heartbeat` row's `beat_at` has changed. (Claude already triggered it once today: 19:23:30 UTC.)
+4. Report back:
+   - anything odd;
+   - "Copy report" from `/lab` on the production site, after the test. The report now covers that exam only, and gives the deployed latency for the Part 3 AI and voice-start open questions.
+
+Before sending the link to Julio (6d), consider deleting your own test sessions in Supabase (Table Editor, `sessions`), so his History, repeat filter and pause calibration start clean. Also clear `profile.pause_p90`, or leave it: his first session overwrites it.
 
 ## Decisions
 
@@ -557,6 +604,8 @@ New decisions during the build go below with a date.
   - Claude compiles the reported Sep–Dec 2026 Part 2 titles from 2–3 prep sites (titles only, sources noted here) to complete the season file; Hassan reviews them in 4c.
   - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
   - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
+
+- 2026-09-30: **Pushing to GitHub `main` approved** (Hassan: "you're good to push"). Every push deploys to production at https://ielts-nclex-rn-trainer.vercel.app. Before each push: typecheck, tests, build and the bundle scan.
 
 - 2026-09-30 (step 6 implementation choices within SPEC 4, 9 and 12; Hassan: "make sure if you make any changes, you note it down"):
   - **Supabase access:** plain `fetch` to its REST API from the server functions, with no `supabase-js`. The `sb_secret_` key goes on the `apikey` header only; Supabase's docs say secret keys aren't JWTs and must not be sent as `Authorization: Bearer`.
