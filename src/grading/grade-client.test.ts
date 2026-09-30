@@ -164,6 +164,10 @@ describe("startGrading", () => {
     await settle();
     expect(currentGradeJob("s1")?.failure).toBe("server");
 
+    startGrading(checkpoint(), 1, { force: true, fetchImpl: streamingFetch([], 429) });
+    await settle();
+    expect(currentGradeJob("s1")?.failure).toBe("cap");
+
     vi.mocked(getToken).mockResolvedValueOnce(null);
     const fetchImpl = streamingFetch([]);
     startGrading(checkpoint(), 1, { force: true, fetchImpl });

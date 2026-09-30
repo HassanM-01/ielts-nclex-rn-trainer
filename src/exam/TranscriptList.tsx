@@ -1,10 +1,11 @@
 // The transcript by part and question, with notes such as "interrupted for
-// time". Shown on the results screen (it replaced the step 2 transcript page).
+// time". Shown on the results screen (it replaced the step 2 transcript page)
+// and in History.
 
 import { t } from "../i18n";
-import type { ExamCheckpoint } from "../session/checkpoint";
+import type { StoredAnswer } from "../shared/persistence-api";
 
-export function TranscriptList({ cp }: { cp: ExamCheckpoint }) {
+export function TranscriptList({ cp }: { cp: { answers: readonly StoredAnswer[]; notes: string } }) {
   const answers = cp.answers.filter((a) => a.outcome !== null);
   return (
     <div className="space-y-3">

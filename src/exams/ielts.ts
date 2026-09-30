@@ -2,6 +2,7 @@
 // engine runs. Lines follow the neutral, formulaic style of the real test.
 
 import { LEVELS, type LevelId } from "../levels/levels";
+import { personalBaseMs } from "../session/endpointing";
 import { orderPart3 } from "../session/part3";
 import type { AnswerRules, CueCard, DiscussionRules, EndpointingDefaults, MonologueRules, Part3Set, Step } from "./types";
 
@@ -107,12 +108,23 @@ export interface ScriptOptions {
   hour: number;
   /** Default "full". */
   mode?: ScriptMode;
+  /**
+   * SPEC 8 personal calibration: p90 of his mid-answer pauses last session
+   * (from the profile). Raises the base silence, capped at default + 1.5 s.
+   */
+  pauseP90Ms?: number | null;
+}
+
+/** Answer rules with the personal base silence applied. */
+function personal(rules: AnswerRules, p90: number | null | undefined): AnswerRules {
+  return p90 == null ? rules : { ...rules, baseSilenceMs: personalBaseMs(rules.baseSilenceMs, p90) };
 }
 
 /** Compiles the selected items into the steps the engine runs. */
 export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[] {
   const level = LEVELS[opts.level];
   const mode = opts.mode ?? "full";
+  const p90 = opts.pauseP90Ms;
   const steps: Step[] = [];
   const withOpening = mode !== "parts23";
   const withPart1 = mode !== "parts23";
@@ -127,10 +139,10 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
     part: 0,
     text: LINES.opening(opts.hour, opts.examinerName),
     repeatText: LINES.openingRepeat,
-    rules: OPENING_RULES,
+    rules: personal(OPENING_RULES, p90),
   });
   if (withOpening) {
-    steps.push({ kind: "ask", state: "opening", id: "opening-id", part: 0, text: LINES.id, repeatText: LINES.idRepeat, rules: OPENING_RULES });
+    steps.push({ kind: "ask", state: "opening", id: "opening-id", part: 0, text: LINES.id, repeatText: LINES.idRepeat, rules: personal(OPENING_RULES, p90) });
   }
 
   const topics = withPart1 ? [...items.part1].sort((a, b) => Number(b.opening) - Number(a.opening)) : [];
@@ -144,7 +156,7 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
         part: 1,
         text: [...lead, q].filter(Boolean).join(" "),
         repeatText: q,
-        rules: PART1_RULES,
+        rules: personal(PART1_RULES, p90),
       });
     });
   });
@@ -167,7 +179,7 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
 
   const roundoff = card.roundoff[0];
   if (roundoff) {
-    steps.push({ kind: "ask", state: "part2_roundoff", id: `${card.id}-roundoff`, part: 2, text: roundoff, repeatText: roundoff, rules: ROUNDOFF_RULES });
+    steps.push({ kind: "ask", state: "part2_roundoff", id: `${card.id}-roundoff`, part: 2, text: roundoff, repeatText: roundoff, rules: personal(ROUNDOFF_RULES, p90) });
   }
 
   if (items.part3 && items.part3.questions.length > 0) {
@@ -178,7 +190,7 @@ export function buildIeltsScript(items: IeltsItems, opts: ScriptOptions): Step[]
       set: { ...items.part3, questions: orderPart3(items.part3.questions, level.part3Order) },
       part2Prompt: card.prompt,
       link: LINES.part3Link(cardTopic(card.prompt)),
-      rules: PART3_DISCUSSION,
+      rules: { ...PART3_DISCUSSION, answer: personal(PART3_DISCUSSION.answer, p90) },
     });
   }
 

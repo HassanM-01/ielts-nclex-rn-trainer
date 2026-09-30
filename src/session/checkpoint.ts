@@ -41,6 +41,12 @@ export interface ExamCheckpoint {
   startedAt: string;
   updatedAt: string;
   items: IeltsItems;
+  /** The season file the questions came from (step 6; saved with the session). */
+  season?: string | null;
+  /** Saved words due for review, sent to the grader (step 6). */
+  dueWords?: string[];
+  /** The profile's pause p90 this session's endpointing was calibrated with (step 6). */
+  pauseP90Ms?: number | null;
   examinerName: string;
   voiceURI: string | null;
   /** First step not yet completed. */

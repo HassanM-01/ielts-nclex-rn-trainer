@@ -116,3 +116,22 @@ describe("greeting", () => {
     expect(greeting(20)).toBe("Good evening");
   });
 });
+
+describe("personal pause calibration (SPEC 8)", () => {
+  const base = (steps: ReturnType<typeof buildIeltsScript>) => ({
+    p1: steps.find((s) => s.kind === "ask" && s.part === 1),
+    p3: steps.find((s) => s.kind === "discussion"),
+  });
+
+  it("raises the base silence to p90 + 0.4 s, capped at default + 1.5 s", () => {
+    const at = (p90: number | null) => base(buildIeltsScript(FIXED_SET, { examinerName: "Sonia", level: 3, hour: 15, pauseP90Ms: p90 }));
+    const r = (x: ReturnType<typeof at>) => [
+      x.p1?.kind === "ask" ? x.p1.rules.baseSilenceMs : null,
+      x.p3?.kind === "discussion" ? x.p3.rules.answer.baseSilenceMs : null,
+    ];
+    expect(r(at(null))).toEqual([PART1_RULES.baseSilenceMs, PART3_DISCUSSION.answer.baseSilenceMs]);
+    expect(r(at(1_000))).toEqual([2_500, 3_500]); // below default: unchanged
+    expect(r(at(2_600))).toEqual([3_000, 3_500]);
+    expect(r(at(9_000))).toEqual([4_000, 5_000]); // capped
+  });
+});

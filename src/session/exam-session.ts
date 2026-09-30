@@ -1,7 +1,8 @@
 // Creates and holds the running exam. Questions come from
 // /api/session-start (step 4), or the fixed set offline. Grading starts as
 // the closing line begins (SPEC 11), and the Part 2 long turn is recorded
-// in memory for replay (SPEC 13).
+// in memory for replay (SPEC 13). The session is saved to Supabase when the
+// exam ends and again when its grade arrives (step 6).
 
 import { useFrameSubscription } from "../app/speech";
 import { FIXED_SET } from "../exams/ielts-fixed-set";
@@ -9,11 +10,12 @@ import { buildIeltsScript, IELTS_ENDPOINTING, type ScriptMode } from "../exams/i
 import { currentGradeJob, startGrading, subscribeGrade } from "../grading/grade-client";
 import { startPart2Recording, stopPart2Recording } from "../grading/part2-audio";
 import { conditionsLevel, DEFAULT_LEVEL } from "../levels/levels";
+import { buildSaveRequest, queueSave } from "../persistence/save-client";
 import type { SpeechController } from "../speech/controller";
 import { newSessionId, saveCheckpoint, type ExamCheckpoint } from "./checkpoint";
 import { ExamEngine } from "./engine";
 import { ExaminerClient } from "./examiner-client";
-import { getToken, takePreparedItems } from "./token-client";
+import { getToken, sessionInfo, takePreparedItems } from "./token-client";
 
 const FALLBACK_EXAMINER_NAME = "Alex";
 
@@ -29,6 +31,7 @@ export function getActiveExam(): ExamEngine | null {
  */
 export function startNewExam(speech: SpeechController, clickAt: number, mode: ScriptMode = "full"): ExamEngine {
   const prepared = takePreparedItems();
+  const info = sessionInfo();
   const now = new Date().toISOString();
   const cp: ExamCheckpoint = {
     v: 1,
@@ -41,6 +44,9 @@ export function startNewExam(speech: SpeechController, clickAt: number, mode: Sc
     startedAt: now,
     updatedAt: now,
     items: prepared?.items ?? FIXED_SET,
+    season: prepared?.season ?? null,
+    dueWords: (info?.dueWords ?? []).map((w) => w.word),
+    pauseP90Ms: info?.profile?.pauseP90Ms ?? null,
     examinerName: speech.examiner.name || FALLBACK_EXAMINER_NAME,
     voiceURI: speech.synth.voice?.voiceURI ?? null,
     nextStep: 0,
@@ -49,6 +55,9 @@ export function startNewExam(speech: SpeechController, clickAt: number, mode: Sc
     finished: false,
     endedEarly: false,
   };
+  // Each exam's numbers stand alone: the overlay, "Copy report" and
+  // sessions.metrics show this exam only (a resumed exam keeps its numbers).
+  speech.metrics.reset();
   return launch(speech, cp, clickAt);
 }
 
@@ -69,6 +78,7 @@ function launch(speech: SpeechController, cp: ExamCheckpoint, clickAt: number): 
     level: cp.level,
     hour: new Date(cp.startedAt).getHours(),
     mode: scriptMode(cp.mode),
+    pauseP90Ms: cp.pauseP90Ms ?? null,
   });
   const engine = new ExamEngine(speech, steps, cp, {
     level: cp.level,
@@ -77,8 +87,13 @@ function launch(speech: SpeechController, cp: ExamCheckpoint, clickAt: number): 
     // One client per exam: its guard counts the 40-request session cap.
     examiner: new ExaminerClient(() => getToken()),
     onClosing: () => beginGrading(speech, cp, true, () => engine.endedAt),
-    // "Terminar" skips the closing line: grade what exists.
-    onFinish: () => beginGrading(speech, cp, false, () => engine.endedAt),
+    onFinish: () => {
+      // "Terminar" skips the closing line: grade what exists.
+      beginGrading(speech, cp, false, () => engine.endedAt);
+      // First save, without the grade; the graded save follows (watchGradeJob).
+      const job = currentGradeJob(cp.id);
+      void queueSave(buildSaveRequest(cp, job?.status === "done" ? job.grade : null, speech.metrics.snapshot()));
+    },
     onMonologue: (on) => (on ? startPart2Recording(cp.id, speech.vad?.stream) : stopPart2Recording()),
   });
   active = engine;
@@ -96,16 +111,17 @@ function beginGrading(speech: SpeechController, cp: ExamCheckpoint, reachedClosi
   if (currentGradeJob(cp.id)) return;
   const job = startGrading(cp, speech.recognizer.avgConfidence, { reachedClosing });
   speech.metrics.log("grade-start", `${cp.mode}: ${job.status}`);
-  watchGradeJob(speech, cp.id, examEndedAt);
+  watchGradeJob(speech, cp, examEndedAt);
 }
 
 /**
  * Logs how the current grading job went ("grade-done" with timings and
- * tokens, or "grade-error") and, for an exam that just ended, records
- * "exam end → first band". Done here rather than by the results screen, so
+ * tokens, or "grade-error"), saves the graded session, and, for an exam that
+ * just ended, records "exam end → first band". Done here rather than by the results screen, so
  * a background tab (which doesn't render) still gets its numbers.
  */
-export function watchGradeJob(speech: SpeechController, sessionId: string, examEndedAt: () => number | null = () => null): void {
+export function watchGradeJob(speech: SpeechController, cp: ExamCheckpoint, examEndedAt: () => number | null = () => null): void {
+  const sessionId = cp.id;
   const job = currentGradeJob(sessionId);
   if (!job || job.status !== "streaming") return;
   const m = speech.metrics;
@@ -123,6 +139,8 @@ export function watchGradeJob(speech: SpeechController, sessionId: string, examE
     if (j.status === "done") {
       const u = j.usage ? `, ${j.usage.input} input / ${j.usage.output} output tokens` : "";
       m.log("grade-done", `first band ${secs((j.firstBandAt ?? j.startedAt) - j.startedAt)} after the request, all ${secs((j.endedAt ?? j.startedAt) - j.startedAt)}${u}`);
+      // The graded save (an upsert over the one made when the exam ended).
+      void queueSave(buildSaveRequest(cp, j.grade, m.snapshot()));
     } else {
       m.log("grade-error", j.failure ?? "?");
     }

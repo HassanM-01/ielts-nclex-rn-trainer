@@ -58,8 +58,8 @@ export function buildGradeRequest(cp: ExamCheckpoint, avgConfidence: number | nu
     level: cp.feedbackLevel ?? DEFAULT_LEVEL,
     partial: isPartial(cp, reachedClosing),
     answers,
-    // Saved words due for review arrive with step 6; "Ayuda" with step 7.
-    savedWords: [],
+    // Saved words due for review (from session-start); "Ayuda" arrives with step 7.
+    savedWords: (cp.dueWords ?? []).slice(0, GRADE_LIMITS.savedWords).filter((w) => w.length <= GRADE_LIMITS.wordChars),
     ayuda: [],
     avgConfidence: avgConfidence === null ? null : Math.min(1, Math.max(0, avgConfidence)),
   };
@@ -68,7 +68,8 @@ export function buildGradeRequest(cp: ExamCheckpoint, avgConfidence: number | nu
 // ---- the job ---------------------------------------------------------------------
 
 export type GradeStatus = "streaming" | "done" | "too-short" | "error";
-export type GradeFailure = "no-token" | "network" | "server";
+/** "cap": DAILY_SESSION_CAP graded sessions today (step 6). */
+export type GradeFailure = "no-token" | "network" | "server" | "cap";
 
 export interface GradeJob {
   sessionId: string;
@@ -202,7 +203,7 @@ async function run(j: GradeJob, body: GradeRequest, signal: AbortSignal, fetchIm
   } catch {
     return fail("network");
   }
-  if (!res.ok || !res.body) return fail(res.status === 401 ? "no-token" : "server");
+  if (!res.ok || !res.body) return fail(res.status === 401 ? "no-token" : res.status === 429 ? "cap" : "server");
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();

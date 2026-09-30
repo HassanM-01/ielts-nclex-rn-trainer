@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SayOptions, SayResult, Turn, TurnKind } from "../speech/controller";
-import { saveWord, isSaved, loadSavedWords } from "./vocab-store";
+import { saveWord, isSaved, loadSavedWords, syncWords } from "./vocab-store";
 
-vi.mock("../session/token-client", () => ({ getToken: vi.fn(async () => "tok") }));
+vi.mock("../session/token-client", () => ({ getToken: vi.fn(async () => "tok"), storedPassphrase: () => "pass" }));
 
 const { RetryAttempt, compareAttempts, resetCompareCap, retryRules } = await import("./retry");
 
@@ -142,11 +142,28 @@ describe("vocab store (Guardar)", () => {
     const store = new Map<string, string>();
     const kv = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
     const item = { word: "Triage", es: "clasificación", example: "Triage comes first.", exam: "both" as const, nclex_area: "Management of Care" as const };
-    expect(saveWord(item, "s1", kv)).toBe(true);
-    expect(saveWord({ ...item, word: "triage" }, "s2", kv)).toBe(true);
+    const down = vi.fn(async () => new Response("{}", { status: 503 }));
+    expect(saveWord(item, "s1", kv, down)).toBe(true);
+    expect(saveWord({ ...item, word: "triage" }, "s2", kv, down)).toBe(true);
     expect(loadSavedWords(kv)).toHaveLength(1);
     expect(isSaved("TRIAGE", kv)).toBe(true);
     expect(isSaved("shift", kv)).toBe(false);
     expect(saveWord(item, "s1", null)).toBe(false);
+  });
+
+  it("sends unsynced words to /api/vocab (including step 5's), then marks them synced", async () => {
+    const store = new Map<string, string>();
+    const kv = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v) };
+    const sid = "3f2c1a9e-8b7d-4c6e-9f10-1a2b3c4d5e6f";
+    // A word saved in step 5 has no "synced" flag.
+    kv.setItem("vocab.saved.v1", JSON.stringify([{ word: "hectic", es: "ajetreado", example: "", exam: "ielts", nclex_area: "none", sessionId: sid, savedAt: "t" }]));
+    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ ok: true })));
+    await syncWords(kv, fetchImpl);
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("/api/vocab");
+    expect(JSON.parse(init.body as string)).toEqual({ action: "save", sessionId: sid, items: [{ word: "hectic", es: "ajetreado", example: "", exam: "ielts", nclex_area: "none" }] });
+    expect(loadSavedWords(kv)[0]?.synced).toBe(true);
+    await syncWords(kv, fetchImpl);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 });

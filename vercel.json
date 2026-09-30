@@ -13,5 +13,15 @@
     "api/session-start.ts": {
       "includeFiles": "data/bank/ielts/*.json"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/lab", "destination": "/index.html" },
+    { "source": "/examen", "destination": "/index.html" },
+    { "source": "/resultados", "destination": "/index.html" },
+    { "source": "/transcripcion", "destination": "/index.html" },
+    { "source": "/historial", "destination": "/index.html" },
+    { "source": "/historial/:id", "destination": "/index.html" },
+    { "source": "/vocabulario", "destination": "/index.html" }
+  ],
+  "crons": [{ "path": "/api/keepalive", "schedule": "0 12 * * *" }]
 }

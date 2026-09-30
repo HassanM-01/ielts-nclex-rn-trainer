@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FIXED_SET } from "../exams/ielts-fixed-set";
-import { getToken, login, prepareSession, resetTokenCache, storedPassphrase, takePreparedItems } from "./token-client";
+import { getToken, login, prepareSession, resetTokenCache, sessionInfo, storedPassphrase, takePreparedItems } from "./token-client";
 
 let store: Map<string, string>;
 
@@ -44,6 +44,26 @@ describe("token client", () => {
     expect(await login("x", down as unknown as typeof fetch)).toBe("unavailable");
     const notConfigured = vi.fn(async () => new Response("{}", { status: 500 }));
     expect(await login("x", notConfigured as unknown as typeof fetch)).toBe("unavailable");
+  });
+
+  it("reports the daily cap, keeping the (correct) passphrase", async () => {
+    const f = vi.fn(async () => new Response(JSON.stringify({ error: "daily-cap" }), { status: 429 }));
+    expect(await login("enfermero2027", f as unknown as typeof fetch)).toBe("cap");
+    expect(storedPassphrase()).toBe("enfermero2027");
+  });
+
+  it("keeps the profile, due words and last full test from the database", async () => {
+    const body = {
+      token: "t",
+      expiresAt: Date.now() + 45 * 60_000,
+      items: null,
+      season: null,
+      profile: { level: 2, pauseP90Ms: 1_500, testDate: null },
+      dueWords: [{ word: "triage", es: "clasificación" }],
+      lastFull: { overall: 6.5, startedAt: "2026-09-29T15:00:00Z" },
+    };
+    await login("p", vi.fn(async () => new Response(JSON.stringify(body))) as unknown as typeof fetch);
+    expect(sessionInfo()).toEqual({ profile: body.profile, dueWords: body.dueWords, lastFull: body.lastFull });
   });
 
   it("keeps the questions the server selected, for one exam", async () => {

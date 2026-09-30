@@ -7,8 +7,18 @@ import { usePath } from "./router";
 
 const LabPage = lazy(() => import("../lab/LabPage"));
 const ResultsScreen = lazy(loadResultsScreen);
+const HistoryScreen = lazy(() => import("../history/HistoryScreen"));
+const VocabScreen = lazy(() => import("../vocab/VocabScreen"));
 
 function Route({ path }: { path: string }) {
+  const history = /^\/historial(?:\/([0-9a-f-]{36}))?$/i.exec(path);
+  if (history) {
+    return (
+      <Suspense fallback={null}>
+        <HistoryScreen id={history[1] ?? null} />
+      </Suspense>
+    );
+  }
   switch (path) {
     case "/lab":
       return (
@@ -30,6 +40,12 @@ function Route({ path }: { path: string }) {
         </Suspense>
       );
     }
+    case "/vocabulario":
+      return (
+        <Suspense fallback={null}>
+          <VocabScreen />
+        </Suspense>
+      );
     default:
       return <Home />;
   }

@@ -5,7 +5,8 @@
 import type { IeltsItems } from "../exams/ielts";
 import type { SessionStartResponse } from "../shared/examiner-api";
 
-export type LoginResult = "ok" | "wrong" | "unavailable";
+/** "cap": DAILY_SESSION_CAP reached today (no token until tomorrow). */
+export type LoginResult = "ok" | "wrong" | "unavailable" | "cap";
 
 const PASS_KEY = "app.passphrase.v1";
 export const TOKEN_REFRESH_MS = 30 * 60 * 1000;
@@ -19,6 +20,8 @@ interface Cached {
 let cached: Cached | null = null;
 /** Questions the server selected with the last token, not yet used by an exam. */
 let prepared: { items: IeltsItems; season: string | null; fetchedAt: number } | null = null;
+/** What the database knew at the last session-start (profile, due words, last full test). */
+let info: Pick<SessionStartResponse, "profile" | "dueWords" | "lastFull"> | null = null;
 let pending: Promise<LoginResult> | null = null;
 let lastResult: LoginResult | null = null;
 
@@ -53,11 +56,17 @@ export function login(passphrase: string, fetchImpl: typeof fetch = fetch): Prom
         body: JSON.stringify({ passphrase }),
       });
       if (res.status === 401) return "wrong";
+      if (res.status === 429) {
+        // The passphrase is right; today's graded sessions are used up.
+        storePassphrase(passphrase);
+        return "cap";
+      }
       if (!res.ok) return "unavailable";
       const data = (await res.json()) as SessionStartResponse;
       if (typeof data.token !== "string") return "unavailable";
       cached = { token: data.token, fetchedAt: Date.now(), expiresAt: data.expiresAt };
       if (data.items) prepared = { items: data.items, season: data.season, fetchedAt: Date.now() };
+      info = { profile: data.profile ?? null, dueWords: Array.isArray(data.dueWords) ? data.dueWords : [], lastFull: data.lastFull ?? null };
       storePassphrase(passphrase);
       return "ok";
     } catch {
@@ -97,10 +106,16 @@ export function takePreparedItems(): { items: IeltsItems; season: string | null 
   return p && Date.now() - p.fetchedAt < TOKEN_REFRESH_MS ? { items: p.items, season: p.season } : null;
 }
 
+/** Profile, due words and last full test from the last session-start; null if none yet. */
+export function sessionInfo(): Pick<SessionStartResponse, "profile" | "dueWords" | "lastFull"> | null {
+  return info;
+}
+
 /** Tests only. */
 export function resetTokenCache(): void {
   cached = null;
   prepared = null;
+  info = null;
   pending = null;
   lastResult = null;
 }
