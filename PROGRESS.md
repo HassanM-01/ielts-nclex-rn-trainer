@@ -542,7 +542,7 @@ Half-done: nothing.
    - anything odd;
    - "Copy report" from `/lab` on the production site, after the test. The report now covers that exam only, and gives the deployed latency for the Part 3 AI and voice-start open questions.
 
-Before sending the link to Julio (6d), consider deleting your own test sessions in Supabase (Table Editor, `sessions`), so his History, repeat filter and pause calibration start clean. Also clear `profile.pause_p90`, or leave it: his first session overwrites it.
+**After the 6c checks and before sending Julio the link (6d): run `supabase/manual/reset-before-julio.sql`** in the Supabase SQL Editor. Hassan's test sessions are saved like Julio's, so they would otherwise show in his History, chart and "last score", skip those topics in his repeat filter, seed his pause calibration, and could count as his "first full test" for step 7's placement. The script deletes all sessions, vocab, usage and case flags, resets the profile (level 2, no pause_p90, placement not done), and ends with a check query (all counts 0). Run it once, and never after Julio has started.
 
 ## Decisions
 
@@ -604,6 +604,8 @@ New decisions during the build go below with a date.
   - Claude compiles the reported Sep–Dec 2026 Part 2 titles from 2–3 prep sites (titles only, sources noted here) to complete the season file; Hassan reviews them in 4c.
   - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
   - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
+
+- 2026-09-30: **Test data vs Julio's data:** there is no "test mode". Hassan tests on production like Julio would, then wipes everything once with `supabase/manual/reset-before-julio.sql` (outside `migrations/` on purpose) before Julio's first session. From then on, Hassan should not run graded sessions with the production passphrase; he can use `npm run dev` locally, which saves to the same database. So any local test after Julio starts also lands in his data. If that becomes a need, a separate Supabase project for development is the fix, to propose then.
 
 - 2026-09-30: **Pushing to GitHub `main` approved** (Hassan: "you're good to push"). Every push deploys to production at https://ielts-nclex-rn-trainer.vercel.app. Before each push: typecheck, tests, build and the bundle scan.
 
