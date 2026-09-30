@@ -56,7 +56,8 @@ function Chart({ rows }: { rows: HistoryRow[] }) {
           </g>
         ))}
         <line x1={28} x2={c.width - 12} y1={c.targetY} y2={c.targetY} className="stroke-emerald-700" strokeDasharray="6 4" strokeWidth={1.5} />
-        {SERIES.map((s) =>
+        {/* The overall last, so it stays on top where the lines meet. */}
+        {[...SERIES].reverse().map((s) =>
           c.lines[s.key] ? (
             <polyline key={s.key} points={c.lines[s.key]} fill="none" className={s.className} strokeWidth={s.key === "overall" ? 3 : 1.5} />
           ) : null,
