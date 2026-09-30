@@ -5,8 +5,8 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 ## Current status
 
 - **Current step:** 5 (grading, streamed and structured, and the results screen)
-- **State:** built (2026-09-26). Test A first scored 7.0; after recalibration the regrade scored 8.0 (passes). Waiting for Test B. See "Checkpoint for Hassan" below.
-- **Waiting on:** Hassan's Test B result, plus a decision on the examiner-voice start latency (open questions).
+- **State:** built (2026-09-26). Scoring calibration looks right: Test A 8.0 (after recalibration), Test B 4.0. Waiting for Hassan to confirm the remaining Stage 5 checks and call the checkpoint.
+- **Waiting on:** Hassan's answers on checks 6 to 9 (Reintentar, Guardar, Part 2 replay, a partial practice), Test B's `grade-done` line, whether step 5 is a pass, and a decision on the examiner-voice start latency (open questions).
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
 ## Step 5 plan (approved 2026-09-25)
@@ -61,7 +61,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
-| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. Test B pending. |
+| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. 2026-09-30 Test B (Hassan as a B1 speaker): FC 4, LR 4, GR 4, overall 4.0 (expected 4.5 to 5.5; the "off" line is above 6). Remaining checks pending. |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
@@ -83,6 +83,14 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-30: Test B result.**
+- Hassan as a B1 speaker scored FC 4, LR 4, GR 4, overall 4.0. His stats: 1:52 speaking in total, 94 wpm, 11 pauses over 2 s, a Part 2 of 57 s, and many one-word Part 3 answers ("No.").
+- That is half a band below HUMAN_GUIDE's expected 4.5 to 5.5. It is inside SPEC 7's B1 range (band 4.0 to 5.0), and far from the "off" line (above 6).
+- The evidence is real and the advice is specific: it cites the 57 s long turn, "I enjoy help the people" and the repetition of "relax" / "safe".
+- Grammar 4 versus 5 is the only close call. It follows "when torn, choose the lower band" (SPEC 11), so the prompt was not changed.
+- Spread between the tests: 8.0 versus 4.0.
+- Hassan viewed the page through Edge's automatic translation (English labels such as "Esteemed band"). That is not an app bug.
 
 **2026-09-27 (second part): Test A regrade passes.**
 - With the recalibrated prompt, Test A's regrade scored FC 8, LR 8, GR 8, overall 8.0.
