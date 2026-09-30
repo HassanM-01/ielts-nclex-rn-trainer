@@ -4,37 +4,39 @@ Shared memory between Claude Code sessions. Claude Code updates this at the end 
 
 ## Current status
 
-- **Current step:** 5 (grading, streamed and structured, and the results screen)
-- **State:** built (2026-09-26). Scoring calibration looks right: Test A 8.0 (after recalibration), Test B 4.0. Waiting for Hassan to confirm the remaining Stage 5 checks and call the checkpoint.
-- **Waiting on:** Hassan's answers on checks 6 to 9 (Reintentar, Guardar, Part 2 replay, a partial practice), Test B's `grade-done` line, whether step 5 is a pass, and a decision on the examiner-voice start latency (open questions).
+- **Current step:** 6 (Supabase persistence, History, Vocab, keepalive cron, deploy)
+- **State:** step 5 done (2026-09-30). The step 6 plan below is PROPOSED, waiting for Hassan's go-ahead.
+- **Waiting on:** Hassan's go-ahead on the step 6 plan, and HUMAN_GUIDE Stage 6a (Supabase project, keys, CRON_SECRET) before the database parts can be tested.
 - **DO NOT PUSH.** GitHub is connected to Vercel, so every push to GitHub deploys publicly. Nothing gets pushed until the passphrase gate and session tokens are confirmed deploy-ready (step 6) and Hassan says so.
 
-## Step 5 plan (approved 2026-09-25)
+## Step 6 plan (proposed 2026-09-30, not approved yet)
 
-- **`/api/grade`** (SPEC 11): token check; streams `GRADE_MODEL` (claude-opus-5-5) with structured outputs (`output_config.format`, the SPEC 11 schema, fields in schema order so `evidence` comes before `band`); `maxDuration` 300 in `vercel.json`; one retry on `max_tokens`, a refusal or a network error.
-  - Prompt: `api/prompts/grade-ielts.md` plus `api/prompts/ielts-descriptors.md` (verbatim official descriptors).
-  - Input: the transcript labelled by part and question; per-turn metrics (speaking time, words, words per minute, pauses over 1 s and 2 s, time to first word; Edge confidence is always 1, so no low-confidence words); saved words (none until step 6); level; "Ayuda" use (none until step 7).
-  - Rules: quote evidence, then a whole band; when torn, choose the lower band; don't penalise obvious recognition errors; nonsense words may be pronunciation problems; use the fluency metrics.
-- **Overall band** in code: mean of the 3 criteria, rounded DOWN to the nearest 0.5, labelled "Banda estimada, sin pronunciación". Unit tested.
-- **Timing:** start the grade request when the closing line begins. Parse the stream with a small partial-JSON parser and render each criterion as its object closes.
-- **Engine additions:** record per-answer metrics on `AnswerRecord` (speech start/end, words, pauses, time to first word); record Part 2 audio with MediaRecorder (kept in memory, never uploaded).
-- **Results screen** (SPEC 13, replaces the transcript screen as the post-exam page):
-  - local stats instantly (target ≤ 200 ms);
-  - criteria streaming in (first band ~30 s, p95 90 s);
-  - top 3 fixes and the next focus;
-  - 2 upgraded answers side by side at the level's target band;
-  - "Reintentar": the examiner re-asks, Julio answers, and `/api/examiner` with a new `kind: "compare"` uses `EXAMINER_MODEL` to compare the two attempts in 2 lines of Spanish;
-  - "vocab to learn" with "Guardar";
-  - Part 2 replay;
-  - partial modes labelled as a partial sample;
-  - a Spanish error message with a retry.
-- **Metrics:** new latency rows `stats_on_screen` and `grade_first_band` (SPEC 3 budget: 0 / 200 ms and 30 / 90 s).
-- **Tests:** rounding, schema, partial JSON, local stats, prompt input, `/api/grade` and compare with the SDK mocked (never the real API).
-- **Checkpoint** = HUMAN_GUIDE Stage 5 (Test A as himself: about 8+, below 7.5 means off; Test B as a B1 speaker: 4.5 to 5.5, above 6 means off). About $0.10 to $0.20 per graded test.
-- **Hassan's answers:**
-  - "Guardar" saves to localStorage now (moved to Supabase in step 6).
-  - Feedback targets Nivel 2 (upgraded answers at band 7) until placement in step 7.
-  - The grade-time daily cap waits for step 6.
+- **Migrations** (`supabase/migrations/0001_init.sql`), per SPEC 12:
+  - The tables `profile`, `sessions`, `vocab`, `case_flags`, `usage` and `heartbeat`, with explicit GRANTs for `service_role` (SPEC 4). RLS is on, with no public policies.
+  - Two RPCs:
+    - `session_start_info()`: today's count, the last 5 sessions' Part 1 topic ids, the last 10 sessions' card ids, the profile row, and up to 30 saved words due for review.
+    - `grade_admit(day, cap)`: an atomic increment-and-check.
+  - Hassan runs the SQL (Stage 6b).
+- **Server** (`api/_lib/db.ts`): plain `fetch` to Supabase's REST/RPC endpoints with `SUPABASE_SECRET_KEY`, and a short timeout. No `supabase-js`, so cold starts stay light and nothing can leak into the browser bundle.
+  - `/api/session-start`: the one RPC. It refuses at `DAILY_SESSION_CAP`, applies the repeat filter, and returns the level and saved words. If Supabase fails, it keeps today's behaviour.
+  - `/api/grade`: `grade_admit` before the model call. Past the cap, it refuses with a Spanish message on the results screen.
+  - `/api/sessions` (passphrase header): upsert by the client uuid, carrying the transcript, the metrics snapshot, the grade, the overall and `pause_p90`. The profile's `pause_p90` is updated, and `saved_words_used` counts toward mastery. The browser retries with backoff and keeps the finished checkpoint in localStorage until the save succeeds. Saving never blocks the results screen.
+  - `/api/history`: the list, plus one session in full.
+  - `/api/vocab`: list, save and the mastered toggle. Words saved in localStorage in step 5 are moved over once.
+  - `/api/keepalive`: a Vercel Cron job, daily, checking `CRON_SECRET`, that updates the heartbeat.
+- **Browser:**
+  - A lazy History route. A small hand-drawn SVG line chart shows the overall and each criterion, with a 7.0 target line, from full tests only. Practice sessions appear as dots marked with their level. Tapping a session reopens its transcript and feedback.
+  - A lazy Vocab route with exam tags and the mastered toggle.
+  - Home shows up to 10 words due for review, and links to History and Vocab.
+  - `personalBaseMs()` is applied from the profile's `pause_p90`.
+- **Deploy:**
+  - SPA rewrites (`/lab`, `/examen`, `/resultados`, `/transcripcion`, `/historial`, `/vocabulario`).
+  - The passphrase gate: without a working passphrase, only the Spanish passphrase card shows.
+  - The cron entry in `vercel.json`.
+  - A check that no function answers without the token or passphrase.
+  - Then the first push to GitHub, only once Hassan says so. After deploy, re-measure Part 3 AI and voice latency on the deployed site.
+- **Tests:** the SQL-backed code with `fetch` mocked (cap refusal, repeat filter input, fallback when Supabase is down, upsert retries, keepalive auth, History chart data from full tests only). No real database or API in tests.
+- **Checkpoint** = HUMAN_GUIDE Stage 6c.
 
 ## Deferred to later steps (don't forget)
 
@@ -61,7 +63,7 @@ Step 7 (levels, Ayuda, quick practice):
 | 2 | Engine: scripted opening, Part 1, Part 2; endpointing; voice commands | done | 2026-09-23: first run passed except "Sorry?" and the 40 s cut-off (headphone leak). A fix then broke pacing (VAD noise floor). Final retest: everything passed. Commit → examiner audio 125 / 449 ms (p50 / p95), 0 stalls, 0 barge-ins. |
 | 3 | Part 3 examiner endpoint, speculative prefetch, fallback | done | 2026-09-24: Part 3 and follow-ups worked; problems with the Part 2 early finish and Wi-Fi recovery. 2026-09-25 retest: both passed. Commit → audio: scripted 250 / 710 ms, Part 3 AI 214 / 823 ms (n = 2). |
 | 4 | Bank build and validation scripts, seasonal selection, `/api/session-start` | done | 2026-09-25: bank reviewed. Health Part 3 repetition, Spanish gender forms and a city name were fixed. Hassan: "everything worked, step 4 is a pass" (validation, modes, varied questions). |
-| 5 | Grading (streamed, structured) and results screen | built (awaiting checkpoint) | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. 2026-09-30 Test B (Hassan as a B1 speaker): FC 4, LR 4, GR 4, overall 4.0 (expected 4.5 to 5.5; the "off" line is above 6). Remaining checks pending. |
+| 5 | Grading (streamed, structured) and results screen | done | 2026-09-27 Test A (Hassan as himself): FC 7, LR 8, GR 7, overall 7.0: too low (bar 7.5). Prompt recalibrated; regrade FC 8, LR 8, GR 8, overall 8.0 (pass): first band 18.8 s after the request, 40 s total, 10.5k input / 3.8k output tokens. 2026-09-30 Test B (Hassan as a B1 speaker): FC 4, LR 4, GR 4, overall 4.0 (expected 4.5 to 5.5; the "off" line is above 6). 2026-09-30: Hassan confirmed the other checks (Reintentar, Guardar, Part 2 replay, partial practice) and called step 5 a pass. Test B first band 27.1 s after the request (exam end → first band 22.1 s), 45.6 s total. |
 | 6 | Supabase persistence, History, Vocab, keepalive cron, deploy | pending | |
 | 7 | Levels, "Ayuda", quick practice | pending | |
 | 8 | Clinical mode | pending | |
@@ -83,6 +85,15 @@ Status values: pending, in progress, built (awaiting checkpoint), done, blocked.
 | Julio has the link and passphrase | after step 6 | |
 
 ## Last session
+
+**2026-09-30 (second part): step 5 done.**
+- Hassan confirmed all remaining Stage 5 checks: "Reintentar", "Guardar" after a reload, the Part 2 replay, and a partial practice labelled "Muestra parcial".
+- He called step 5 a pass and agreed to keep the natural voice (open question below).
+- Test B timing: first band 27.1 s after the request, 45.6 s total, 9,032 input / 4,102 output tokens (about US$0.12). "Exam end → first band ready": 22.1 s, within 30 s. "Exam end → local stats on screen": 16 ms after the fix (the 334 ms sample was from before it).
+- His metrics weren't reset between the tests, so the latency rows mix Test A and Test B. Two points from Test B:
+  - 6 recognizer `network` errors. None of them switched to push-to-talk, and no text was lost.
+  - One examiner timeout (13:25:19, fell back to the scripted question). That is probably the "Part 3 AI" p95 of 1,514 ms: the 1.2 s reply deadline plus the voice start, as predicted in the open question. It gets re-measured after deploy.
+- The step 6 plan is written above and waiting for the go-ahead.
 
 **2026-09-30: Test B result.**
 - Hassan as a B1 speaker scored FC 4, LR 4, GR 4, overall 4.0. His stats: 1:52 speaking in total, 94 wpm, 11 pauses over 2 s, a Part 2 of 57 s, and many one-word Part 3 answers ("No.").
@@ -426,33 +437,7 @@ Half-done: nothing.
 
 ## Checkpoint for Hassan
 
-**Next (2026-09-27): Test B.** Test A passed on regrade (8.0). Run Test B below as a B1 speaker and report the bands, the `grade-done` line from "Copy report" on `/lab`, and checks 6 to 9 if not done yet (Reintentar, Guardar, Part 2 replay, a partial practice). If Test B scores above 6, press "Volver a calificar" after the next prompt change instead of repeating the test.
-
-**Step 5: calibrate the grading (HUMAN_GUIDE.md Stage 5, about 40 minutes).** Each graded test costs about US$0.10 to 0.20; each "Reintentar" comparison is under a cent.
-
-Setup: `npm run dev`, then http://localhost:3000 in Edge, with headphones. Choose "Examen completo". Press Shift+D any time to see the numbers.
-
-**Test A, as yourself.** Answer naturally and fully. Expected overall: about 8 or higher. Below 7.5 means the grading is off.
-
-**Test B, as a B1 speaker.** Give short answers, use the simple present, basic words and a few mistakes ("I go to hospital yesterday"), and pause for a long time. Expected overall: 4.5 to 5.5. Above 6 means the grading is off.
-
-For both, check:
-1. When the closing line ends, the results page opens and "Tu fluidez" (speaking time, words per minute, long pauses, time to start) is there at once.
-2. The criteria appear one by one ("Calificando…" until each arrives). The first should come in about 30 s, and the limit is 90 s. The overall ("Banda estimada, sin pronunciación") appears once all three are in.
-3. The evidence quotes are things you actually said.
-4. The advice, fixes and focus are in Spanish and specific (not "practica más").
-5. The two upgraded answers are one step above what you said (written at band 7, since feedback targets Nivel 2), not wildly fancier.
-6. "Reintentar" on one of them: the examiner asks the question again, you answer, and within a few seconds you get 2 lines of Spanish comparing the attempts.
-7. "Guardar" on a vocabulary word turns into "Guardada", and stays that way after reloading the page.
-8. "Escucha tu Parte 2" plays back your long turn.
-9. Optional: start a "Solo Parte 1" practice and press "Terminar" early. The results say "Muestra parcial" and still grade (if you said at least ~30 words).
-
-Report back:
-- Both tests' bands per criterion and the overall.
-- From Shift+D: "Exam end → first band ready" and "Exam end → local stats on screen".
-- If a score looks off, paste one criterion's evidence and band so the prompt can be adjusted.
-- Anything odd (Reintentar, replay, messages). "Copy report" on `/lab` includes the `grade-start` / `grade-done` / `grade-error` events.
-- If the first band takes longer than 90 s, say so. The first lever is `effort: "low"` (SPEC 4), before any model change.
+Step 5 is done (2026-09-30). The step 6 checkpoint (HUMAN_GUIDE Stage 6c) will be written when step 6 is built. Before then, Stage 6a (Supabase project, keys, CRON_SECRET) is needed to test the database parts.
 
 ## Decisions
 
@@ -515,6 +500,8 @@ New decisions during the build go below with a date.
   - The database-dependent parts of `/api/session-start` (daily cap, repeat filter over the last 5/10 sessions, saved level and saved words) wait for step 6. Until then it runs SPEC 4's "Supabase unreachable" path: token plus questions, no cap, no filter.
   - The Home mode selector gets "Examen completo / Solo Parte 1 / Partes 2 y 3" in step 4. "Práctica rápida" and the level display come in step 7.
 
+- 2026-09-30: **Step 5 passed** (Hassan). **Examiner voice start latency:** keep the online Natural voice (option a) and re-measure on Julio's connection after deploy (option c). The scripted p95 over 800 ms comes from the voice service, not the app.
+
 - 2026-09-27 (step 5 calibration, following HUMAN_GUIDE Stage 5 "Claude Code can adjust the prompt"): the grading prompt's recogniser, error-weighting, discourse-marker and Part 1-length rules, as described under "Last session". SPEC 11's rules are unchanged.
 
 - 2026-09-26 (step 5 implementation choices within the spec and the approved plan):
@@ -535,7 +522,7 @@ New decisions during the build go below with a date.
 
 ## Open questions
 
-- **Examiner voice start latency (decision for Hassan, 2026-09-27).** "Commit → examiner audio (scripted)" was 378 / 1,000 ms (p50 / p95, n = 20) against 400 / 800, and "click → examiner speaking" was 1,045 ms (n = 1, limit 1,000). Both are Edge's online Natural voice starting slowly ("speak() → voice start" p95 1,043 ms), not our code. This is the second run over the p95 limit (the first was 822 ms). The options:
+- **Examiner voice start latency (decided 2026-09-30: keep the natural voice, re-measure after deploy).** "Commit → examiner audio (scripted)" was 378 / 1,000 ms (p50 / p95, n = 20) against 400 / 800, and "click → examiner speaking" was 1,045 ms (n = 1, limit 1,000). Both are Edge's online Natural voice starting slowly ("speak() → voice start" p95 1,043 ms), not our code. This is the second run over the p95 limit (the first was 822 ms). The options:
   - (a) Accept it for the online Natural voice.
   - (b) Lower the no-start fallback from 1.5 s to about 0.6 s, so a slow sentence switches to a local voice. The p95 would be met, but the voice would sometimes change mid-line and sound robotic.
   - (c) Keep watching it on Julio's connection after deploy.
@@ -582,3 +569,4 @@ New decisions during the build go below with a date.
 | 2026-09-26 | Step 5 build: no model calls (all mocked or stubbed) | US$0 |
 | 2026-09-27 | Hassan's Test A: 1 grade (claude-opus-5-5) + Part 3 examiner calls | about US$0.15 (estimate; tokens weren't logged yet) |
 | 2026-09-27 | Test A regrade (10,515 input / 3,849 output tokens at $4 / $20 per million) | US$0.12 |
+| 2026-09-30 | Test B grade (9,032 input / 4,102 output tokens) + Part 3 examiner calls + Reintentar comparisons | about US$0.13 |
